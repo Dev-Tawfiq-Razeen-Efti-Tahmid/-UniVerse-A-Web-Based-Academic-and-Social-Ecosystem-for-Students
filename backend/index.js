@@ -13,6 +13,10 @@ const app = express();
 app.use(cors({ origin: process.env.CLIENT_URL || "http://localhost:5173" }));
 app.use(express.json());
 
+app.get('/', (req, res) => {
+  res.send('UniVerse API is running ✅');
+});
+
 // 3) Health route
 app.get("/api/health", (_req, res) => {
   res.json({ ok: true, service: "universe-api" });
@@ -28,7 +32,7 @@ const MONGO_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/universe";
 
 mongoose
   .connect(MONGO_URI)
-  .then(() => console.log("✅ MongoDB connected"))
+  .then(() => console.log("✅ MongoDB Atlas connected"))
   .catch((err) => console.error("❌ Mongo error:", err));
 
 app.listen(PORT, () => {
