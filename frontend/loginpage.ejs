@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniVerse Login</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Orbitron:wght@400;700&display=swap');
+
+        :root {
+            --dark-bg: #1a1a2e; /* Dark background */
+            --dark-card: #272c4a; /* Slightly lighter dark for card */
+            --primary-blue: #007bff; /* Standard blue */
+            --accent-violet: #8a2be2; /* Violet accent */
+            --text-light: #e0e0e0; /* Light text for dark background */
+            --input-bg: #3e4a6e; /* Darker input background */
+            --button-hover-blue: #0056b3;
+            --button-hover-violet: #6a1ba3;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #160e2c 100%); /* Dark gradient background */
+            color: var(--text-light);
+            overflow: hidden; /* Prevent scrollbar from background effects */
+        }
+
+        .login-container {
+            background-color: var(--dark-card);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            position: relative;
+            z-index: 1; /* Ensure content is above background effects */
+            border: 1px solid var(--accent-violet); /* Subtle violet border */
+        }
+
+        .logo {
+            font-family: 'Orbitron', sans-serif; /* Sci-fi/techy font for logo */
+            font-size: 3em; /* Larger size */
+            font-weight: 700;
+            margin-bottom: 30px;
+            text-shadow: 0 0 15px var(--accent-violet), 0 0 30px var(--primary-blue); /* Glowing effect */
+            background: linear-gradient(45deg, var(--primary-blue), var(--accent-violet));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 2px;
+            transition: all 0.3s ease;
+        }
+        .logo:hover {
+            transform: scale(1.05);
+            text-shadow: 0 0 20px var(--accent-violet), 0 0 40px var(--primary-blue);
+        }
+
+        h2 {
+            color: var(--text-light);
+            margin-bottom: 25px;
+            font-size: 1.8em;
+            letter-spacing: 1px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-light);
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: calc(100% - 20px); /* Account for padding */
+            padding: 12px 10px;
+            background-color: var(--input-bg);
+            border: 1px solid var(--primary-blue);
+            border-radius: 8px;
+            color: var(--text-light);
+            font-size: 1.1em;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            border-color: var(--accent-violet);
+            box-shadow: 0 0 10px rgba(138, 43, 226, 0.6); /* Violet glow on focus */
+            outline: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(90deg, var(--primary-blue), var(--accent-violet));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+            letter-spacing: 1px;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background: linear-gradient(90deg, var(--button-hover-blue), var(--button-hover-violet));
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .register-link {
+            margin-top: 30px;
+            font-size: 0.95em;
+        }
+
+        .register-link a {
+            color: var(--primary-blue);
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+
+        .register-link a:hover {
+            color: var(--accent-violet);
+            text-decoration: underline;
+        }
+
+        #message {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            display: none; /* Hidden by default */
+        }
+        #message.success {
+            background-color: rgba(0, 128, 0, 0.3);
+            color: #90ee90;
+        }
+        #message.error {
+            background-color: rgba(255, 0, 0, 0.3);
+            color: #ffb6c1;
+        }
+
+        /* Background animation for extra flair */
+        .background-dots {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .dot {
+            position: absolute;
+            background: rgba(138, 43, 226, 0.2); /* Violet dots */
+            border-radius: 50%;
+            animation: moveDots 15s infinite linear;
+            opacity: 0;
+        }
+        .dot:nth-child(even) {
+            background: rgba(0, 123, 255, 0.2); /* Blue dots */
+            animation-delay: 7.5s;
+        }
+
+        @keyframes moveDots {
+            0% { transform: translate(var(--x-start), var(--y-start)) scale(0); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translate(var(--x-end), var(--y-end)) scale(1.5); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-dots">
+        <% for(let i=0; i<20; i++) { %>
+            <div class="dot" style="
+                width: <%= Math.floor(Math.random() * 20) + 10 %>px;
+                height: <%= Math.floor(Math.random() * 20) + 10 %>px;
+                --x-start: <%= Math.random() * 100 %>vw;
+                --y-start: <%= Math.random() * 100 %>vh;
+                --x-end: <%= Math.random() * 100 %>vw;
+                --y-end: <%= Math.random() * 100 %>vh;
+                animation-delay: <%= Math.random() * 10 %>s;
+                "></div>
+        <% } %>
+    </div>
+
+    <div class="login-container">
+        <div class="logo">UniVerse</div>
+        <h2>Welcome Back!</h2>
+        <form id="login-form">
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit">Login</button>
+        </form>
+        <div id="message" style="display: none;"></div>
+        <div class="register-link">
+            Don't have an account? <a href="/api/register" >Register here</a>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const messageElement = document.getElementById('message');
+
+            // Reset message
+            messageElement.style.display = 'none';
+            messageElement.className = '';
+            messageElement.textContent = '';
+
+            try {
+                // IMPORTANT: This route '/login' on the client side needs to match your server's POST route for login
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, password }), // Send username and password
+                });
+
+                const data = await response.json();
+
+                if (response.ok) { // response.ok checks for 2xx status codes
+                    messageElement.textContent = `Login successful! Welcome, ${username}!`;
+                    messageElement.classList.add('success');
+                    // In a real app, you'd likely redirect or store a token here
+                    // window.location.href = '/dashboard';
+                } else {
+                    messageElement.textContent = `Error: ${data.error || 'Invalid credentials'}`;
+                    messageElement.classList.add('error');
+                }
+            } catch (error) {
+                console.error('Network Error:', error);
+                messageElement.textContent = 'A network error occurred. Please try again.';
+                messageElement.classList.add('error');
+            } finally {
+                messageElement.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
