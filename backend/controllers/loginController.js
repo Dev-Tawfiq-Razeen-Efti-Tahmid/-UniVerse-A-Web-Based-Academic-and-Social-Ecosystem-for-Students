@@ -1,4 +1,4 @@
-import User from "../models/User.js";
+import User from "../models/UserModel.js";
 import path from "path";
 
 export const showLogin = async (req, res) => {
