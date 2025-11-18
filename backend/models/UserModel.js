@@ -5,38 +5,39 @@ const userSchema = new mongoose.Schema(
   {
     name: { 
       type: String, 
-      required: true 
+      required: true,
     },
     id: { 
       type: String, 
       required: true,
-      unique: true
+      unique: true,
     },
     DateOfBirth: { 
       type: String, 
-      required: true
+      required: true,
     },
     email: { 
       type: String, 
       required: true, 
-      unique: true 
+      unique: true ,
     },
     UserName: { 
       type: String, 
       required: true,
-      unique: true
+      unique: true,
     },
     password: { 
       type: String, 
-      required: true
+      required: true,
     },
     department: { 
       type: String, 
-      required: true
+      required: true,
     },
     profilePic: { 
       type: String, 
-      required: false 
+      required: false,
+      default: null
     }
   },
   { timestamps: true } // automatically adds createdAt and updatedAt fields

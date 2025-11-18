@@ -354,7 +354,7 @@
 
                 <div class="form-group full-width profile-picture-upload">
                     <label>Profile Picture:</label>
-                    <input type="file" id="profilePicture" name="profilePicture" accept="image/*">
+                    <input type="file" id="profilePicture" name="profileImage" required accept="image/*">
                     <label for="profilePicture" class="profile-picture-preview">
                         <img id="profilePicturePreview" src="" alt="Profile Preview" style="display: none;">
                         <span id="profilePicturePlaceholder">Click to Upload</span>
@@ -371,83 +371,74 @@
         </div>
     </div>
 
-    <script>
-        document.getElementById('profilePicture').addEventListener('change', function(event) {
-            const [file] = event.target.files;
-            if (file) {
-                const preview = document.getElementById('profilePicturePreview');
-                const placeholder = document.getElementById('profilePicturePlaceholder');
-                preview.src = URL.createObjectURL(file);
-                preview.style.display = 'block';
-                placeholder.style.display = 'none';
-            }
-        });
+<script>
+    // Handles the profile picture preview when a file is selected
+    document.getElementById('profilePicture').addEventListener('change', function(event) {
+        const [file] = event.target.files;
+        if (file) {
+            const preview = document.getElementById('profilePicturePreview');
+            const placeholder = document.getElementById('profilePicturePlaceholder');
+            preview.src = URL.createObjectURL(file);
+            preview.style.display = 'block';
+            placeholder.style.display = 'none';
+        } else {
+            // Reset if no file is selected (e.g., user cancels)
+            document.getElementById('profilePicturePreview').style.display = 'none';
+            document.getElementById('profilePicturePlaceholder').style.display = 'inline';
+        }
+    });
 
-        document.getElementById('registration-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const form = e.target;
-            const formData = new FormData(form); // Use FormData for file uploads
+    document.getElementById('registration-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const form = e.target;
+        // **KEY CHANGE 1: Use FormData to capture all fields, including the file**
+        const formData = new FormData(form); 
 
-            // Convert FormData to JSON for non-file fields if your backend expects JSON
-            // For file uploads, backend usually expects multipart/form-data
-            // If you're sending JSON and then a separate file upload, adjust this logic.
-            // For simplicity, this example assumes a backend that can handle multipart/form-data
-            // or that the image upload is handled separately.
+        const messageElement = document.getElementById('message');
+        messageElement.style.display = 'none';
+        messageElement.className = '';
+        messageElement.textContent = '';
 
-            // Example for JSON data if no file is uploaded or file is handled separately:
-            const data = {
-                name: formData.get('name'),
-                studentId: formData.get('studentId'),
-                gsuiteEmail: formData.get('gsuiteEmail'),
-                department: formData.get('department'),
-                username: formData.get('username'),
-                password: formData.get('password'),
-                dateOfBirth: formData.get('dob')
-                // Profile picture would be handled separately if not sending FormData directly
-            };
-
-            const messageElement = document.getElementById('message');
-            messageElement.style.display = 'none';
-            messageElement.className = '';
-            messageElement.textContent = '';
-
-            try {
-                // IMPORTANT: This targets the POST route handled by your backend for registration
-                // If you are sending a file, ensure your backend uses a middleware like `multer`
-                // and expects `multipart/form-data`.
-                // If not sending a file, you'd use 'application/json' for Content-Type
+        try {
+            const response = await fetch('/api/register', {
+                method: 'POST',
+                // **KEY CHANGE 2: REMOVE the Content-Type header**
+                // The browser will automatically set the correct 'multipart/form-data'
+                // Content-Type, including the 'boundary', for FormData.
+                // headers: {
+                //    'Content-Type': 'application/json', // REMOVE THIS LINE
+                // },
                 
-                const response = await fetch('/api/register', { // Assuming your registration endpoint is /register
-                    method: 'POST',
-                    // For FormData with file, browser automatically sets Content-Type header.
-                    // If sending JSON (e.g., no file), uncomment headers and JSON.stringify(data):
-                    headers: {
-                       'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(data) // Sending JSON for this example; adjust for file upload
-                    // body: formData // Use this if your backend expects multipart/form-data (e.g., with multer)
-                });
+                // **KEY CHANGE 3: Send the FormData object directly as the body**
+                body: formData // This includes all text fields and the profile picture file
+            });
+            
+            const data = await response.json();
 
-                const result = await response.json();
-
-                if (response.ok) { // response.ok checks for 2xx status codes
-                    messageElement.textContent = `Registration successful! Welcome, ${result.username || data.username}!`;
-                    messageElement.classList.add('success');
-                    form.reset(); // Clear form after successful registration
-                    document.getElementById('profilePicturePreview').style.display = 'none';
-                    document.getElementById('profilePicturePlaceholder').style.display = 'inline';
-                } else {
-                    messageElement.textContent = `Error: ${result.error || 'Registration failed'}`;
-                    messageElement.classList.add('error');
+            if (response.ok) { // Check if the response status is 200-299
+                if (data.redirectTo) {
+                    messageElement.textContent = data.message || 'Registration successful! Redirecting to login...';
+                    messageElement.className = 'success';
+                    messageElement.style.display = 'block';
+                    // Delay redirect to allow user to see the success message
+                    setTimeout(() => {
+                        window.location.href = data.redirectTo; 
+                    }, 1500);
                 }
-            } catch (error) {
-                console.error('Network Error:', error);
-                messageElement.textContent = 'A network error occurred. Please try again.';
-                messageElement.classList.add('error');
-            } finally {
+            } else {
+                // Handle server-side validation/error messages
+                messageElement.textContent = data.message || `Registration failed. Status: ${response.status}`;
+                messageElement.className = 'error';
                 messageElement.style.display = 'block';
             }
-        });
-    </script>
+            
+        } catch (error) {
+            console.error('Error during registration:', error);
+            messageElement.textContent = 'Network or server connection error.';
+            messageElement.className = 'error';
+            messageElement.style.display = 'block';
+        }
+    });
+</script>
 </body>
 </html>
