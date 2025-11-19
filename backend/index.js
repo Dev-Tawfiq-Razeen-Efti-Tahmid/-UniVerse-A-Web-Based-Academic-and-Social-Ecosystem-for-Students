@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 import path from "path";
 import { fileURLToPath } from 'url';
-
+import session from "express-session";
 // Load env
 dotenv.config();
 
@@ -19,7 +19,14 @@ const DIRNAME = path.dirname(FILENAME);
 // 2) Middlewares
 app.use(cors({ origin: process.env.CLIENT_URL || "http://localhost:5173" }));
 app.use(express.json());
-
+app.use(session({
+  secret: "ThisisASecretKeyForSession",
+  resave: false,
+  saveUninitialized: false,
+  cookie:{
+    maxAge: 1000 * 60 * 60 // 1 hour
+  }
+}));
 // --- Middleware ---
 app.use(express.json()); // For parsing application/json (used in your processLogin)
 app.use(express.urlencoded({ extended: true })); // For parsing application/x-www-form-urlencoded
@@ -59,6 +66,11 @@ app.use("/api/login", loginRouter);
 import registerRouter from "./routes/register.js"; 
 app.use("/api/register", registerRouter);
 
+import dashboardRouter from "./routes/dashboard.js";
+app.use("/api/dashboard", dashboardRouter);
+
+import logoutRouter from "./routes/logout.js";
+app.use("/api/logout", logoutRouter);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

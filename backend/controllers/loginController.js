@@ -10,11 +10,32 @@ export const showLogin = async (req, res) => {
 };
 
 export const processLogin = async (req, res) => {
-  const { name, email } = req.body;
-  if (!name || !email) return res.status(400).json({ error: "name and email required" });
   try {
-    const user = await User.create({ name, email });
-    res.status(201).json(user);
+    const { username, password } = req.body;
+
+    const store= await User.findOne({ UserName: username, password: password });
+    
+    if (store) {
+      const data = {
+        username: store.UserName,
+        name: store.name,
+        email: store.email,
+        id: store.id,
+        department: store.department,
+        DateOfBirth: store.DateOfBirth,                                 //Still needs work to function properly
+        profilePic: store.profilePic
+      }
+      req.session.userData = data;
+      req.session.visited=true;
+      console.log("Session Data after login:", req.session.id);
+      res.redirect('/api/dashboard');
+      
+    }
+    else{
+      res.message= "Invalid username or password";
+      res.status(401).json({ message: "Invalid username or password" });
+    }
+
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
