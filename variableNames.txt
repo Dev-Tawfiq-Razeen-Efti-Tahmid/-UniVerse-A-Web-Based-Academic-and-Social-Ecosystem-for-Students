@@ -1,0 +1,5 @@
+This file will contain the names of the variables that everyone might require during the development process.
+The express session module was used to create sessions and as such variables can be accessed by accessing the variable req.session.
+Print the req.session object to better understand the contents within it.
+For now the req.session object contains a key userData.
+req.session.userData will give access to all the data of the user right after logging in.

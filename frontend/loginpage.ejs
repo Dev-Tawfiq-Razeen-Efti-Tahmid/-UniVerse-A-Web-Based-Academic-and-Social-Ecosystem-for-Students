@@ -201,7 +201,7 @@
     <div class="login-container">
         <div class="logo">UniVerse</div>
         <h2>Welcome Back!</h2>
-        <form id="login-form">
+        <form id="login-form" method="post" action="/api/login">
             <div class="form-group">
                 <label for="username">Username:</label>
                 <input type="text" id="username" name="username" required>
@@ -219,46 +219,7 @@
     </div>
 
     <script>
-        document.getElementById('login-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            const messageElement = document.getElementById('message');
 
-            // Reset message
-            messageElement.style.display = 'none';
-            messageElement.className = '';
-            messageElement.textContent = '';
-
-            try {
-                // IMPORTANT: This route '/login' on the client side needs to match your server's POST route for login
-                const response = await fetch('/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ username, password }), // Send username and password
-                });
-
-                const data = await response.json();
-
-                if (response.ok) { // response.ok checks for 2xx status codes
-                    messageElement.textContent = `Login successful! Welcome, ${username}!`;
-                    messageElement.classList.add('success');
-                    // In a real app, you'd likely redirect or store a token here
-                    // window.location.href = '/dashboard';
-                } else {
-                    messageElement.textContent = `Error: ${data.error || 'Invalid credentials'}`;
-                    messageElement.classList.add('error');
-                }
-            } catch (error) {
-                console.error('Network Error:', error);
-                messageElement.textContent = 'A network error occurred. Please try again.';
-                messageElement.classList.add('error');
-            } finally {
-                messageElement.style.display = 'block';
-            }
-        });
     </script>
 </body>
 </html>
