@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>UniVerse Events</title>
+</head>
+<body>
+  <h1>Upcoming Events</h1>
+
+  <% if (!events || events.length === 0) { %>
+    <p>No upcoming events yet. 🎉</p>
+  <% } else { %>
+    <ul>
+      <% events.forEach(event => { %>
+        <li>
+          <h3><%= event.title %></h3>
+          <p><strong>When:</strong>
+            <%= new Date(event.startTime).toLocaleString() %>
+            <% if (event.endTime) { %>
+              – <%= new Date(event.endTime).toLocaleString() %>
+            <% } %>
+          </p>
+          <p><strong>Where:</strong> <%= event.location %></p>
+          <% if (event.description) { %>
+            <p><%= event.description %></p>
+          <% } %>
+          <p><em>Category: <%= event.category %></em></p>
+        </li>
+      <% }); %>
+    </ul>
+  <% } %>
+</body>
+</html>
