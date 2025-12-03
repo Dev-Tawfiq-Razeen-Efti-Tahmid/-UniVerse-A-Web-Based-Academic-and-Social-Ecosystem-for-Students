@@ -3,14 +3,18 @@ import express from "express";
 import {
   listUpcomingEvents,
   listUpcomingEventsJson,
+  // listEventReminders,  // <- make sure this is removed or commented
 } from "../controllers/eventController.js";
 
 const router = express.Router();
 
-// This becomes:  /dashboard/events
+// /dashboard/events → full list (events.ejs)
 router.get("/events", listUpcomingEvents);
 
-// Optional JSON route: /dashboard/events/api
-router.get("/events/api", listUpcomingEventsJson);
+// /dashboard/api/events → JSON
+router.get("/api/events", listUpcomingEventsJson);
+
+// (optional reminders route for later)
+// router.get("/events/reminders", listEventReminders);
 
 export default router;
