@@ -13,6 +13,7 @@ import dashboardRouter from "./routes/dashboard.js";
 import registerRouter from "./routes/register.js";
 import logoutRouter from "./routes/logout.js";
 import eventsRouter from "./routes/events.js";
+import forumRouter from "./routes/forum.js";
 
 // Load env
 dotenv.config();
@@ -71,6 +72,7 @@ app.use("/api/register", registerRouter);
 app.use("/api/dashboard", dashboardRouter);
 app.use("/api/logout", logoutRouter);
 app.use("/dashboard", eventsRouter);
+app.use("/dashboard/forumDash", forumRouter);
 
 // ---------- DB + SERVER ----------
 const PORT = process.env.PORT || 5000;
