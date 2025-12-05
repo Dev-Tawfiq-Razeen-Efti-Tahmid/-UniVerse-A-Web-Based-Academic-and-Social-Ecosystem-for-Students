@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Room: <%= channel.name %></title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+            @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Orbitron:wght@400;700&display=swap");
+            
+            :root {
+                --dark-bg: #1a1a2e;
+                --dark-card: #272c4a;
+                --primary-blue: #007bff;
+                --accent-violet: #8a2be2;
+                --text-light: #e0e0e0;
+                --input-bg: #3e4a6e;
+                --button-hover-blue: #0056b3;
+                --button-hover-violet: #6a1ba3;
+                --border-glow: rgba(138, 43, 226, 0.4);
+                --subtle-text: #a0a0a0;
+            }
+            
+            * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+            
+            body {
+                font-family: "Montserrat", sans-serif;
+                margin: 0;
+                padding: 0;
+                min-height: 100vh;
+                background: linear-gradient(135deg, var(--dark-bg) 0%, #160e2c 100%);
+                color: var(--text-light);
+                overflow-x: hidden;
+                position: relative;
+                display: flex;
+                flex-direction: column;
+            }
+            
+            .background-dots {
+                position: absolute;
+                inset: 0;
+                overflow: hidden;
+                pointer-events: none;
+                z-index: 0;
+                opacity: 0.3;
+            }
+            
+            .dot {
+                position: absolute;
+                background: rgba(138, 43, 226, 0.2);
+                border-radius: 50%;
+                animation: moveDots 20s infinite linear;
+                opacity: 0;
+            }
+            
+            .dot:nth-child(even) {
+                background: rgba(0, 123, 255, 0.2);
+                animation-delay: 10s;
+            }
+            
+            @keyframes moveDots {
+                0% {
+                    transform: translate(var(--x-start), var(--y-start)) scale(0);
+                    opacity: 0;
+                }
+                50% {
+                    opacity: 1;
+                }
+                100% {
+                    transform: translate(var(--x-end), var(--y-end)) scale(1.5);
+                    opacity: 0;
+                }
+            }
+            
+            .top-bar {
+                background-color: var(--dark-card);
+                padding: 15px 40px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+                border-bottom: 1px solid var(--accent-violet);
+                position: sticky;
+                top: 0;
+                z-index: 1000;
+            }
+            
+            .top-bar .logo {
+                font-family: "Orbitron", sans-serif;
+                font-size: 2.2em;
+                font-weight: 700;
+                text-shadow: 0 0 10px var(--accent-violet), 0 0 20px var(--primary-blue);
+                background: linear-gradient(45deg, var(--primary-blue), var(--accent-violet));
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                letter-spacing: 1.5px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
+            
+            .top-bar .logo:hover {
+                transform: scale(1.03);
+                text-shadow: 0 0 12px var(--accent-violet), 0 0 25px var(--primary-blue);
+            }
+            
+            .user-controls {
+                display: flex;
+                align-items: center;
+                gap: 20px;
+            }
+            
+            .back-btn {
+                background: transparent;
+                border: 1px solid rgba(0, 123, 255, 0.6);
+                color: var(--text-light);
+                border-radius: 8px;
+                padding: 8px 16px;
+                font-size: 0.95em;
+                font-weight: 500;
+                cursor: pointer;
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                transition: all 0.3s ease;
+            }
+            
+            .back-btn:hover {
+                background: rgba(0, 123, 255, 0.15);
+                border-color: var(--accent-violet);
+                transform: translateY(-1px);
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            }
+            
+            .logout-btn {
+                background: linear-gradient(90deg, var(--primary-blue), var(--accent-violet));
+                color: white;
+                border: none;
+                border-radius: 8px;
+                padding: 8px 18px;
+                font-size: 0.95em;
+                font-weight: 600;
+                cursor: pointer;
+                transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+                letter-spacing: 0.5px;
+            }
+
+        /* --- NEW CHAT ROOM SPECIFIC STYLES --- */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 150px); /* Adjust height based on top-bar size */
+            background-color: var(--dark-card);
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            padding-right: 15px;
+            /* Scrollbar styling for a cleaner look */
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-violet) transparent;
+        }
+
+        .message-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            line-height: 1.5;
+            padding: 8px 10px;
+            border-radius: 8px;
+            transition: background-color 0.2s;
+        }
+
+        .message-item:hover {
+            background-color: rgba(138, 43, 226, 0.05);
+        }
+
+        .message-content-wrapper {
+            display: flex;
+            flex-direction: column;
+            max-width: 90%;
+        }
+
+        .message-sender {
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-right: 10px;
+            font-size: 0.9em;
+        }
+
+        .message-text {
+            color: var(--text-light);
+            word-wrap: break-word;
+        }
+        
+        .message-actions {
+            flex-shrink: 0;
+            margin-left: 10px;
+        }
+
+        .report-btn {
+            background: none;
+            border: none;
+            color: var(--subtle-text);
+            cursor: pointer;
+            font-size: 0.8em;
+            opacity: 0.5;
+            transition: opacity 0.2s, color 0.2s;
+        }
+
+        .report-btn:hover {
+            opacity: 1;
+            color: #ff4d4d; /* Bright red on hover */
+        }
+        
+        .input-area {
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-area input[type="text"] {
+            flex-grow: 1;
+            padding: 12px 15px;
+            border: 1px solid var(--accent-violet);
+            border-radius: 8px;
+            background-color: var(--input-bg);
+            color: var(--text-light);
+            font-size: 1em;
+            outline: none;
+        }
+
+        .input-area button {
+            background: linear-gradient(45deg, var(--primary-blue), var(--accent-violet));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        .input-area button:hover {
+             transform: translateY(-1px);
+        }
+    </style>
+</head>
+<body>
+    <main class="main-content">
+        <h1 class="page-title"><%= channel.name %> Chat Room</h1>
+        <p class="page-subtitle">Discuss the topic and connect with fellow members.</p>
+
+        <section class="chat-container">
+            <div class="messages" id="messages">
+                <% messages.forEach(message => { %>
+                    <div class="message-item" data-message-id="<%= message._id %>">
+                        <div class="message-content-wrapper">
+                            <span class="message-sender"><%= message.username %></span>
+                            <span class="message-text"><%= message.content %></span>
+                        </div>
+                        <div class="message-actions">
+                            <button class="report-btn" onclick="reportMessage('<%= message._id %>', this)">
+                                <i class="fas fa-flag"></i> Report
+                            </button>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+
+            <div class="input-area">
+                <input type="text" id="messageInput" placeholder="Type your message here..." />
+                <button id="sendButton">Send</button>
+            </div>
+        </section>
+    </main>
+    
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        // Data for Socket.IO connection
+        const channelId = '<%= channel._id %>';
+        const userId = '<%= user._id %>';       // Must be passed from your controller
+        const username = '<%= user.username %>'; // Must be passed from your controller
+
+        // Initialize Socket.IO connection
+        const socket = io();
+        const messagesDiv = document.getElementById('messages');
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendButton');
+
+        // --- 1. JOIN THE ROOM ---
+        socket.emit('joinRoom', { channelId, username });
+
+        // Scroll to the bottom on load
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+        // --- 2. RECEIVE MESSAGE ---
+        socket.on('message', (msg) => {
+            const messageHtml = createMessageElement(msg);
+            messagesDiv.insertAdjacentHTML('beforeend', messageHtml);
+            // Scroll to the latest message
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        });
+
+        // --- 3. SEND MESSAGE ---
+        sendButton.addEventListener('click', sendMessage);
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        function sendMessage() {
+            const content = messageInput.value.trim();
+            if (content) {
+                socket.emit('sendMessage', { channelId, userId, username, content });
+                messageInput.value = ''; // Clear input field
+            }
+        }
+
+        // --- 4. REPORT MESSAGE FUNCTIONALITY ---
+        function reportMessage(messageId, buttonElement) {
+            if (!confirm("Are you sure you want to report this message for improper content?")) {
+                return;
+            }
+            
+            socket.emit('reportMessage', { 
+                messageId: messageId, 
+                reportingUserId: userId 
+            });
+
+            // Visually update the button to indicate the report was sent
+            buttonElement.innerText = "Reported!";
+            buttonElement.disabled = true;
+            buttonElement.style.color = '#ff4d4d';
+        }
+        
+        // --- UTILITY: Create Message HTML ---
+        function createMessageElement(msg) {
+             const time = new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+             return `
+                <div class="message-item" data-message-id="${msg._id}">
+                    <div class="message-content-wrapper">
+                        <span class="message-sender">${msg.username} <small style="color:var(--subtle-text); font-weight: 400;">(${time})</small></span>
+                        <span class="message-text">${msg.content}</span>
+                    </div>
+                    <div class="message-actions">
+                        <button class="report-btn" onclick="reportMessage('${msg._id}', this)">
+                            <i class="fas fa-flag"></i> Report
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+    </script>
+</body>
+</html>
