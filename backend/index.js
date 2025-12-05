@@ -5,6 +5,9 @@ import mongoose from "mongoose";
 import path from "path";
 import { fileURLToPath } from "url";
 import session from "express-session";
+import http from "http";
+import { Server } from "socket.io";
+
 
 // ---- Routers ----
 import usersRouter from "./routes/users.js";
@@ -14,6 +17,9 @@ import registerRouter from "./routes/register.js";
 import logoutRouter from "./routes/logout.js";
 import eventsRouter from "./routes/events.js";
 import forumRouter from "./routes/forum.js";
+import forumCreateRouter from "./routes/forumCreate.js";
+import ForumMessagingRouter from "./routes/ForumMessaging.js";
+import message from "./models/forumMessage.js";
 
 // Load env
 dotenv.config();
@@ -35,6 +41,101 @@ app.use(
 // Parse JSON and form data
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+
+
+
+
+//Socket.io setup
+
+const httpServer = http.createServer(app);
+const io = new Server(httpServer, {
+    // Optional: Configure CORS if your frontend is on a different domain/port
+    cors: {
+        origin: 'http://localhost:8080', // Replace with your frontend domain if different
+        methods: ['GET', 'POST']
+    }
+});
+io.on('connection', (socket) => {
+    console.log(`User connected: ${socket.id}`);
+
+    // --- 1. JOIN ROOM ---
+    socket.on('joinRoom', (data) => {
+        const { channelId, username } = data;
+        
+        // Check if user is logged in (optional security step)
+        if (!channelId || !username) return; 
+
+        // Leave any existing rooms before joining the new one
+        socket.rooms.forEach(room => {
+            if (room !== socket.id) socket.leave(room);
+        });
+
+        // Join the specified room
+        socket.join(channelId);
+        
+        console.log(`${username} joined channel room: ${channelId}`);
+        
+        // Notify others in the room (optional: send a system message)
+        socket.to(channelId).emit('userJoined', `${username} has entered the chat.`);
+    });
+
+    // --- 2. SEND MESSAGE ---
+    socket.on('sendMessage', async (data) => {
+        const { channelId, userId, username, content } = data;
+        
+        // Check for empty or invalid message
+        if (!content || content.trim() === '') return;
+        
+        try {
+            // A. Save message to MongoDB
+            const newMessage = new Message({
+                channel: channelId,
+                user: userId,
+                username: username,
+                content: content
+            });
+            await newMessage.save();
+
+            // B. Emit the message to all clients in the room
+            io.to(channelId).emit('message', {
+                _id: newMessage._id, // Send the ID for reporting functionality
+                username: username,
+                content: content,
+                timestamp: Date.now()
+            });
+        } catch (error) {
+            console.error("Error saving message:", error);
+        }
+    });
+
+    // --- 3. REPORT MESSAGE ---
+    socket.on('reportMessage', async (data) => {
+        const { messageId, reportingUserId } = data;
+        
+        try {
+            // Find the message and push the reporting user's ID to the 'reports' array
+            const message = await Message.findByIdAndUpdate(
+                messageId,
+                { $addToSet: { reports: reportingUserId } }, // $addToSet prevents duplicate reports from the same user
+                { new: true }
+            );
+
+            if (message) {
+                console.log(`Message ${messageId} reported by user ${reportingUserId}. Total reports: ${message.reports.length}`);
+                // Optional: Send an admin notification or update the UI to show the message was reported
+            }
+        } catch (error) {
+            console.error("Error reporting message:", error);
+        }
+    });
+
+    // --- DISCONNECT ---
+    socket.on('disconnect', () => {
+        console.log(`User disconnected: ${socket.id}`);
+        // Optional: Notify the rooms the user was in
+    });
+});
 
 // Sessions
 app.use(
@@ -73,7 +174,8 @@ app.use("/api/dashboard", dashboardRouter);
 app.use("/api/logout", logoutRouter);
 app.use("/dashboard", eventsRouter);
 app.use("/dashboard/forumDash", forumRouter);
-
+app.use("/dashboard/forumDash/ForumCreate", forumCreateRouter);
+app.use("/dashboard/forumDash/ForumMessaging/:channelId", ForumMessagingRouter);
 // ---------- DB + SERVER ----------
 const PORT = process.env.PORT || 5000;
 const MONGO_URI =
@@ -84,6 +186,6 @@ mongoose
   .then(() => console.log("✅ MongoDB Atlas connected"))
   .catch((err) => console.error("❌ Mongo error:", err));
 
-app.listen(PORT, () => {
+httpServer.listen(PORT, () => {
   console.log(`✅ API running on http://localhost:${PORT}`);
 });

@@ -3,6 +3,9 @@ import path from "path";
 
 export const showLogin = async (req, res) => {
   try {
+    if (req.session?.userData) {
+      return  res.redirect("/api/dashboard");
+    }
     res.render("loginpage",{});
   } catch (err) {
     res.status(500).json({ error: "Login page not delivered" });

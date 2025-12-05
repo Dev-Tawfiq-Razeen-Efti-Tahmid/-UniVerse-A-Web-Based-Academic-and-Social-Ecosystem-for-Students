@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create New Channel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Existing Global Variables */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Orbitron:wght@400;700&display=swap');
+        :root {
+            --dark-bg: #1a1a2e;
+            --dark-card: #272c4a;
+            --primary-blue: #007bff;
+            --accent-violet: #8a2be2;
+            --text-light: #e0e0e0;
+            --input-bg: #3e4a6e;
+            --button-hover-blue: #0056b3;
+            --button-hover-violet: #6a1ba3;
+            --border-glow: rgba(138, 43, 226, 0.4);
+            --subtle-text: #a0a0a0;
+            --success-green: #28a745;
+            --error-red: #dc3545; /* Added for error messages */
+        }
+
+        /* Existing Base Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: "Montserrat", sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #160e2c 100%);
+            color: var(--text-light);
+            overflow-x: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start; /* FIX: Ensures content starts at the top */
+        }
+
+        .background-dots {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.3;
+        }
+
+        .dot {
+            position: absolute;
+            background: rgba(138, 43, 226, 0.2);
+            border-radius: 50%;
+            animation: moveDots 20s infinite linear;
+            opacity: 0;
+        }
+
+        .dot:nth-child(even) {
+            background: rgba(0, 123, 255, 0.2);
+            animation-delay: 10s;
+        }
+
+        @keyframes moveDots {
+            0% {
+                transform: translate(var(--x-start), var(--y-start)) scale(0);
+                opacity: 0;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--x-end), var(--y-end)) scale(1.5);
+                opacity: 0;
+            }
+        }
+
+        .top-bar {
+            background-color: var(--dark-card);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            border-bottom: 1px solid var(--accent-violet);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            width: 100%; /* FIX: Ensures full width */
+        }
+
+        .top-bar .logo {
+            font-family: "Orbitron", sans-serif;
+            font-size: 2.2em;
+            font-weight: 700;
+            text-shadow: 0 0 10px var(--accent-violet), 0 0 20px var(--primary-blue);
+            background: linear-gradient(45deg, var(--primary-blue), var(--accent-violet));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .user-controls {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .logout-btn {
+            background: linear-gradient(90deg, var(--primary-blue), var(--accent-violet));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 18px;
+            font-size: 0.95em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            letter-spacing: 0.5px;
+        }
+        
+        .main-content {
+            max-width: 800px; /* Reduced max width for form focus */
+            width: 100%;
+            margin: 0 auto;
+            padding: 40px 20px 60px;
+            position: relative;
+            z-index: 1;
+            flex: 1;
+        }
+
+        .page-title {
+            font-family: "Orbitron", sans-serif;
+            font-size: 2.2em;
+            text-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+            margin-bottom: 5px;
+        }
+
+        .page-subtitle {
+            font-size: 0.98em;
+            color: var(--subtle-text);
+            margin-bottom: 30px;
+        }
+
+        /* --- NEW FORM STYLES --- */
+
+        .form-card {
+            background-color: rgba(23, 27, 54, 0.9);
+            border-radius: 16px;
+            padding: 30px;
+            border: 1px solid rgba(138, 43, 226, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(6px);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-light);
+            font-size: 1.05em;
+        }
+
+        .form-group input:not([type="submit"]),
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--accent-violet);
+            border-radius: 8px;
+            background-color: var(--input-bg);
+            color: var(--text-light);
+            font-size: 1em;
+            outline: none;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 10px var(--border-glow);
+        }
+        
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .tag-input-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 8px;
+            border: 1px solid var(--accent-violet);
+            border-radius: 8px;
+            background-color: var(--input-bg);
+            min-height: 50px;
+        }
+
+        .tag-input-container input {
+            flex-grow: 1;
+            border: none;
+            background: transparent;
+            padding: 0;
+            color: var(--text-light);
+            min-width: 100px;
+        }
+
+        .tag-pill {
+            display: flex;
+            align-items: center;
+            padding: 5px 10px;
+            border-radius: 999px;
+            background-color: rgba(0, 123, 255, 0.2);
+            border: 1px solid var(--primary-blue);
+            font-size: 0.85em;
+            color: var(--primary-blue);
+            font-weight: 600;
+            user-select: none;
+        }
+
+        .tag-remove {
+            margin-left: 8px;
+            cursor: pointer;
+            color: var(--text-light);
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .tag-remove:hover {
+            opacity: 1;
+        }
+
+        #tagCount {
+            font-size: 0.85em;
+            color: var(--subtle-text);
+            margin-top: 5px;
+            display: block;
+        }
+
+        .error-message {
+            color: var(--error-red);
+            font-size: 0.9em;
+            margin-top: 10px;
+            display: none;
+            font-weight: 600;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(45deg, var(--accent-violet), var(--primary-blue));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 20px;
+            font-size: 1.1em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .submit-btn:hover {
+            background: linear-gradient(
+                45deg,
+                var(--button-hover-violet),
+                var(--button-hover-blue)
+            );
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--border-glow);
+        }
+        
+        /* --- MODAL/POPUP STYLES --- */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+
+        .modal-backdrop.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background-color: var(--dark-card);
+            padding: 30px 40px;
+            border-radius: 12px;
+            text-align: center;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+            max-width: 400px;
+            border: 2px solid var(--success-green);
+            box-shadow: 0 0 25px rgba(40, 167, 69, 0.6);
+        }
+
+        .modal-backdrop.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-icon {
+            color: var(--success-green);
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .modal-title {
+            font-family: "Orbitron", sans-serif;
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .modal-message {
+            color: var(--subtle-text);
+            margin-bottom: 20px;
+        }
+
+    </style>
+</head>
+<body>
+    <!-- Background Animated Dots -->
+    <div class="background-dots" id="dots-container"></div>
+    
+    <!-- Top Navigation Bar -->
+    <header class="top-bar">
+        <div class="logo">UniVerse</div>
+        <div class="user-controls">
+            <!-- Back Button -->
+            <button class="back-btn" onclick="window.history.back()">
+                <i class="fas fa-chevron-left"></i> Back to Channels
+            </button>
+            <!-- Logout Button (Simulated) -->
+            <button class="logout-btn" onclick="console.log('Logging out...')">Logout</button>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <h1 class="page-title">Create New Forum Channel</h1>
+        <p class="page-subtitle">Define the topic, add keywords, and start your community.</p>
+
+        <div class="form-card">
+            <!-- Updated form action to use the specified route -->
+            <form id="channelForm" action="/api/forumCreate" method="POST">
+                
+                <!-- Channel Name -->
+                <div class="form-group">
+                    <label for="channelName">Channel Name</label>
+                    <input type="text" id="channelName" placeholder="e.g., Quantum Computing Discussions" required maxlength="100">
+                </div>
+
+                <!-- Channel Description -->
+                <div class="form-group">
+                    <label for="channelDescription">Channel Description</label>
+                    <textarea id="channelDescription" placeholder="A brief summary of what this channel is about (max 300 characters)." required maxlength="300"></textarea>
+                </div>
+                
+                <!-- Channel Tags (Array Input) -->
+                <div class="form-group">
+                    <label for="tagInput">Channel Tags (Max 6)</label>
+                    <div class="tag-input-container" id="tagContainer">
+                        <input type="text" id="tagInput" placeholder="Press Enter or comma to add a tag">
+                    </div>
+                    <span id="tagCount">0 of 6 tags added.</span>
+                    <span class="error-message" id="tagError">Tags must be unique.</span>
+                    <input type="hidden" id="hiddenTags" name="channelTags"> <!-- Hidden field to hold final array string -->
+                </div>
+                
+                <!-- Submit Button -->
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    <i class="fas fa-plus-circle"></i> Create Channel
+                </button>
+            </form>
+        </div>
+    </main>
+
+    <!-- Success Modal Pop-up -->
+    <div class="modal-backdrop" id="successModal">
+        <div class="modal-content">
+            <div class="modal-icon"><i class="fas fa-check-circle"></i></div>
+            <h2 class="modal-title">Channel Created!</h2>
+            <p class="modal-message">Your new channel has been successfully launched. Redirecting to the dashboard...</p>
+        </div>
+    </div>
+    
+    <script>
+        const MAX_TAGS = 6;
+        let tags = [];
+        const tagInput = document.getElementById('tagInput');
+        const tagContainer = document.getElementById('tagContainer');
+        const hiddenTags = document.getElementById('hiddenTags');
+        const tagCountSpan = document.getElementById('tagCount');
+        const tagErrorSpan = document.getElementById('tagError');
+        const channelForm = document.getElementById('channelForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const successModal = document.getElementById('successModal');
+        const dotsContainer = document.getElementById('dots-container');
+        
+        // --- Background Dots Initialization ---
+        function createDots() {
+            const numDots = 15;
+            for (let i = 0; i < numDots; i++) {
+                const dot = document.createElement('div');
+                dot.classList.add('dot');
+                const size = Math.random() * 8 + 4; // Size between 4px and 12px
+                dot.style.width = `${size}px`;
+                dot.style.height = `${size}px`;
+
+                // Set random start/end positions for animation variables
+                dot.style.setProperty('--x-start', `${Math.random() * 100}vw`);
+                dot.style.setProperty('--y-start', `${Math.random() * 100}vh`);
+                dot.style.setProperty('--x-end', `${Math.random() * 100}vw`);
+                dot.style.setProperty('--y-end', `${Math.random() * 100}vh`);
+                dot.style.animationDelay = `${Math.random() * 20}s`; // Stagger delay
+                dotsContainer.appendChild(dot);
+            }
+        }
+
+        // --- Tag Management Functions ---
+
+        function renderTags() {
+            // Clear existing pills but keep the input field
+            const existingPills = tagContainer.querySelectorAll('.tag-pill');
+            existingPills.forEach(pill => pill.remove());
+
+            // Re-render pills
+            tags.forEach((tag, index) => {
+                const pill = document.createElement('span');
+                pill.className = 'tag-pill';
+                // Add the actual index for removal reference
+                pill.innerHTML = `${tag} <span class="tag-remove" data-tag-index="${index}"><i class="fas fa-times-circle"></i></span>`;
+                tagContainer.insertBefore(pill, tagInput);
+            });
+
+            // Update hidden field and count
+            hiddenTags.value = JSON.stringify(tags);
+            tagCountSpan.textContent = `${tags.length} of ${MAX_TAGS} tags added.`;
+
+            // Disable input if max tags reached
+            if (tags.length >= MAX_TAGS) {
+                tagInput.disabled = true;
+                tagInput.placeholder = 'Maximum tags reached';
+            } else {
+                tagInput.disabled = false;
+                tagInput.placeholder = 'Press Enter or comma to add a tag';
+            }
+            tagErrorSpan.style.display = 'none';
+        }
+
+        function addTag(value) {
+            const rawTag = value.trim();
+            if (!rawTag) return;
+
+            const tag = rawTag.toLowerCase();
+
+            if (tags.length >= MAX_TAGS) {
+                tagInput.value = '';
+                return;
+            }
+            
+            if (tags.includes(tag)) {
+                tagInput.value = '';
+                tagErrorSpan.style.display = 'block';
+                return;
+            }
+
+            tags.push(tag);
+            renderTags();
+            tagInput.value = '';
+            tagInput.focus();
+        }
+
+        function removeTag(index) {
+            tags.splice(index, 1);
+            renderTags();
+        }
+
+        // --- Event Listeners ---
+
+        tagInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ',') {
+                e.preventDefault();
+                addTag(tagInput.value.replace(/,/g, ''));
+            }
+        });
+
+        tagInput.addEventListener('blur', () => {
+            addTag(tagInput.value.replace(/,/g, ''));
+        });
+
+        tagContainer.addEventListener('click', (e) => {
+            const removeBtn = e.target.closest('.tag-remove');
+            if (removeBtn) {
+                const index = Array.from(removeBtn.parentNode.parentNode.children).indexOf(removeBtn.parentNode);
+                removeTag(index);
+            }
+        });
+
+
+        // --- FORM SUBMISSION LOGIC (Updated to use fetch and redirect) ---
+        channelForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            // Disable button and show loading state
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+
+            // Collect form data
+            const channelData = {
+                name: document.getElementById('channelName').value,
+                description: document.getElementById('channelDescription').value,
+                tags: tags // Already an array of strings
+            };
+            
+            // Check for minimum tag requirement (optional, but good practice)
+            if (channelData.tags.length === 0) {
+                alert('Please add at least one channel tag.');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-plus-circle"></i> Create Channel';
+                return;
+            }
+
+            try {
+                const response = await fetch('/dashboard/forumDash/ForumCreate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(channelData)
+                });
+                
+                // Check if the response was successful (200-299 status code)
+                if (response.ok) {
+                    // Success Path
+                    console.log('Channel created successfully.');
+                    
+                    // --- 1. Show Success Popup ---
+                    successModal.classList.add('active');
+
+                    // --- 2. Redirect After Delay ---
+                    setTimeout(() => {
+                        // Redirect to the specified route
+                        window.location.href = '/dashboard/forumDash'; 
+                    }, 2000); // 2 seconds delay
+                    
+                } else {
+                    // Handle API errors (e.g., validation failed, server error)
+                    const errorData = await response.json();
+                    const errorMessage = errorData.message || 'Channel creation failed. Please try again.';
+                    
+                    console.error('API Error:', errorMessage);
+                    alert(`Error: ${errorMessage}`);
+                    
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-plus-circle"></i> Create Channel';
+                }
+
+            } catch (error) {
+                // Handle network errors (e.g., server offline)
+                console.error('Network Error:', error);
+                alert('A network error occurred. Could not connect to the server.');
+                
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-plus-circle"></i> Create Channel';
+            }
+        });
+
+
+        // Initialize on load
+        window.onload = function() {
+            createDots();
+            renderTags();
+        };
+
+        // Note: The alert function is defined here as a console log
+        // to avoid browser popups (which are forbidden in this environment).
+        // In a production environment, you would use a dedicated UI element 
+        // to display errors instead of 'alert'.
+        function alert(message) {
+            console.warn(`[USER NOTIFICATION] ${message}`);
+        }
+
+    </script>
+</body>
+</html>

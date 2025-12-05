@@ -9,10 +9,10 @@
         rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
         />
-        
+
         <style>
-            @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Orbitron:wght@400;700&display=swap");
-            
+
+            @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Orbitron:wght@400;700&display=swap");            
             :root {
                 --dark-bg: #1a1a2e;
                 --dark-card: #272c4a;
@@ -271,14 +271,13 @@
                         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
                         backdrop-filter: blur(6px);
                     }
-                    
+
                     .channels-grid {
                         display: grid;
-                        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); 
+                        grid-template-columns: 1fr;
                         gap: 25px;
                         margin-top: 18px;
                     }
-                    
                     .channel-card {
                         background-color: var(--dark-card);
                         border-radius: 14px;
@@ -309,7 +308,7 @@
                         }
                         
                         .channel-card:hover {
-                            transform: translateY(-8px) scale(1.02);
+                            transform: translateY(-8px) scale(1.01); /* Reduced scale slightly for full row */
                             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.8);
                             border-color: var(--accent-violet);
                         }
@@ -337,92 +336,100 @@
                             color: #d0d0ea;
                         }
                         
-                        .channel-tags {
-                            display: flex;
-                            flex-wrap: wrap;
-                            gap: 8px;
+                        .channel-description {
+                            font-size: 0.9em;
+                            color: var(--text-light);
+                            margin: 5px 0 10px 0;
+                            line-height: 1.5;
                         }
-                        
-                        .tag-pill {
-                            padding: 4px 10px;
-                            border-radius: 999px;
-                            font-size: 0.75em;
-                            text-transform: uppercase;
-                            background-color: rgba(138, 43, 226, 0.15);
-                            border: 1px solid rgba(138, 43, 226, 0.5);
-                            color: var(--accent-violet);
-                            font-weight: 600;
-                            letter-spacing: 0.5px;
-                        }
-                        
-                        .channel-footer {
-                            display: flex;
-                            justify-content: space-between;
-                            align-items: center;
-                            padding-top: 10px;
-                            border-top: 1px solid rgba(0, 123, 255, 0.3);
-                        }
-                        
-                        .member-count {
-                            font-size: 1em;
-                            font-weight: 600;
-                            color: #7fffd4;
-                            display: flex;
-                            align-items: center;
-                            gap: 8px;
-                        }
-                        
-                        .member-count i {
-                            color: var(--primary-blue);
-                            font-size: 1.2em;
-                        }
-                        
-                        .join-btn {
-                            padding: 6px 15px;
-                            border-radius: 6px;
-                            background-color: var(--primary-blue);
-                            color: white;
-                            font-weight: 600;
-                            border: none;
-                            transition: background-color 0.2s ease;
-                        }
-                        
-                        .join-btn:hover {
-                            background-color: var(--button-hover-blue);
-                        }
-                        
-                        .no-channels {
-                            text-align: center;
-                            padding: 40px 16px 20px;
-                            font-size: 1.05em;
-                            color: var(--subtle-text);
-                        }
-                        
-                        .no-channels span {
-                            display: block;
-                            font-size: 2.2em;
-                            margin-bottom: 10px;
-                        }
-                        
-                        @media (max-width: 768px) {
-                            .page-title {
-                                font-size: 1.8em;
+                            
+                            .channel-tags {
+                                display: flex;
+                                flex-wrap: wrap;
+                                gap: 8px;
                             }
                             
-                            .channel-controls {
-                                flex-direction: column;
-                                align-items: stretch;
+                            .tag-pill {
+                                padding: 4px 10px;
+                                border-radius: 999px;
+                                font-size: 0.75em;
+                                text-transform: uppercase;
+                                background-color: rgba(138, 43, 226, 0.15);
+                                border: 1px solid rgba(138, 43, 226, 0.5);
+                                color: var(--accent-violet);
+                                font-weight: 600;
+                                letter-spacing: 0.5px;
                             }
                             
-                            .create-channel-btn {
-                                width: 100%;
+                            .channel-footer {
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: center;
+                                padding-top: 10px;
+                                border-top: 1px solid rgba(0, 123, 255, 0.3);
                             }
                             
-                            .channels-wrapper {
-                                padding: 18px 16px 24px;
+                            .member-count {
+                                font-size: 1em;
+                                font-weight: 600;
+                                color: #7fffd4;
+                                display: flex;
+                                align-items: center;
+                                gap: 8px;
                             }
-                        }
-                        </style>
+                            
+                            .member-count i {
+                                color: var(--primary-blue);
+                                font-size: 1.2em;
+                            }
+                            
+                            .join-btn {
+                                padding: 6px 15px;
+                                border-radius: 6px;
+                                background-color: var(--primary-blue);
+                                color: white;
+                                font-weight: 600;
+                                border: none;
+                                transition: background-color 0.2s ease;
+                            }
+                            
+                            .join-btn:hover {
+                                background-color: var(--button-hover-blue);
+                            }
+                            
+                            .no-channels {
+                                text-align: center;
+                                padding: 40px 16px 20px;
+                                font-size: 1.05em;
+                                color: var(--subtle-text);
+                            }
+                            
+                            .no-channels span {
+                                display: block;
+                                font-size: 2.2em;
+                                margin-bottom: 10px;
+                            }
+                            
+                            @media (max-width: 768px) {
+                                .page-title {
+                                    font-size: 1.8em;
+                                }
+                                
+                                .channel-controls {
+                                    flex-direction: column;
+                                    align-items: stretch;
+                                }
+                                
+                                .create-channel-btn {
+                                    width: 100%;
+                                }
+                                
+                                .channels-wrapper {
+                                    padding: 18px 16px 24px;
+                                }
+                            }
+                            </style>
+
 </head>
 <body>
     <div class="background-dots">
@@ -467,7 +474,7 @@
             <input type="text" placeholder="Search channels by name or tag..." id="channelSearch" />
         </div>
         
-        <button class="create-channel-btn" onclick="window.location.href='/api/channels/create'">
+        <button class="create-channel-btn" onclick="window.location.href='/dashboard/forumDash/ForumCreate'">
             <i class="fas fa-plus-circle"></i>
             Create Channel
         </button>
@@ -483,34 +490,38 @@
                 <div class="channels-grid">
                     <% channels.forEach(channel => { %>
                         <article 
-                        class="channel-card" 
-                        onclick="window.location.href='/api/channels/<%= channel.slug || channel._id %>'"
-                        data-name="<%= channel.name %>"
-                        data-tags="<%= (channel.tags || []).join(',').toLowerCase() %>"
+                            class="channel-card" 
+                            onclick="window.location.href='/dashboard/forumDash/ForumMessaging/<%= channel.id %>'"
+                            data-name="<%= channel.name %>"
+                            data-tags="<%= (channel.tags || []).join(',').toLowerCase() %>"
                         >
-                        <div class="channel-header">
-                            <h2 class="channel-name"><%= channel.name %></h2>
-                            <p class="channel-subject"><%= channel.subject %></p>
-                        </div>
-                        
-                        <% if (channel.tags && channel.tags.length > 0) { %>
-                            <div class="channel-tags">
-                                <% channel.tags.forEach(tag => { %>
-                                    <span class="tag-pill"><%= tag %></span>
+                            <div class="channel-header">
+                                <h2 class="channel-name"><%= channel.name %></h2>
+                                <p class="channel-subject"><%= channel.subject %></p>
+                            </div>
+                            
+                            <p class="channel-description">
+                                <%= channel.description %>
+                            </p>
+
+                            <% if (channel.tags && channel.tags.length > 0) { %>
+                                <div class="channel-tags">
+                                    <% channel.tags.forEach(tag => { %>
+                                        <span class="tag-pill"><%= tag %></span>
                                     <% }) %>
                                 </div>
-                                <% } %>
-                                
-                                <div class="channel-footer">
-                                    <div class="member-count">
-                                        <i class="fas fa-users"></i>
-                                        <%= channel.activeMembers || 0 %> Active
-                                    </div>
-                                    <div class="join-btn">
-                                        Join Channel
-                                    </div>
+                            <% } %>
+                            
+                            <div class="channel-footer">
+                                <div class="member-count">
+                                    <i class="fas fa-users"></i>
+                                    <%= channel.activeMembers %> Active
                                 </div>
-                            </article>
+                                <div class="join-btn">
+                                    Join Channel
+                                </div>
+                            </div>
+                        </article>
                             <% }) %>
                         </div>
                         <% } %>
