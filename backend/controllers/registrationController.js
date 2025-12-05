@@ -17,7 +17,7 @@ export const processRegister = async (req, res) => {
     const filePath = req.file.path;
     const example={
     name: req.body.name,
-    id: req.body.studentId,
+    student_id: req.body.studentId,
     email: req.body.gsuiteEmail,
     department: req.body.department,
     UserName: req.body.username,

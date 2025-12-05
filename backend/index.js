@@ -19,7 +19,7 @@ import eventsRouter from "./routes/events.js";
 import forumRouter from "./routes/forum.js";
 import forumCreateRouter from "./routes/forumCreate.js";
 import ForumMessagingRouter from "./routes/ForumMessaging.js";
-import message from "./models/forumMessage.js";
+import Message from "./models/forumMessage.js";
 
 // Load env
 dotenv.config();
@@ -52,7 +52,7 @@ const httpServer = http.createServer(app);
 const io = new Server(httpServer, {
     // Optional: Configure CORS if your frontend is on a different domain/port
     cors: {
-        origin: 'http://localhost:8080', // Replace with your frontend domain if different
+        origin: process.env.CLIENT_URL || 'http://localhost:5173', // Match frontend URL
         methods: ['GET', 'POST']
     }
 });
@@ -84,8 +84,18 @@ io.on('connection', (socket) => {
     socket.on('sendMessage', async (data) => {
         const { channelId, userId, username, content } = data;
         
+        console.log('Received sendMessage:', { channelId, userId, username, content });
+        
         // Check for empty or invalid message
-        if (!content || content.trim() === '') return;
+        if (!content || content.trim() === '') {
+            console.warn('Empty message received');
+            return;
+        }
+        
+        if (!channelId || !userId) {
+            console.warn('Missing channelId or userId');
+            return;
+        }
         
         try {
             // A. Save message to MongoDB
@@ -96,13 +106,14 @@ io.on('connection', (socket) => {
                 content: content
             });
             await newMessage.save();
+            console.log('Message saved to DB:', newMessage._id);
 
             // B. Emit the message to all clients in the room
             io.to(channelId).emit('message', {
                 _id: newMessage._id, // Send the ID for reporting functionality
                 username: username,
                 content: content,
-                timestamp: Date.now()
+                timestamp: newMessage.timestamp
             });
         } catch (error) {
             console.error("Error saving message:", error);
