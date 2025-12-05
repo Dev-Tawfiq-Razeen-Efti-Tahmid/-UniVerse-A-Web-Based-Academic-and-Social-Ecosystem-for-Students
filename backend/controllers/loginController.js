@@ -20,10 +20,11 @@ export const processLogin = async (req, res) => {
     
     if (store) {
       const data = {
+        _id: store._id,
         username: store.UserName,
         name: store.name,
         email: store.email,
-        id: store.id,
+        student_id: store.student_id,
         department: store.department,
         DateOfBirth: store.DateOfBirth,                                 //Still needs work to function properly
         profilePic: store.profilePic

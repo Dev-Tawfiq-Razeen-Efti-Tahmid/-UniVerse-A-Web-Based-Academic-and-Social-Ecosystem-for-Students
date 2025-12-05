@@ -9,6 +9,11 @@ import Message from '../models/forumMessage.js';
  */
 export const MessageRoom = async (req, res) => {
     try {
+        // Check if user is logged in
+        if (!req.session.userData) {
+            return res.status(401).send('Unauthorized: Please log in first');
+        }
+
         const { channelId } = req.params;
         
         // 1. Fetch channel details
@@ -30,7 +35,7 @@ export const MessageRoom = async (req, res) => {
         res.render("forumRoom", {
             channel, // ES6 short hand for channel: channel
             messages, // ES6 short hand for messages: messages
-            user: req.session.userData.username // Assumes user data is available via Express middleware (e.g., session/passport)
+            user: req.session.userData // Pass full user object with _id and username
         });
 
     } catch (error) {

@@ -297,18 +297,31 @@
         const messageInput = document.getElementById('messageInput');
         const sendButton = document.getElementById('sendButton');
 
-        // --- 1. JOIN THE ROOM ---
-        socket.emit('joinRoom', { channelId, username });
+        // --- 0. WAIT FOR CONNECTION BEFORE JOINING ROOM ---
+        socket.on('connect', () => {
+            console.log('Socket connected:', socket.id);
+            // --- 1. JOIN THE ROOM ---
+            socket.emit('joinRoom', { channelId, username });
+        });
+
+        socket.on('connect_error', (error) => {
+            console.error('Socket connection error:', error);
+        });
 
         // Scroll to the bottom on load
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
 
         // --- 2. RECEIVE MESSAGE ---
         socket.on('message', (msg) => {
+            console.log('Message received:', msg);
             const messageHtml = createMessageElement(msg);
             messagesDiv.insertAdjacentHTML('beforeend', messageHtml);
             // Scroll to the latest message
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        });
+
+        socket.on('userJoined', (message) => {
+            console.log('User joined:', message);
         });
 
         // --- 3. SEND MESSAGE ---
@@ -322,6 +335,7 @@
         function sendMessage() {
             const content = messageInput.value.trim();
             if (content) {
+                console.log('Sending message:', { channelId, userId, username, content });
                 socket.emit('sendMessage', { channelId, userId, username, content });
                 messageInput.value = ''; // Clear input field
             }
