@@ -32,6 +32,14 @@ const ChannelInfo = new mongoose.Schema(
       type: String,
       required: true,
     },
+    upvoters: {
+      type: [String], // Array of usernames who upvoted
+      default: [],
+    },
+    downvoters: {
+      type: [String], // Array of usernames who downvoted
+      default: [],
+    },
   },
   {
     timestamps: true, // createdAt, updatedAt

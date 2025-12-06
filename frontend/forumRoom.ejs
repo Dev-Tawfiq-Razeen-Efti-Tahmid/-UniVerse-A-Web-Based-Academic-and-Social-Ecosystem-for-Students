@@ -7,158 +7,187 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
-            @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Orbitron:wght@400;700&display=swap");
-            
-            :root {
-                --dark-bg: #1a1a2e;
-                --dark-card: #272c4a;
-                --primary-blue: #007bff;
-                --accent-violet: #8a2be2;
-                --text-light: #e0e0e0;
-                --input-bg: #3e4a6e;
-                --button-hover-blue: #0056b3;
-                --button-hover-violet: #6a1ba3;
-                --border-glow: rgba(138, 43, 226, 0.4);
-                --subtle-text: #a0a0a0;
-            }
-            
-            * {
-                box-sizing: border-box;
-                margin: 0;
-                padding: 0;
-            }
-            
-            body {
-                font-family: "Montserrat", sans-serif;
-                margin: 0;
-                padding: 0;
-                min-height: 100vh;
-                background: linear-gradient(135deg, var(--dark-bg) 0%, #160e2c 100%);
-                color: var(--text-light);
-                overflow-x: hidden;
-                position: relative;
-                display: flex;
-                flex-direction: column;
-            }
-            
-            .background-dots {
-                position: absolute;
-                inset: 0;
-                overflow: hidden;
-                pointer-events: none;
-                z-index: 0;
-                opacity: 0.3;
-            }
-            
-            .dot {
-                position: absolute;
-                background: rgba(138, 43, 226, 0.2);
-                border-radius: 50%;
-                animation: moveDots 20s infinite linear;
-                opacity: 0;
-            }
-            
-            .dot:nth-child(even) {
-                background: rgba(0, 123, 255, 0.2);
-                animation-delay: 10s;
-            }
-            
-            @keyframes moveDots {
-                0% {
-                    transform: translate(var(--x-start), var(--y-start)) scale(0);
-                    opacity: 0;
-                }
-                50% {
-                    opacity: 1;
-                }
-                100% {
-                    transform: translate(var(--x-end), var(--y-end)) scale(1.5);
-                    opacity: 0;
-                }
-            }
-            
-            .top-bar {
-                background-color: var(--dark-card);
-                padding: 15px 40px;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-                border-bottom: 1px solid var(--accent-violet);
-                position: sticky;
-                top: 0;
-                z-index: 1000;
-            }
-            
-            .top-bar .logo {
-                font-family: "Orbitron", sans-serif;
-                font-size: 2.2em;
-                font-weight: 700;
-                text-shadow: 0 0 10px var(--accent-violet), 0 0 20px var(--primary-blue);
-                background: linear-gradient(45deg, var(--primary-blue), var(--accent-violet));
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-                letter-spacing: 1.5px;
-                cursor: pointer;
-                transition: all 0.3s ease;
-            }
-            
-            .top-bar .logo:hover {
-                transform: scale(1.03);
-                text-shadow: 0 0 12px var(--accent-violet), 0 0 25px var(--primary-blue);
-            }
-            
-            .user-controls {
-                display: flex;
-                align-items: center;
-                gap: 20px;
-            }
-            
-            .back-btn {
-                background: transparent;
-                border: 1px solid rgba(0, 123, 255, 0.6);
-                color: var(--text-light);
-                border-radius: 8px;
-                padding: 8px 16px;
-                font-size: 0.95em;
-                font-weight: 500;
-                cursor: pointer;
-                display: inline-flex;
-                align-items: center;
-                gap: 8px;
-                transition: all 0.3s ease;
-            }
-            
-            .back-btn:hover {
-                background: rgba(0, 123, 255, 0.15);
-                border-color: var(--accent-violet);
-                transform: translateY(-1px);
-                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
-            }
-            
-            .logout-btn {
-                background: linear-gradient(90deg, var(--primary-blue), var(--accent-violet));
-                color: white;
-                border: none;
-                border-radius: 8px;
-                padding: 8px 18px;
-                font-size: 0.95em;
-                font-weight: 600;
-                cursor: pointer;
-                transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-                letter-spacing: 0.5px;
-            }
-
-        /* --- NEW CHAT ROOM SPECIFIC STYLES --- */
-        .chat-container {
+        @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Orbitron:wght@400;700&display=swap");
+        
+        :root {
+            --dark-bg: #1a1a2e;
+            --dark-card: #272c4a;
+            --primary-blue: #007bff;
+            --accent-violet: #8a2be2;
+            --text-light: #e0e0e0;
+            --input-bg: #3e4a6e;
+            --subtle-text: #a0a0a0;
+            --user-active: #28a745;
+            --user-self: #ffc107;
+            --report-red: #dc3545;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: "Montserrat", sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #160e2c 100%);
+            color: var(--text-light);
             display: flex;
             flex-direction: column;
-            height: calc(100vh - 150px); /* Adjust height based on top-bar size */
+        }
+        
+        /* General Top Bar Styles (Kept consistent) */
+        .top-bar {
+            background-color: var(--dark-card);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            border-bottom: 1px solid var(--accent-violet);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .top-bar .logo {
+            font-family: "Orbitron", sans-serif;
+            font-size: 2.2em;
+            font-weight: 700;
+            text-shadow: 0 0 10px var(--accent-violet), 0 0 20px var(--primary-blue);
+            background: linear-gradient(45deg, var(--primary-blue), var(--accent-violet));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .user-controls {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .btn {
+            background: linear-gradient(90deg, var(--primary-blue), var(--accent-violet));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 18px;
+            font-size: 0.95em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            letter-spacing: 0.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-btn {
+            background: transparent;
+            border: 1px solid rgba(0, 123, 255, 0.6);
+            color: var(--text-light);
+            padding: 8px 16px;
+        }
+
+        .back-btn:hover {
+            background: rgba(0, 123, 255, 0.15);
+            border-color: var(--accent-violet);
+            transform: translateY(-1px);
+        }
+
+        /* --- NEW LAYOUT: Two-Column Flex Container --- */
+        .main-layout {
+            flex-grow: 1;
+            display: flex;
+            max-width: 1200px;
+            width: 95%;
+            margin: 20px auto;
+            gap: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* --- Sidebar: Channel Info & User List --- */
+        .channel-info {
+            flex: 1 1 35%; /* Takes up about 35% of the space */
+            padding: 25px;
+            background-color: var(--dark-card);
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            min-height: 70vh; /* Set a minimum height */
+        }
+
+        .channel-title {
+            font-family: "Orbitron", sans-serif;
+            font-size: 1.8em;
+            margin-bottom: 10px;
+            color: var(--primary-blue);
+        }
+
+        .channel-description {
+            font-size: 0.9em;
+            color: var(--subtle-text);
+            margin-bottom: 20px;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+            padding-bottom: 15px;
+        }
+
+        .user-list-header {
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--accent-violet);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .active-users {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding-right: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .user-list-item {
+            padding: 8px 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-radius: 6px;
+            background-color: rgba(0, 0, 0, 0.1);
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+
+        .user-list-item.self {
+             background-color: rgba(255, 193, 7, 0.1);
+        }
+
+        .user-status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--user-active);
+        }
+
+        /* --- Chat Area (The other half) --- */
+        .chat-container {
+            flex: 1 1 65%; /* Takes up about 65% of the space */
+            display: flex;
+            flex-direction: column;
             background-color: var(--dark-card);
             border-radius: 16px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
             padding: 20px;
-            margin-top: 20px;
+            min-height: 70vh;
         }
 
         .messages {
@@ -166,14 +195,13 @@
             overflow-y: auto;
             margin-bottom: 15px;
             padding-right: 15px;
-            /* Scrollbar styling for a cleaner look */
+            /* Custom Scrollbar */
             scrollbar-width: thin;
             scrollbar-color: var(--accent-violet) transparent;
         }
 
         .message-item {
             display: flex;
-            justify-content: space-between;
             align-items: flex-start;
             margin-bottom: 12px;
             line-height: 1.5;
@@ -186,17 +214,45 @@
             background-color: rgba(138, 43, 226, 0.05);
         }
 
+        /* Profile Icon Next to Message */
+        .profile-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: var(--accent-violet);
+            color: var(--text-light);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.8em;
+            font-weight: 700;
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+
         .message-content-wrapper {
+            flex-grow: 1;
             display: flex;
             flex-direction: column;
             max-width: 90%;
         }
 
+        .message-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
         .message-sender {
             font-weight: 700;
             color: var(--primary-blue);
-            margin-right: 10px;
             font-size: 0.9em;
+            margin-right: 10px;
+        }
+
+        .message-timestamp {
+            font-size: 0.75em;
+            color: var(--subtle-text);
         }
 
         .message-text {
@@ -204,11 +260,6 @@
             word-wrap: break-word;
         }
         
-        .message-actions {
-            flex-shrink: 0;
-            margin-left: 10px;
-        }
-
         .report-btn {
             background: none;
             border: none;
@@ -217,13 +268,14 @@
             font-size: 0.8em;
             opacity: 0.5;
             transition: opacity 0.2s, color 0.2s;
+            margin-left: 10px;
         }
 
         .report-btn:hover {
             opacity: 1;
-            color: #ff4d4d; /* Bright red on hover */
+            color: var(--report-red);
         }
-        
+
         .input-area {
             display: flex;
             gap: 10px;
@@ -253,26 +305,98 @@
         .input-area button:hover {
              transform: translateY(-1px);
         }
+
+        /* Modal for Confirmation/Alerts */
+        .message-box-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: none; /* Controlled by JS */
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .message-box-content {
+            background-color: var(--dark-card);
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            max-width: 350px;
+            border: 1px solid var(--accent-violet);
+        }
+
+        .message-box-content h3 {
+            margin-bottom: 15px;
+            color: var(--primary-blue);
+        }
+        
+        @media (max-width: 800px) {
+            .main-layout {
+                flex-direction: column;
+                width: 90%;
+            }
+            .channel-info, .chat-container {
+                flex: 1 1 100%; /* Full width on small screens */
+                min-height: auto;
+            }
+            .channel-info {
+                order: -1; /* Move info block above chat */
+            }
+        }
     </style>
 </head>
 <body>
-    <main class="main-content">
-        <h1 class="page-title"><%= channel.name %> Chat Room</h1>
-        <p class="page-subtitle">Discuss the topic and connect with fellow members.</p>
+    <!-- Top Navigation Bar -->
+    <header class="top-bar">
+        <div class="logo">UniVerse</div>
+        <div class="user-controls">
+            <!-- Back Button -->
+            <button class="btn back-btn" onclick="window.location.href='/dashboard/forumDash'">
+                <i class="fas fa-chevron-left"></i> Back to Channels
+            </button>
+            <!-- Logout Button with Custom Handler -->
+            <button class="btn logout-btn" onclick="handleLogout()">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+    </header>
 
+    <!-- Two-Column Main Layout -->
+    <div class="main-layout">
+        <!-- LEFT COLUMN: Channel Info & Active Users -->
+        <section class="channel-info">
+            <h1 class="channel-title"><%= channel.channelName %></h1>
+            <p class="channel-description"><%= channel.channelDescription || "No description provided for this channel." %></p>
+
+            <h2 class="user-list-header">
+                <i class="fas fa-users"></i> Active Members (<span id="userCount">0</span>)
+            </h2>
+            <div class="active-users" id="activeUsersList">
+                <!-- User list will be rendered here by JS -->
+            </div>
+        </section>
+
+        <!-- RIGHT COLUMN: Chat Room -->
         <section class="chat-container">
             <div class="messages" id="messages">
+                <!-- Historical messages loaded by EJS -->
                 <% messages.forEach(message => { %>
                     <div class="message-item" data-message-id="<%= message._id %>">
+                        <div class="profile-icon"><%= message.username.charAt(0).toUpperCase() %></div>
                         <div class="message-content-wrapper">
-                            <span class="message-sender"><%= message.username %></span>
+                            <div class="message-header">
+                                <span class="message-sender"><%= message.username %></span>
+                                <span class="message-timestamp"><%= new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) %></span>
+                            </div>
                             <span class="message-text"><%= message.content %></span>
                         </div>
-                        <div class="message-actions">
-                            <button class="report-btn" onclick="reportMessage('<%= message._id %>', this)">
-                                <i class="fas fa-flag"></i> Report
-                            </button>
-                        </div>
+                        <button class="report-btn" data-message-id="<%= message._id %>" onclick="reportMessage('<%= message._id %>', this)">
+                            <i class="fas fa-flag"></i> Report
+                        </button>
                     </div>
                 <% }) %>
             </div>
@@ -282,99 +406,197 @@
                 <button id="sendButton">Send</button>
             </div>
         </section>
-    </main>
+    </div>
+
+    <!-- Custom Message Box Modal (Replaces alert/confirm) -->
+    <div class="message-box-backdrop" id="messageBox">
+        <div class="message-box-content">
+            <h3 id="messageBoxTitle"></h3>
+            <p id="messageBoxContent"></p>
+            <div style="margin-top: 20px;">
+                <button class="btn" onclick="closeMessageBox()" style="padding: 10px 20px;">OK</button>
+            </div>
+        </div>
+    </div>
     
+    <!-- Socket.IO Client Library -->
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        // Data for Socket.IO connection
-        const channelId = '<%= channel._id %>';
-        const userId = '<%= user._id %>';       // Must be passed from your controller
-        const username = '<%= user.username %>'; // Must be passed from your controller
+        // Fix: Wrap main logic in window.onload to ensure Socket.IO client library is loaded first.
+        window.onload = function() {
+            // Data passed from the server (EJS rendering)
+            const channelId = '<%= channel._id %>';
+            const userId = '<%= user._id %>';
+            const username = '<%= user.username %>';
 
-        // Initialize Socket.IO connection
-        const socket = io();
-        const messagesDiv = document.getElementById('messages');
-        const messageInput = document.getElementById('messageInput');
-        const sendButton = document.getElementById('sendButton');
+            // DOM Elements
+            const messagesDiv = document.getElementById('messages');
+            const messageInput = document.getElementById('messageInput');
+            const sendButton = document.getElementById('sendButton');
+            const activeUsersListDiv = document.getElementById('activeUsersList');
+            const userCountSpan = document.getElementById('userCount');
 
-        // --- 0. WAIT FOR CONNECTION BEFORE JOINING ROOM ---
-        socket.on('connect', () => {
-            console.log('Socket connected:', socket.id);
-            // --- 1. JOIN THE ROOM ---
-            socket.emit('joinRoom', { channelId, username });
-        });
-
-        socket.on('connect_error', (error) => {
-            console.error('Socket connection error:', error);
-        });
-
-        // Scroll to the bottom on load
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
-
-        // --- 2. RECEIVE MESSAGE ---
-        socket.on('message', (msg) => {
-            console.log('Message received:', msg);
-            const messageHtml = createMessageElement(msg);
-            messagesDiv.insertAdjacentHTML('beforeend', messageHtml);
-            // Scroll to the latest message
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-        });
-
-        socket.on('userJoined', (message) => {
-            console.log('User joined:', message);
-        });
-
-        // --- 3. SEND MESSAGE ---
-        sendButton.addEventListener('click', sendMessage);
-        messageInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                sendMessage();
-            }
-        });
-
-        function sendMessage() {
-            const content = messageInput.value.trim();
-            if (content) {
-                console.log('Sending message:', { channelId, userId, username, content });
-                socket.emit('sendMessage', { channelId, userId, username, content });
-                messageInput.value = ''; // Clear input field
-            }
-        }
-
-        // --- 4. REPORT MESSAGE FUNCTIONALITY ---
-        function reportMessage(messageId, buttonElement) {
-            if (!confirm("Are you sure you want to report this message for improper content?")) {
-                return;
-            }
+            // Initialize Socket.IO connection AFTER the script is loaded
+            const socket = io();
             
-            socket.emit('reportMessage', { 
-                messageId: messageId, 
-                reportingUserId: userId 
+            // Global State
+            let activeUsers = [];
+
+            // --- UTILITY: Custom Message Box (Replaces alert/confirm) ---
+            const messageBox = document.getElementById('messageBox');
+            const messageBoxTitle = document.getElementById('messageBoxTitle');
+            const messageBoxContent = document.getElementById('messageBoxContent');
+
+            function showMessageBox(title, content) {
+                messageBoxTitle.textContent = title;
+                messageBoxContent.textContent = content;
+                messageBox.style.display = 'flex';
+            }
+
+            window.closeMessageBox = function() { // Made global to be accessible from inline onClick
+                messageBox.style.display = 'none';
+            }
+
+            // --- 0. SOCKET.IO CONNECTION & ROOM JOIN ---
+            socket.on('connect', () => {
+                console.log('Socket connected:', socket.id);
+                // Join the room and announce self
+                socket.emit('joinRoom', { channelId, username });
             });
 
-            // Visually update the button to indicate the report was sent
-            buttonElement.innerText = "Reported!";
-            buttonElement.disabled = true;
-            buttonElement.style.color = '#ff4d4d';
-        }
-        
-        // --- UTILITY: Create Message HTML ---
-        function createMessageElement(msg) {
-             const time = new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-             return `
-                <div class="message-item" data-message-id="${msg._id}">
-                    <div class="message-content-wrapper">
-                        <span class="message-sender">${msg.username} <small style="color:var(--subtle-text); font-weight: 400;">(${time})</small></span>
-                        <span class="message-text">${msg.content}</span>
-                    </div>
-                    <div class="message-actions">
-                        <button class="report-btn" onclick="reportMessage('${msg._id}', this)">
+            socket.on('connect_error', (error) => {
+                console.error('Socket connection error:', error);
+            });
+
+            // --- USER LIST MANAGEMENT ---
+
+            function renderActiveUsers() {
+                userCountSpan.textContent = activeUsers.length;
+                activeUsersListDiv.innerHTML = activeUsers.map(user => {
+                    const isSelf = user.username === username;
+                    const selfClass = isSelf ? 'self' : '';
+                    return `
+                        <div class="user-list-item ${selfClass}">
+                            <span class="user-status-dot"></span>
+                            <span class="user-name">${user.username} ${isSelf ? '(You)' : ''}</span>
+                        </div>
+                    `;
+                }).join('');
+            }
+            
+            socket.on('activeUsersList', (users) => {
+                // Received initial list or full updated list
+                activeUsers = users;
+                renderActiveUsers();
+            });
+
+            socket.on('userJoined', (user) => {
+                // user is now an object with { username }
+                if (!activeUsers.some(u => u.username === user.username)) {
+                    activeUsers.push(user);
+                    renderActiveUsers();
+                    showMessageBox('User Joined', `${user.username} has joined the channel.`);
+                }
+            });
+
+            socket.on('userLeft', (username) => {
+                const leavingUser = activeUsers.find(u => u.username === username);
+                if (leavingUser) {
+                    activeUsers = activeUsers.filter(u => u.username !== username);
+                    renderActiveUsers();
+                    showMessageBox('User Left', `${leavingUser.username} has left the channel.`);
+                }
+            });
+
+
+            // --- CHAT MESSAGE HANDLING ---
+
+            function createMessageElement({ content, username, timestamp, _id }) {
+                const time = new Date(timestamp || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const initial = username.charAt(0).toUpperCase();
+
+                // Note: We use a placeholder ID for messages generated locally before the server saves them
+                const messageId = _id || 'temp-' + Date.now();
+
+                return `
+                    <div class="message-item" data-message-id="${messageId}">
+                        <div class="profile-icon">${initial}</div>
+                        <div class="message-content-wrapper">
+                            <div class="message-header">
+                                <span class="message-sender">${username}</span>
+                                <span class="message-timestamp">${time}</span>
+                            </div>
+                            <span class="message-text">${content}</span>
+                        </div>
+                        <button class="report-btn" data-message-id="${messageId}" onclick="reportMessage('${messageId}', this)">
                             <i class="fas fa-flag"></i> Report
                         </button>
                     </div>
-                </div>
-            `;
-        }
+                `;
+            }
+
+            socket.on('message', (msg) => {
+                // msg should contain { content, username, timestamp, _id }
+                const messageHtml = createMessageElement(msg);
+                messagesDiv.insertAdjacentHTML('beforeend', messageHtml);
+                // Scroll to the latest message
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            });
+
+            // --- SEND MESSAGE LOGIC ---
+            function sendMessage() {
+                const content = messageInput.value.trim();
+                if (content) {
+                    // Emit to the server
+                    socket.emit('sendMessage', { channelId, userId, username, content });
+                    messageInput.value = ''; // Clear input field
+                }
+            }
+
+            sendButton.addEventListener('click', sendMessage);
+            messageInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+
+            // --- REPORT MESSAGE FUNCTIONALITY ---
+            window.reportMessage = function(messageId, buttonElement) {
+                // Using showMessageBox as a simple notification instead of prompt/confirm
+                showMessageBox(
+                    'Report Submitted', 
+                    `Message ID ${messageId} has been reported. Moderators will review it shortly.`
+                );
+                
+                // Emit report event to the server
+                socket.emit('reportMessage', { 
+                    messageId: messageId, 
+                    reportingUserId: userId 
+                });
+
+                // Visually update the button
+                buttonElement.innerText = "Reported!";
+                buttonElement.disabled = true;
+                buttonElement.style.color = 'var(--report-red)';
+                buttonElement.style.opacity = '1';
+            }
+            
+            // --- LOGOUT DISCONNECTION ---
+            window.handleLogout = function() {
+                // 1. Notify the server the user is leaving the room before navigating
+                socket.emit('userLeft', { username, channelId });
+                
+                // 2. Disconnect the socket connection
+                socket.disconnect();
+
+                // 3. Redirect to the logout route (assuming this handles session cleanup)
+                window.location.href = '/api/logout';
+            }
+
+            // --- INITIAL SCROLL ---
+            // Scroll to the bottom on load to show latest messages
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        };
 
     </script>
 </body>

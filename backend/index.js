@@ -17,6 +17,7 @@ import registerRouter from "./routes/register.js";
 import logoutRouter from "./routes/logout.js";
 import eventsRouter from "./routes/events.js";
 import forumRouter from "./routes/forum.js";
+import forumApiRouter from "./routes/forumApi.js";
 import forumCreateRouter from "./routes/forumCreate.js";
 import ForumMessagingRouter from "./routes/ForumMessaging.js";
 import Message from "./models/forumMessage.js";
@@ -59,6 +60,13 @@ const io = new Server(httpServer, {
 io.on('connection', (socket) => {
     console.log(`User connected: ${socket.id}`);
 
+    // Initialize global room users map if it doesn't exist
+    if (!io.roomUsers) {
+        io.roomUsers = {};
+    }
+    
+    const roomUsers = io.roomUsers;
+
     // --- 1. JOIN ROOM ---
     socket.on('joinRoom', (data) => {
         const { channelId, username } = data;
@@ -68,16 +76,40 @@ io.on('connection', (socket) => {
 
         // Leave any existing rooms before joining the new one
         socket.rooms.forEach(room => {
-            if (room !== socket.id) socket.leave(room);
+            if (room !== socket.id) {
+                // Remove user from old room's user list
+                if (roomUsers[room]) {
+                    roomUsers[room] = roomUsers[room].filter(u => u.socketId !== socket.id);
+                }
+                socket.leave(room);
+            }
         });
 
         // Join the specified room
         socket.join(channelId);
         
-        console.log(`${username} joined channel room: ${channelId}`);
+        // Initialize room users array if it doesn't exist
+        if (!roomUsers[channelId]) {
+            roomUsers[channelId] = [];
+        }
+
+        // Add user to room
+        roomUsers[channelId].push({ username, socketId: socket.id });
         
-        // Notify others in the room (optional: send a system message)
-        socket.to(channelId).emit('userJoined', `${username} has entered the chat.`);
+        console.log(`${username} joined channel room: ${channelId}`);
+        console.log(`Active users in ${channelId}:`, roomUsers[channelId]);
+        
+        // Send updated active users list to all clients in the room
+        io.to(channelId).emit('activeUsersList', roomUsers[channelId]);
+        
+        // Broadcast user count update to ALL clients (for dashboard display)
+        io.emit('channelUserCountUpdate', { 
+            channelId, 
+            count: roomUsers[channelId].length 
+        });
+        
+        // Notify others in the room
+        socket.to(channelId).emit('userJoined', { username });
     });
 
     // --- 2. SEND MESSAGE ---
@@ -144,7 +176,50 @@ io.on('connection', (socket) => {
     // --- DISCONNECT ---
     socket.on('disconnect', () => {
         console.log(`User disconnected: ${socket.id}`);
-        // Optional: Notify the rooms the user was in
+        
+        // Remove user from all rooms
+        Object.keys(roomUsers).forEach(roomId => {
+            const roomUserList = roomUsers[roomId];
+            const userIndex = roomUserList.findIndex(u => u.socketId === socket.id);
+            
+            if (userIndex !== -1) {
+                const removedUser = roomUserList[userIndex];
+                roomUserList.splice(userIndex, 1);
+                
+                // Notify remaining users in the room
+                io.to(roomId).emit('userLeft', removedUser.username);
+                io.to(roomId).emit('activeUsersList', roomUserList);
+                
+                // Broadcast user count update to ALL clients (for dashboard display)
+                io.emit('channelUserCountUpdate', { 
+                    roomId, 
+                    count: roomUserList.length 
+                });
+                
+                console.log(`${removedUser.username} left room ${roomId}`);
+            }
+        });
+    });
+
+    // --- USER LEFT (Explicit logout) ---
+    socket.on('userLeft', (data) => {
+        const { username, channelId } = data;
+        
+        if (roomUsers[channelId]) {
+            roomUsers[channelId] = roomUsers[channelId].filter(u => u.socketId !== socket.id);
+            
+            // Notify remaining users
+            io.to(channelId).emit('userLeft', username);
+            io.to(channelId).emit('activeUsersList', roomUsers[channelId]);
+            
+            // Broadcast user count update to ALL clients (for dashboard display)
+            io.emit('channelUserCountUpdate', { 
+                channelId, 
+                count: roomUsers[channelId].length 
+            });
+            
+            console.log(`${username} explicitly left room ${channelId}`);
+        }
     });
 });
 
@@ -185,6 +260,7 @@ app.use("/api/dashboard", dashboardRouter);
 app.use("/api/logout", logoutRouter);
 app.use("/dashboard", eventsRouter);
 app.use("/dashboard/forumDash", forumRouter);
+app.use("/dashboard/forumDash/api", forumApiRouter);
 app.use("/dashboard/forumDash/ForumCreate", forumCreateRouter);
 app.use("/dashboard/forumDash/ForumMessaging/:channelId", ForumMessagingRouter);
 // ---------- DB + SERVER ----------
