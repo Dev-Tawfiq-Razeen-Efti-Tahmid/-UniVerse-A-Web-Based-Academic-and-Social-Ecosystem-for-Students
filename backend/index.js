@@ -8,7 +8,6 @@ import session from "express-session";
 import http from "http";
 import { Server } from "socket.io";
 
-
 // ---- Routers ----
 import usersRouter from "./routes/users.js";
 import loginRouter from "./routes/login.js";
@@ -21,6 +20,8 @@ import forumApiRouter from "./routes/forumApi.js";
 import forumCreateRouter from "./routes/forumCreate.js";
 import ForumMessagingRouter from "./routes/ForumMessaging.js";
 import Message from "./models/forumMessage.js";
+import socialHubRouter from "./routes/socialHubRouter.js";
+import socialApiRouter from "./routes/socialApiRouter.js";
 
 // Load env
 dotenv.config();
@@ -43,184 +44,191 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-
-
-
-
 //Socket.io setup
 
 const httpServer = http.createServer(app);
 const io = new Server(httpServer, {
-    // Optional: Configure CORS if your frontend is on a different domain/port
-    cors: {
-        origin: process.env.CLIENT_URL || 'http://localhost:5173', // Match frontend URL
-        methods: ['GET', 'POST']
-    }
+  // Optional: Configure CORS if your frontend is on a different domain/port
+  cors: {
+    origin: process.env.CLIENT_URL || "http://localhost:5173", // Match frontend URL
+    methods: ["GET", "POST"],
+  },
 });
-io.on('connection', (socket) => {
-    console.log(`User connected: ${socket.id}`);
+io.on("connection", (socket) => {
+  console.log(`User connected: ${socket.id}`);
 
-    // Initialize global room users map if it doesn't exist
-    if (!io.roomUsers) {
-        io.roomUsers = {};
+  // Initialize global room users map if it doesn't exist
+  if (!io.roomUsers) {
+    io.roomUsers = {};
+  }
+
+  const roomUsers = io.roomUsers;
+
+  // --- 1. JOIN ROOM ---
+  socket.on("joinRoom", (data) => {
+    const { channelId, username } = data;
+
+    // Check if user is logged in (optional security step)
+    if (!channelId || !username) return;
+
+    // Leave any existing rooms before joining the new one
+    socket.rooms.forEach((room) => {
+      if (room !== socket.id) {
+        // Remove user from old room's user list
+        if (roomUsers[room]) {
+          roomUsers[room] = roomUsers[room].filter(
+            (u) => u.socketId !== socket.id
+          );
+        }
+        socket.leave(room);
+      }
+    });
+
+    // Join the specified room
+    socket.join(channelId);
+
+    // Initialize room users array if it doesn't exist
+    if (!roomUsers[channelId]) {
+      roomUsers[channelId] = [];
     }
-    
-    const roomUsers = io.roomUsers;
 
-    // --- 1. JOIN ROOM ---
-    socket.on('joinRoom', (data) => {
-        const { channelId, username } = data;
-        
-        // Check if user is logged in (optional security step)
-        if (!channelId || !username) return; 
+    // Add user to room
+    roomUsers[channelId].push({ username, socketId: socket.id });
 
-        // Leave any existing rooms before joining the new one
-        socket.rooms.forEach(room => {
-            if (room !== socket.id) {
-                // Remove user from old room's user list
-                if (roomUsers[room]) {
-                    roomUsers[room] = roomUsers[room].filter(u => u.socketId !== socket.id);
-                }
-                socket.leave(room);
-            }
-        });
+    console.log(`${username} joined channel room: ${channelId}`);
+    console.log(`Active users in ${channelId}:`, roomUsers[channelId]);
 
-        // Join the specified room
-        socket.join(channelId);
-        
-        // Initialize room users array if it doesn't exist
-        if (!roomUsers[channelId]) {
-            roomUsers[channelId] = [];
-        }
+    // Send updated active users list to all clients in the room
+    io.to(channelId).emit("activeUsersList", roomUsers[channelId]);
 
-        // Add user to room
-        roomUsers[channelId].push({ username, socketId: socket.id });
-        
-        console.log(`${username} joined channel room: ${channelId}`);
-        console.log(`Active users in ${channelId}:`, roomUsers[channelId]);
-        
-        // Send updated active users list to all clients in the room
-        io.to(channelId).emit('activeUsersList', roomUsers[channelId]);
-        
+    // Broadcast user count update to ALL clients (for dashboard display)
+    io.emit("channelUserCountUpdate", {
+      channelId,
+      count: roomUsers[channelId].length,
+    });
+
+    // Notify others in the room
+    socket.to(channelId).emit("userJoined", { username });
+  });
+
+  // --- 2. SEND MESSAGE ---
+  socket.on("sendMessage", async (data) => {
+    const { channelId, userId, username, content } = data;
+
+    console.log("Received sendMessage:", {
+      channelId,
+      userId,
+      username,
+      content,
+    });
+
+    // Check for empty or invalid message
+    if (!content || content.trim() === "") {
+      console.warn("Empty message received");
+      return;
+    }
+
+    if (!channelId || !userId) {
+      console.warn("Missing channelId or userId");
+      return;
+    }
+
+    try {
+      // A. Save message to MongoDB
+      const newMessage = new Message({
+        channel: channelId,
+        user: userId,
+        username: username,
+        content: content,
+      });
+      await newMessage.save();
+      console.log("Message saved to DB:", newMessage._id);
+
+      // B. Emit the message to all clients in the room
+      io.to(channelId).emit("message", {
+        _id: newMessage._id, // Send the ID for reporting functionality
+        username: username,
+        content: content,
+        timestamp: newMessage.timestamp,
+      });
+    } catch (error) {
+      console.error("Error saving message:", error);
+    }
+  });
+
+  // --- 3. REPORT MESSAGE ---
+  socket.on("reportMessage", async (data) => {
+    const { messageId, reportingUserId } = data;
+
+    try {
+      // Find the message and push the reporting user's ID to the 'reports' array
+      const message = await Message.findByIdAndUpdate(
+        messageId,
+        { $addToSet: { reports: reportingUserId } }, // $addToSet prevents duplicate reports from the same user
+        { new: true }
+      );
+
+      if (message) {
+        console.log(
+          `Message ${messageId} reported by user ${reportingUserId}. Total reports: ${message.reports.length}`
+        );
+        // Optional: Send an admin notification or update the UI to show the message was reported
+      }
+    } catch (error) {
+      console.error("Error reporting message:", error);
+    }
+  });
+
+  // --- DISCONNECT ---
+  socket.on("disconnect", () => {
+    console.log(`User disconnected: ${socket.id}`);
+
+    // Remove user from all rooms
+    Object.keys(roomUsers).forEach((roomId) => {
+      const roomUserList = roomUsers[roomId];
+      const userIndex = roomUserList.findIndex((u) => u.socketId === socket.id);
+
+      if (userIndex !== -1) {
+        const removedUser = roomUserList[userIndex];
+        roomUserList.splice(userIndex, 1);
+
+        // Notify remaining users in the room
+        io.to(roomId).emit("userLeft", removedUser.username);
+        io.to(roomId).emit("activeUsersList", roomUserList);
+
         // Broadcast user count update to ALL clients (for dashboard display)
-        io.emit('channelUserCountUpdate', { 
-            channelId, 
-            count: roomUsers[channelId].length 
+        io.emit("channelUserCountUpdate", {
+          roomId,
+          count: roomUserList.length,
         });
-        
-        // Notify others in the room
-        socket.to(channelId).emit('userJoined', { username });
+
+        console.log(`${removedUser.username} left room ${roomId}`);
+      }
     });
+  });
 
-    // --- 2. SEND MESSAGE ---
-    socket.on('sendMessage', async (data) => {
-        const { channelId, userId, username, content } = data;
-        
-        console.log('Received sendMessage:', { channelId, userId, username, content });
-        
-        // Check for empty or invalid message
-        if (!content || content.trim() === '') {
-            console.warn('Empty message received');
-            return;
-        }
-        
-        if (!channelId || !userId) {
-            console.warn('Missing channelId or userId');
-            return;
-        }
-        
-        try {
-            // A. Save message to MongoDB
-            const newMessage = new Message({
-                channel: channelId,
-                user: userId,
-                username: username,
-                content: content
-            });
-            await newMessage.save();
-            console.log('Message saved to DB:', newMessage._id);
+  // --- USER LEFT (Explicit logout) ---
+  socket.on("userLeft", (data) => {
+    const { username, channelId } = data;
 
-            // B. Emit the message to all clients in the room
-            io.to(channelId).emit('message', {
-                _id: newMessage._id, // Send the ID for reporting functionality
-                username: username,
-                content: content,
-                timestamp: newMessage.timestamp
-            });
-        } catch (error) {
-            console.error("Error saving message:", error);
-        }
-    });
+    if (roomUsers[channelId]) {
+      roomUsers[channelId] = roomUsers[channelId].filter(
+        (u) => u.socketId !== socket.id
+      );
 
-    // --- 3. REPORT MESSAGE ---
-    socket.on('reportMessage', async (data) => {
-        const { messageId, reportingUserId } = data;
-        
-        try {
-            // Find the message and push the reporting user's ID to the 'reports' array
-            const message = await Message.findByIdAndUpdate(
-                messageId,
-                { $addToSet: { reports: reportingUserId } }, // $addToSet prevents duplicate reports from the same user
-                { new: true }
-            );
+      // Notify remaining users
+      io.to(channelId).emit("userLeft", username);
+      io.to(channelId).emit("activeUsersList", roomUsers[channelId]);
 
-            if (message) {
-                console.log(`Message ${messageId} reported by user ${reportingUserId}. Total reports: ${message.reports.length}`);
-                // Optional: Send an admin notification or update the UI to show the message was reported
-            }
-        } catch (error) {
-            console.error("Error reporting message:", error);
-        }
-    });
+      // Broadcast user count update to ALL clients (for dashboard display)
+      io.emit("channelUserCountUpdate", {
+        channelId,
+        count: roomUsers[channelId].length,
+      });
 
-    // --- DISCONNECT ---
-    socket.on('disconnect', () => {
-        console.log(`User disconnected: ${socket.id}`);
-        
-        // Remove user from all rooms
-        Object.keys(roomUsers).forEach(roomId => {
-            const roomUserList = roomUsers[roomId];
-            const userIndex = roomUserList.findIndex(u => u.socketId === socket.id);
-            
-            if (userIndex !== -1) {
-                const removedUser = roomUserList[userIndex];
-                roomUserList.splice(userIndex, 1);
-                
-                // Notify remaining users in the room
-                io.to(roomId).emit('userLeft', removedUser.username);
-                io.to(roomId).emit('activeUsersList', roomUserList);
-                
-                // Broadcast user count update to ALL clients (for dashboard display)
-                io.emit('channelUserCountUpdate', { 
-                    roomId, 
-                    count: roomUserList.length 
-                });
-                
-                console.log(`${removedUser.username} left room ${roomId}`);
-            }
-        });
-    });
-
-    // --- USER LEFT (Explicit logout) ---
-    socket.on('userLeft', (data) => {
-        const { username, channelId } = data;
-        
-        if (roomUsers[channelId]) {
-            roomUsers[channelId] = roomUsers[channelId].filter(u => u.socketId !== socket.id);
-            
-            // Notify remaining users
-            io.to(channelId).emit('userLeft', username);
-            io.to(channelId).emit('activeUsersList', roomUsers[channelId]);
-            
-            // Broadcast user count update to ALL clients (for dashboard display)
-            io.emit('channelUserCountUpdate', { 
-                channelId, 
-                count: roomUsers[channelId].length 
-            });
-            
-            console.log(`${username} explicitly left room ${channelId}`);
-        }
-    });
+      console.log(`${username} explicitly left room ${channelId}`);
+    }
+  });
 });
 
 // Sessions
@@ -263,10 +271,13 @@ app.use("/dashboard/forumDash", forumRouter);
 app.use("/dashboard/forumDash/api", forumApiRouter);
 app.use("/dashboard/forumDash/ForumCreate", forumCreateRouter);
 app.use("/dashboard/forumDash/ForumMessaging/:channelId", ForumMessagingRouter);
+
+app.use("/dashboard/social", socialHubRouter);
+app.use("/dashboard/social/api", socialApiRouter);
+
 // ---------- DB + SERVER ----------
 const PORT = process.env.PORT || 5000;
-const MONGO_URI =
-  process.env.MONGO_URI || "mongodb://127.0.0.1:27017/universe";
+const MONGO_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/universe";
 
 mongoose
   .connect(MONGO_URI)

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Social Hub</title>
+  </head>
+  <body>
+    <h2>Social Hub</h2>
+
+    <input type="text" id="searchBox" placeholder="Search users..." />
+    <button onclick="loadFriendList()">Friend List</button>
+
+    <div id="results"></div>
+    <div id="friendList"></div>
+
+    <script>
+      async function searchUsers() {
+        const query = document.getElementById("searchBox").value;
+        const res = await fetch(`/dashboard/social/api/search?q=${query}`);
+        const data = await res.json();
+
+        let html = "";
+        data.forEach((u) => {
+          html += `<div>${u.name} (${u.UserName})</div>`;
+        });
+
+        document.getElementById("results").innerHTML = html;
+      }
+
+      document
+        .getElementById("searchBox")
+        .addEventListener("input", searchUsers);
+
+      async function loadFriendList() {
+        const res = await fetch(`/dashboard/social/api/friends`);
+        const data = await res.json();
+
+        let html = "<h3>Your Friends:</h3>";
+        data.forEach((f) => {
+          html += `<div>${f.name} (${f.UserName})</div>`;
+        });
+
+        document.getElementById("friendList").innerHTML = html;
+      }
+    </script>
+  </body>
+</html>
