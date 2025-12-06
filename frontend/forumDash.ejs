@@ -285,12 +285,27 @@
                         border: 1px solid rgba(0, 123, 255, 0.35);
                         box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
                         position: relative;
-                        overflow: hidden;
+                        overflow: visible;
                         display: flex;
                         flex-direction: column;
                         gap: 15px;
                         transition: all 0.25s ease;
                         cursor: pointer;
+                    }
+                    
+                    .vote-badge {
+                        position: absolute;
+                        bottom: 12px;
+                        left: 12px;
+                        background: rgba(0, 0, 0, 0.6);
+                        border: 1px solid rgba(0, 123, 255, 0.5);
+                        border-radius: 8px;
+                        padding: 6px 10px;
+                        display: flex;
+                        gap: 8px;
+                        font-size: 0.85em;
+                        font-weight: 600;
+                        z-index: 10;
                     }
                     
                     .channel-card::before {
@@ -474,10 +489,20 @@
             <input type="text" placeholder="Search channels by name or tag..." id="channelSearch" />
         </div>
         
-        <button class="create-channel-btn" onclick="window.location.href='/dashboard/forumDash/ForumCreate'">
-            <i class="fas fa-plus-circle"></i>
-            Create Channel
-        </button>
+        <div style="display:flex; gap:10px;">
+            <button class="create-channel-btn" onclick="window.location.href='/dashboard/forumDash/ForumCreate'">
+                <i class="fas fa-plus-circle"></i>
+                Create Channel
+            </button>
+            <button class="create-channel-btn" id="myServersBtn" style="background: linear-gradient(45deg,#0056b3,#6a1ba3);" onclick="toggleMyServers()">
+                <i class="fas fa-server"></i>
+                My Servers
+            </button>
+            <button class="create-channel-btn" id="sortBtn" style="background: linear-gradient(45deg,#6a1ba3,#0056b3);" onclick="toggleSortByVotes()">
+                <i class="fas fa-arrow-down-wide-short"></i>
+                Sort by Votes
+            </button>
+        </div>
     </div>
     
     <section class="channels-wrapper">
@@ -489,12 +514,11 @@
             <% } else { %>
                 <div class="channels-grid">
                     <% channels.forEach(channel => { %>
-                        <article 
-                            class="channel-card" 
-                            onclick="window.location.href='/dashboard/forumDash/ForumMessaging/<%= channel.id %>'"
-                            data-name="<%= channel.name %>"
-                            data-tags="<%= (channel.tags || []).join(',').toLowerCase() %>"
-                        >
+                <div class="channel-card" data-name="<%= channel.name %>" data-tags="<%= (channel.tags || []).join(',').toLowerCase() %>" data-owner="<%= channel.owner %>" data-channel-id="<%= channel.id %>">
+                            <div class="vote-badge">
+                                <span style="color: #9fd3c7;">▲ <span id="up-<%= channel.id %>"><%= channel.upvotes || 0 %></span></span>
+                                <span style="color: #f6a5a5;">▼ <span id="down-<%= channel.id %>"><%= channel.downvotes || 0 %></span></span>
+                            </div>
                             <div class="channel-header">
                                 <h2 class="channel-name"><%= channel.name %></h2>
                                 <p class="channel-subject"><%= channel.subject %></p>
@@ -513,15 +537,22 @@
                             <% } %>
                             
                             <div class="channel-footer">
-                                <div class="member-count">
-                                    <i class="fas fa-users"></i>
-                                    <%= channel.activeMembers %> Active
+                                <div>
+                                    <span class="member-count" style="visibility: hidden; height: 0;">
+                                        <i class="fas fa-users"></i>
+                                        <span id="member-<%= channel.id %>">0</span> Active
+                                    </span>
                                 </div>
-                                <div class="join-btn">
-                                    Join Channel
+                                <div style="display:flex; gap:8px; align-items:center;">
+                                    <button class="join-btn" onclick="event.stopPropagation(); window.location.href='/dashboard/forumDash/ForumMessaging/<%= channel.id %>'">Join Channel</button>
+                                    <button class="create-channel-btn" style="padding:6px 10px; font-size:0.9em;" onclick="event.stopPropagation(); upvoteChannel('<%= channel.id %>')">Upvote</button>
+                                    <button class="create-channel-btn" style="padding:6px 10px; font-size:0.9em;" onclick="event.stopPropagation(); downvoteChannel('<%= channel.id %>')">Downvote</button>
+                                    <% if (channel.owner === user.username) { %>
+                                        <button class="back-btn" style="padding:6px 10px; font-size:0.9em; background:#6a1ba3;" onclick="event.stopPropagation(); deleteChannel('<%= channel.id %>')">Delete</button>
+                                    <% } %>
                                 </div>
                             </div>
-                        </article>
+                        </div>
                             <% }) %>
                         </div>
                         <% } %>
@@ -531,6 +562,45 @@
                 <script>
                     const searchInput = document.getElementById('channelSearch');
                     const channelGrid = document.querySelector('.channels-grid');
+                    const myServersBtn = document.getElementById('myServersBtn');
+                    const sortBtn = document.getElementById('sortBtn');
+                    let isShowingMyServers = false;
+                    let isSortingByVotes = false;
+                    const username = '<%= user.username %>';
+                    
+                    // Track active users per channel via Socket.IO
+                    const channelUserCounts = {};
+                    let socket = null;
+                    
+                    // Initialize Socket.IO connection for real-time active user tracking
+                    function initializeSocketIO() {
+                        // Check if socket.io is loaded
+                        if (typeof io !== 'undefined' && !socket) {
+                            socket = io();
+                            
+                            // Listen for active users updates from channels
+                            socket.on('channelUserCountUpdate', (data) => {
+                                const { channelId, count } = data;
+                                channelUserCounts[channelId] = count;
+                                const activeSpan = document.getElementById('active-' + channelId);
+                                if (activeSpan) {
+                                    activeSpan.textContent = count;
+                                }
+                            });
+                            
+                            // Periodically check all channels for active users
+                            // (This will be emitted by the server when users join/leave rooms)
+                            socket.on('connect', () => {
+                                console.log('Dashboard socket connected for tracking');
+                            });
+                        } else if (typeof io === 'undefined') {
+                            // Retry if socket.io not ready
+                            setTimeout(initializeSocketIO, 100);
+                        }
+                    }
+                    
+                    // Start tracking on page load
+                    setTimeout(initializeSocketIO, 500);
                     
                     if (searchInput) {
                         searchInput.addEventListener('keyup', (e) => {
@@ -538,21 +608,130 @@
                             
                             if (channelGrid) {
                                 const cards = channelGrid.querySelectorAll('.channel-card');
-                                let found = false;
                                 
                                 cards.forEach(card => {
                                     const name = card.getAttribute('data-name').toLowerCase();
                                     const tags = card.getAttribute('data-tags');
+                                    const owner = card.getAttribute('data-owner');
                                     
-                                    if (name.includes(searchTerm) || tags.includes(searchTerm)) {
-                                        card.style.display = 'flex';
-                                        found = true;
-                                    } else {
-                                        card.style.display = 'none';
-                                    }
+                                    // Apply both search and my-servers filter
+                                    const matchesSearch = !searchTerm || name.includes(searchTerm) || tags.includes(searchTerm);
+                                    const matchesFilter = !isShowingMyServers || owner === username;
+                                    
+                                    card.style.display = (matchesSearch && matchesFilter) ? 'flex' : 'none';
                                 });
                             }
                         });
+                    }
+
+                    // -- Toggle My Servers Filter --
+                    function toggleMyServers() {
+                        isShowingMyServers = !isShowingMyServers;
+                        
+                        // Update button style
+                        myServersBtn.style.opacity = isShowingMyServers ? '1' : '0.7';
+                        myServersBtn.style.boxShadow = isShowingMyServers ? '0 0 12px rgba(0, 123, 255, 0.6)' : 'none';
+                        
+                        // Re-apply filters
+                        if (channelGrid) {
+                            const cards = channelGrid.querySelectorAll('.channel-card');
+                            const searchTerm = (searchInput?.value || '').toLowerCase().trim();
+                            
+                            cards.forEach(card => {
+                                const name = card.getAttribute('data-name').toLowerCase();
+                                const tags = card.getAttribute('data-tags');
+                                const owner = card.getAttribute('data-owner');
+                                
+                                const matchesSearch = !searchTerm || name.includes(searchTerm) || tags.includes(searchTerm);
+                                const matchesFilter = !isShowingMyServers || owner === username;
+                                
+                                card.style.display = (matchesSearch && matchesFilter) ? 'flex' : 'none';
+                            });
+                        }
+                    }
+
+                    // -- Toggle Sort by Votes --
+                    function toggleSortByVotes() {
+                        isSortingByVotes = !isSortingByVotes;
+                        
+                        // Update button style
+                        sortBtn.style.opacity = isSortingByVotes ? '1' : '0.7';
+                        sortBtn.style.boxShadow = isSortingByVotes ? '0 0 12px rgba(138, 43, 226, 0.6)' : 'none';
+                        
+                        // Sort the cards
+                        if (channelGrid) {
+                            const cards = Array.from(channelGrid.querySelectorAll('.channel-card'));
+                            
+                            if (isSortingByVotes) {
+                                // Sort by net votes (upvotes - downvotes) in descending order
+                                cards.sort((a, b) => {
+                                    const aUpvotes = parseInt(a.querySelector('[id^="up-"]').textContent) || 0;
+                                    const aDownvotes = parseInt(a.querySelector('[id^="down-"]').textContent) || 0;
+                                    const bUpvotes = parseInt(b.querySelector('[id^="up-"]').textContent) || 0;
+                                    const bDownvotes = parseInt(b.querySelector('[id^="down-"]').textContent) || 0;
+                                    
+                                    const aNet = aUpvotes - aDownvotes;
+                                    const bNet = bUpvotes - bDownvotes;
+                                    
+                                    return bNet - aNet; // Descending order
+                                });
+                            } else {
+                                // Restore original order by reloading or resetting
+                                location.reload();
+                            }
+                            
+                            // Reorder cards in DOM
+                            cards.forEach(card => {
+                                channelGrid.appendChild(card);
+                            });
+                        }
+                    }
+
+                    // -- Channel actions --
+                    async function upvoteChannel(id) {
+                        try {
+                            const res = await fetch(`/dashboard/forumDash/api/${id}/upvote`, { method: 'POST' });
+                            const data = await res.json();
+                            if (res.ok) {
+                                document.getElementById('up-' + id).innerText = data.upvotes;
+                            } else {
+                                alert(data.error || 'Upvote failed');
+                            }
+                        } catch (err) {
+                            console.error(err);
+                            alert('Network error');
+                        }
+                    }
+
+                    async function downvoteChannel(id) {
+                        try {
+                            const res = await fetch(`/dashboard/forumDash/api/${id}/downvote`, { method: 'POST' });
+                            const data = await res.json();
+                            if (res.ok) {
+                                document.getElementById('down-' + id).innerText = data.downvotes;
+                            } else {
+                                alert(data.error || 'Downvote failed');
+                            }
+                        } catch (err) {
+                            console.error(err);
+                            alert('Network error');
+                        }
+                    }
+
+                    async function deleteChannel(id) {
+                        if (!confirm('Are you sure you want to delete this channel? This action cannot be undone.')) return;
+                        try {
+                            const res = await fetch(`/dashboard/forumDash/api/${id}`, { method: 'DELETE' });
+                            const data = await res.json();
+                            if (res.ok) {
+                                location.reload();
+                            } else {
+                                alert(data.error || 'Delete failed');
+                            }
+                        } catch (err) {
+                            console.error(err);
+                            alert('Network error');
+                        }
                     }
                     </script>
 </body>

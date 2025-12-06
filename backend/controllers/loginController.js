@@ -6,7 +6,7 @@ export const showLogin = async (req, res) => {
     if (req.session?.userData) {
       return  res.redirect("/api/dashboard");
     }
-    res.render("loginpage",{});
+    res.render("loginpage", { error: null });
   } catch (err) {
     res.status(500).json({ error: "Login page not delivered" });
   }
@@ -36,11 +36,10 @@ export const processLogin = async (req, res) => {
       
     }
     else{
-      res.message= "Invalid username or password";
-      res.status(401).json({ message: "Invalid username or password" });
+      res.render("loginpage", { error: "Invalid username or password" });
     }
 
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    res.render("loginpage", { error: "An error occurred during login. Please try again." });
   }
 };
