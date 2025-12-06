@@ -3,9 +3,6 @@ import mongoose from "mongoose";
 // Define the structure (schema) of a User document
 const userSchema = new mongoose.Schema(
   {
-    friends: [
-      { type: mongoose.Schema.Types.ObjectId, ref: "User", default: [] },
-    ],
     name: {
       type: String,
       required: true,

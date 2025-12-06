@@ -20,8 +20,10 @@ import forumApiRouter from "./routes/forumApi.js";
 import forumCreateRouter from "./routes/forumCreate.js";
 import ForumMessagingRouter from "./routes/ForumMessaging.js";
 import Message from "./models/forumMessage.js";
-import socialHubRouter from "./routes/socialHubRouter.js";
-import socialApiRouter from "./routes/socialApiRouter.js";
+// import socialHubRouter from "./routes/socialHubRouter.js";
+// import socialApiRouter from "./routes/socialApiRouter.js";
+
+import socialRoutes from "./routes/socialRoutes.js";
 
 // Load env
 dotenv.config();
@@ -271,9 +273,8 @@ app.use("/dashboard/forumDash", forumRouter);
 app.use("/dashboard/forumDash/api", forumApiRouter);
 app.use("/dashboard/forumDash/ForumCreate", forumCreateRouter);
 app.use("/dashboard/forumDash/ForumMessaging/:channelId", ForumMessagingRouter);
+app.use("/api/dashboard", socialRoutes);
 
-app.use("/dashboard/social", socialHubRouter);
-app.use("/dashboard/social/api", socialApiRouter);
 
 // ---------- DB + SERVER ----------
 const PORT = process.env.PORT || 5000;
