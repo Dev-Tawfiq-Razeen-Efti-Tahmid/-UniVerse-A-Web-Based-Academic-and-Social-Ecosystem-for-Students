@@ -199,17 +199,21 @@
                     color: var(--subtle-text);
                 }
                 
-                .channel-controls {
+                .channel-controls-flex {
                     display: flex;
                     align-items: center;
+                    justify-content: space-between;
                     gap: 15px;
                     width: 100%;
-                    max-width: 500px;
+                    margin-bottom: 32px;
                 }
-                
                 .search-bar {
                     position: relative;
-                    flex-grow: 1;
+                    flex: 1 1 0;
+                }
+                .button-group {
+                    display: flex;
+                    gap: 10px;
                 }
                 
                 .search-bar input {
@@ -483,13 +487,12 @@
         </div>
     </div>
     
-    <div class="channel-controls">
+    <div class="channel-controls channel-controls-flex">
         <div class="search-bar">
             <i class="fas fa-search"></i>
             <input type="text" placeholder="Search channels by name or tag..." id="channelSearch" />
         </div>
-        
-        <div style="display:flex; gap:10px;">
+        <div class="button-group">
             <button class="create-channel-btn" onclick="window.location.href='/dashboard/forumDash/ForumCreate'">
                 <i class="fas fa-plus-circle"></i>
                 Create Channel
