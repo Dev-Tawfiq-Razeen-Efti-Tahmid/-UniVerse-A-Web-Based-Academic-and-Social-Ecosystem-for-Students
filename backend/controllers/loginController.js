@@ -20,7 +20,7 @@ export const processLogin = async (req, res) => {
         username: store.UserName,
         name: store.name,
         email: store.email,
-        id: store.id,
+        userId: store._id.toString(),
         department: store.department,
         DateOfBirth: store.DateOfBirth,                                 //Still needs work to function properly
         profilePic: store.profilePic
