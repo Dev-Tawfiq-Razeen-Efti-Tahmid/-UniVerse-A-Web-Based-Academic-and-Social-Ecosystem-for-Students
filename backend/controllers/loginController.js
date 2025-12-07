@@ -21,6 +21,7 @@ export const processLogin = async (req, res) => {
     if (store) {
       const data = {
         _id: store._id,
+        userId: store._id.toString(),
         username: store.UserName,
         name: store.name,
         email: store.email,

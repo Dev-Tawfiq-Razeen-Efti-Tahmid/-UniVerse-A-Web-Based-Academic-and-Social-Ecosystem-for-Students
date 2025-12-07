@@ -1,20 +1,25 @@
 // backend/routes/events.js
 import express from "express";
+
 import {
   listUpcomingEvents,
   listUpcomingEventsJson,
-  // listEventReminders,  // <- make sure this is removed or commented
+  listEventReminders,
+  addEventReminder,
+  removeEventReminder, 
 } from "../controllers/eventController.js";
 
 const router = express.Router();
-
-// /dashboard/events → full list (events.ejs)
+// show upcoming events
 router.get("/events", listUpcomingEvents);
 
-// /dashboard/api/events → JSON
+// student reminders page
+router.get("/events/reminders", listEventReminders);
+
+// add reminder for an event
+router.post("/events/:id/remind", addEventReminder);
+router.post("/events/:id/unremind", removeEventReminder);
+
+// json api (already there)
 router.get("/api/events", listUpcomingEventsJson);
-
-// (optional reminders route for later)
-// router.get("/events/reminders", listEventReminders);
-
 export default router;

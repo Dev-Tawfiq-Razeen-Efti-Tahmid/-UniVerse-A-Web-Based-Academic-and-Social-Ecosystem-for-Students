@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>UniVerse Events</title>
+  <title>My Event Reminders - UniVerse</title>
 
   <link
     rel="stylesheet"
@@ -45,7 +45,6 @@
       flex-direction: column;
     }
 
-    /* Background dots */
     .background-dots {
       position: absolute;
       inset: 0;
@@ -69,20 +68,11 @@
     }
 
     @keyframes moveDots {
-      0% {
-        transform: translate(var(--x-start), var(--y-start)) scale(0);
-        opacity: 0;
-      }
-      50% {
-        opacity: 1;
-      }
-      100% {
-        transform: translate(var(--x-end), var(--y-end)) scale(1.5);
-        opacity: 0;
-      }
+      0% { transform: translate(var(--x-start), var(--y-start)) scale(0); opacity: 0; }
+      50% { opacity: 1; }
+      100% { transform: translate(var(--x-end), var(--y-end)) scale(1.5); opacity: 0; }
     }
 
-    /* Top bar */
     .top-bar {
       background-color: var(--dark-card);
       padding: 15px 40px;
@@ -156,16 +146,11 @@
     }
 
     .logout-btn:hover {
-      background: linear-gradient(
-        90deg,
-        var(--button-hover-blue),
-        var(--button-hover-violet)
-      );
+      background: linear-gradient(90deg, var(--button-hover-blue), var(--button-hover-violet));
       transform: translateY(-2px);
       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     }
 
-    /* Main content */
     .main-content {
       max-width: 1200px;
       width: 100%;
@@ -202,31 +187,6 @@
       color: var(--subtle-text);
     }
 
-    .filters {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-
-    .filter-pill {
-      background-color: #222744;
-      border-radius: 999px;
-      padding: 6px 14px;
-      border: 1px solid rgba(0, 123, 255, 0.4);
-      font-size: 0.85em;
-      color: var(--subtle-text);
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      cursor: default;
-    }
-
-    .filter-pill i {
-      font-size: 0.9em;
-      color: var(--primary-blue);
-    }
-
     .events-wrapper {
       background-color: rgba(23, 27, 54, 0.9);
       border-radius: 16px;
@@ -249,36 +209,9 @@
       padding: 18px 18px 16px;
       border: 1px solid rgba(0, 123, 255, 0.35);
       box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
-      position: relative;
-      overflow: hidden;
       display: flex;
       flex-direction: column;
       gap: 10px;
-      transition: all 0.25s ease;
-    }
-
-    .event-card::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(
-        circle at top left,
-        rgba(138, 43, 226, 0.35),
-        transparent 55%
-      );
-      opacity: 0;
-      transition: opacity 0.25s ease;
-      pointer-events: none;
-    }
-
-    .event-card:hover {
-      transform: translateY(-6px) scale(1.01);
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.7);
-      border-color: var(--accent-violet);
-    }
-
-    .event-card:hover::before {
-      opacity: 1;
     }
 
     .event-header-row {
@@ -329,37 +262,13 @@
       color: #d0d0ea;
     }
 
-    .event-footer {
-      margin-top: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.8em;
-      color: var(--subtle-text);
-    }
-
-    .badge-approved {
-      padding: 3px 10px;
-      border-radius: 999px;
-      background-color: rgba(0, 200, 120, 0.12);
-      border: 1px solid rgba(0, 200, 120, 0.5);
-      color: #7fffd4;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-    }
-
-    .badge-approved i {
-      font-size: 0.8em;
-    }
-
-    .remind-btn {
+    .remove-btn {
       background: transparent;
       border-radius: 999px;
       padding: 6px 12px;
       font-size: 0.8em;
-      border: 1px solid rgba(0, 123, 255, 0.6);
-      color: var(--text-light);
+      border: 1px solid rgba(255, 80, 80, 0.8);
+      color: #ffb3b3;
       display: inline-flex;
       align-items: center;
       gap: 6px;
@@ -367,40 +276,12 @@
       transition: all 0.2s ease;
     }
 
-    .remind-btn i {
+    .remove-btn i {
       font-size: 0.9em;
-      color: var(--primary-blue);
     }
 
-    .remind-btn:hover {
-      background: rgba(0, 123, 255, 0.15);
-      border-color: var(--accent-violet);
-      transform: translateY(-1px);
-      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
-    }
-
-    .reminders-btn {
-      background: transparent;
-      border-radius: 999px;
-      padding: 6px 14px;
-      font-size: 0.85em;
-      border: 1px solid rgba(0, 123, 255, 0.6);
-      color: var(--text-light);
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .reminders-btn i {
-      font-size: 0.9em;
-      color: var(--primary-blue);
-    }
-
-    .reminders-btn:hover {
-      background: rgba(0, 123, 255, 0.15);
-      border-color: var(--accent-violet);
+    .remove-btn:hover {
+      background: rgba(255, 80, 80, 0.15);
       transform: translateY(-1px);
       box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
     }
@@ -418,7 +299,6 @@
       margin-bottom: 10px;
     }
 
-    /* Toast */
     .remind-toast {
       position: fixed;
       top: 80px;
@@ -426,7 +306,7 @@
       background: rgba(23, 27, 54, 0.98);
       border-radius: 10px;
       padding: 10px 16px;
-      border: 1px solid rgba(0, 200, 120, 0.6);
+      border: 1px solid rgba(255, 80, 80, 0.8);
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
       font-size: 0.9em;
       display: flex;
@@ -436,7 +316,7 @@
     }
 
     .remind-toast i {
-      color: #7fffd4;
+      color: #ffb3b3;
     }
 
     .remind-toast.hide {
@@ -446,52 +326,38 @@
     }
 
     @media (max-width: 768px) {
-      .top-bar {
-        padding: 12px 18px;
-      }
-
-      .top-bar .logo {
-        font-size: 1.8em;
-      }
-
-      .main-content {
-        padding: 28px 16px 40px;
-      }
-
-      .page-title {
-        font-size: 1.8em;
-      }
-
-      .events-wrapper {
-        padding: 18px 16px 24px;
-      }
+      .top-bar { padding: 12px 18px; }
+      .top-bar .logo { font-size: 1.8em; }
+      .main-content { padding: 28px 16px 40px; }
+      .page-title { font-size: 1.8em; }
+      .events-wrapper { padding: 18px 16px 24px; }
     }
   </style>
 </head>
 <body>
   <div class="background-dots">
     <% for (let i = 0; i < 25; i++) { %>
-    <div
-      class="dot"
-      style="
-        width: <%= Math.floor(Math.random() * 25) + 15 %>px;
-        height: <%= Math.floor(Math.random() * 25) + 15 %>px;
-        --x-start: <%= Math.random() * 100 %>vw;
-        --y-start: <%= Math.random() * 100 %>vh;
-        --x-end: <%= Math.random() * 100 %>vw;
-        --y-end: <%= Math.random() * 100 %>vh;
-        animation-delay: <%= Math.random() * 15 %>s;
-      "
-    ></div>
+      <div
+        class="dot"
+        style="
+          width: <%= Math.floor(Math.random() * 25) + 15 %>px;
+          height: <%= Math.floor(Math.random() * 25) + 15 %>px;
+          --x-start: <%= Math.random() * 100 %>vw;
+          --y-start: <%= Math.random() * 100 %>vh;
+          --x-end: <%= Math.random() * 100 %>vw;
+          --y-end: <%= Math.random() * 100 %>vh;
+          animation-delay: <%= Math.random() * 15 %>s;
+        "
+      ></div>
     <% } %>
   </div>
 
   <div class="top-bar">
     <div class="logo" onclick="window.location.href='/api/dashboard'">UniVerse</div>
     <div class="user-controls">
-      <button class="back-btn" onclick="window.location.href='/api/dashboard'">
+      <button class="back-btn" onclick="window.location.href='/dashboard/events'">
         <i class="fas fa-arrow-left"></i>
-        Dashboard
+        Back to Events
       </button>
 
       <form method="get" action="/api/logout">
@@ -500,12 +366,11 @@
     </div>
   </div>
 
-  <% if (typeof reminderAdded !== 'undefined' && reminderAdded) { %>
+  <% if (typeof removed !== 'undefined' && removed) { %>
     <div id="reminder-toast" class="remind-toast">
-      <i class="fas fa-check-circle"></i>
-      <span>Event added to your reminders.</span>
+      <i class="fas fa-trash-alt"></i>
+      <span>Reminder removed.</span>
     </div>
-
     <script>
       setTimeout(() => {
         const t = document.getElementById("reminder-toast");
@@ -517,113 +382,74 @@
   <main class="main-content">
     <div class="page-header">
       <div class="page-title-block">
-        <h1 class="page-title">Upcoming Events</h1>
+        <h1 class="page-title">My Event Reminders</h1>
         <p class="page-subtitle">
-          Stay updated with workshops, club fests, seminars, and more happening around your campus.
+          All the events you’ve saved to keep track of.
         </p>
-      </div>
-
-      <div class="filters">
-        <div class="filter-pill">
-          <i class="fas fa-clock"></i>
-          Showing future, approved events
-        </div>
-        <div class="filter-pill">
-          <i class="fas fa-calendar-day"></i>
-          Sorted by start time
-        </div>
-
-        <button
-          type="button"
-          class="reminders-btn"
-          onclick="window.location.href='/dashboard/events/reminders'"
-        >
-          <i class="far fa-bell"></i>
-          My Reminders
-        </button>
       </div>
     </div>
 
     <section class="events-wrapper">
       <% if (!events || events.length === 0) { %>
-      <div class="no-events">
-        <span>🎉</span>
-        No upcoming events yet. Check back soon!
-      </div>
+        <div class="no-events">
+          <span>🔔</span>
+          You don’t have any saved reminders yet. Go to the Events page and tap “Remind me”.
+        </div>
       <% } else { %>
-      <div class="events-grid">
-        <% events.forEach(event => { %>
-        <article class="event-card">
-          <div class="event-header-row">
-            <h2 class="event-title"><%= event.title %></h2>
-            <span class="event-category"><%= event.category || "other" %></span>
-          </div>
+        <div class="events-grid">
+          <% events.forEach(event => { %>
+            <article class="event-card">
+              <div class="event-header-row">
+                <h2 class="event-title"><%= event.title %></h2>
+                <span class="event-category"><%= event.category || "other" %></span>
+              </div>
 
-          <div class="event-meta">
-            <div class="event-meta-row">
-              <i class="fas fa-map-marker-alt"></i>
-              <span><%= event.location %></span>
-            </div>
-            <div class="event-meta-row">
-              <i class="far fa-calendar-alt"></i>
-              <span>
-                <%= new Date(event.startTime).toLocaleString("en-US", {
-                  weekday: "short",
-                  month: "short",
-                  day: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit"
-                }) %>
-                <% if (event.endTime) { %>
-                  – <%= new Date(event.endTime).toLocaleTimeString("en-US", {
-                    hour: "2-digit",
-                    minute: "2-digit"
-                  }) %>
-                <% } %>
-              </span>
-            </div>
-          </div>
+              <div class="event-meta">
+                <div class="event-meta-row">
+                  <i class="fas fa-map-marker-alt"></i>
+                  <span><%= event.location %></span>
+                </div>
+                <div class="event-meta-row">
+                  <i class="far fa-calendar-alt"></i>
+                  <span>
+                    <%= new Date(event.startTime).toLocaleString("en-US", {
+                      weekday: "short",
+                      month: "short",
+                      day: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit"
+                    }) %>
+                    <% if (event.endTime) { %>
+                      – <%= new Date(event.endTime).toLocaleTimeString("en-US", {
+                        hour: "2-digit",
+                        minute: "2-digit"
+                      }) %>
+                    <% } %>
+                  </span>
+                </div>
+              </div>
 
-          <% if (event.description) { %>
-          <p class="event-description">
-            <%= event.description.length > 160
-              ? event.description.slice(0, 157) + "..."
-              : event.description %>
-          </p>
-          <% } %>
+              <% if (event.description) { %>
+                <p class="event-description">
+                  <%= event.description.length > 160
+                    ? event.description.slice(0, 157) + "..."
+                    : event.description %>
+                </p>
+              <% } %>
 
-          <div class="event-footer">
-            <div class="badge-approved">
-              <i class="fas fa-check-circle"></i>
-              Approved Event
-            </div>
-
-            <div>
               <form
-                action="/dashboard/events/<%= event._id %>/remind"
+                action="/dashboard/events/<%= event._id %>/unremind"
                 method="POST"
-                style="display: inline;"
+                style="margin-top: 10px;"
               >
-                <button type="submit" class="remind-btn">
-                  <i class="far fa-bell"></i>
-                  Remind me
+                <button type="submit" class="remove-btn">
+                  <i class="fas fa-times-circle"></i>
+                  Remove reminder
                 </button>
               </form>
-
-              <% if (event.createdAt) { %>
-              <span style="margin-left: 8px;">
-                Added
-                <%= new Date(event.createdAt).toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "numeric"
-                }) %>
-              </span>
-              <% } %>
-            </div>
-          </div>
-        </article>
-        <% }); %>
-      </div>
+            </article>
+          <% }) %>
+        </div>
       <% } %>
     </section>
   </main>
