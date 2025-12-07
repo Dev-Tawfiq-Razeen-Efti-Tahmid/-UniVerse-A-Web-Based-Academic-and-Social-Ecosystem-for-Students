@@ -17,7 +17,7 @@ export const processRegister = async (req, res) => {
     const filePath = req.file.path;
     const example={
     name: req.body.name,
-    id: req.body.studentId,
+    student_id: req.body.studentId,
     email: req.body.gsuiteEmail,
     department: req.body.department,
     UserName: req.body.username,
@@ -29,7 +29,7 @@ export const processRegister = async (req, res) => {
     console.log("User registered Successfully");
     return res.status(201).json({ 
       message: "Registration successful!",
-      redirectTo: "/api/login" // Client-side JS will read this and navigate
+      redirectTo: "/api/login" 
     });
   } catch (err) {
     console.error("Registration Error:", err.message);
