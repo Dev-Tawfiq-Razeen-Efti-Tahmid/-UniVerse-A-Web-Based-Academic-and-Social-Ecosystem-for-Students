@@ -20,12 +20,13 @@ export const processLogin = async (req, res) => {
         username: store.UserName,
         name: store.name,
         email: store.email,
-        id: store.id,
+        _id: store._id, // Fixed: use _id so planner and dashboard work!
         department: store.department,
         DateOfBirth: store.DateOfBirth,                                 //Still needs work to function properly
         profilePic: store.profilePic
       }
       req.session.userData = data;
+      console.log('[DEBUG] Session userData after login:', req.session.userData);
       req.session.visited=true;
       console.log("Session Data after login:", req.session.id);
       res.redirect('/api/dashboard');

@@ -13,6 +13,9 @@ import dashboardRouter from "./routes/dashboard.js";
 import registerRouter from "./routes/register.js";
 import logoutRouter from "./routes/logout.js";
 import eventsRouter from "./routes/events.js";
+import schedulerRouter from "./routes/scheduler.js";
+import notificationsRouter from "./routes/notifications.js";
+import { processDueNotifications } from "./controllers/notificationController.js";
 
 // Load env
 dotenv.config();
@@ -69,8 +72,11 @@ app.use("/api/users", usersRouter);
 app.use("/api/login", loginRouter);
 app.use("/api/register", registerRouter);
 app.use("/api/dashboard", dashboardRouter);
+app.use("/dashboard", dashboardRouter);
 app.use("/api/logout", logoutRouter);
 app.use("/dashboard", eventsRouter);
+app.use("/api/scheduler", schedulerRouter);
+app.use("/api/notifications", notificationsRouter);
 
 // ---------- DB + SERVER ----------
 const PORT = process.env.PORT || 5000;
@@ -79,7 +85,16 @@ const MONGO_URI =
 
 mongoose
   .connect(MONGO_URI)
-  .then(() => console.log("✅ MongoDB Atlas connected"))
+  .then(() => {
+    console.log("✅ MongoDB Atlas connected");
+    
+    // Start background job to process notifications every minute
+    setInterval(async () => {
+      await processDueNotifications();
+    }, 60000); // Run every 60 seconds
+    
+    console.log("📬 Notification processor started (runs every 60 seconds)");
+  })
   .catch((err) => console.error("❌ Mongo error:", err));
 
 app.listen(PORT, () => {
