@@ -3,7 +3,10 @@ import path from "path";
 
 export const showLogin = async (req, res) => {
   try {
-    res.render("loginpage",{});
+    if (req.session?.userData) {
+      return  res.redirect("/api/dashboard");
+    }
+    res.render("loginpage", { error: null });
   } catch (err) {
     res.status(500).json({ error: "Login page not delivered" });
   }
@@ -17,10 +20,12 @@ export const processLogin = async (req, res) => {
     
     if (store) {
       const data = {
+        _id: store._id,
+        userId: store._id.toString(),
         username: store.UserName,
         name: store.name,
         email: store.email,
-        student_id: store.student_id, // Use student_id for all user references
+        student_id: store.student_id,
         department: store.department,
         DateOfBirth: store.DateOfBirth, // Still needs work to function properly
         profilePic: store.profilePic
@@ -33,11 +38,10 @@ export const processLogin = async (req, res) => {
       
     }
     else{
-      res.message= "Invalid username or password";
-      res.status(401).json({ message: "Invalid username or password" });
+      res.render("loginpage", { error: "Invalid username or password" });
     }
 
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    res.render("loginpage", { error: "An error occurred during login. Please try again." });
   }
 };

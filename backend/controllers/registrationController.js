@@ -29,7 +29,7 @@ export const processRegister = async (req, res) => {
     console.log("User registered Successfully");
     return res.status(201).json({ 
       message: "Registration successful!",
-      redirectTo: "/api/login" // Client-side JS will read this and navigate
+      redirectTo: "/api/login" 
     });
   } catch (err) {
     console.error("Registration Error:", err.message);

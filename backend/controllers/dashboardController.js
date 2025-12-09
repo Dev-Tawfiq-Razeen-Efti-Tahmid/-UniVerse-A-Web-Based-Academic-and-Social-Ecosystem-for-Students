@@ -1,11 +1,15 @@
-import User from "../models/UserModel.js";
-import path from "path";
+// backend/controllers/dashboardController.js
 
-export const showdashBoard = async (req, res) => {
-  try {
-    console.log("Session Data:", req.session.id);
-    res.render("dashboard",{username : req.session.userData.username});
-  } catch (err) {
-    res.status(500).json({ error: "Login page not delivered" });
+export const showdashBoard = (req, res) => {
+  const userData = req.session?.userData;
+
+  // If user is not logged in → redirect to login page
+  if (!userData) {
+    return res.redirect("/api/login");
   }
+
+  // userData exists, so we can safely use username
+  const username = userData.username;
+
+  res.render("dashboard", { username });
 };
