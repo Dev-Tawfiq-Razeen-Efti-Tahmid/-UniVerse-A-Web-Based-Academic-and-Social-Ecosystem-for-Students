@@ -3,15 +3,15 @@ export const showPlanner = (req, res) => {
   try {
     const userData = req.session?.userData;
 
-    // Check if user is authenticated and has an _id
-    if (!userData || !userData._id) {
+    // Check if user is authenticated and has a student_id
+    if (!userData || !userData.student_id) {
       return res.redirect("/api/login");
     }
 
     console.log("[DEBUG] userData in showPlanner:", userData);
     // Render the planner template with user data
     res.render("planner", {
-      userId: userData._id,
+      userId: userData.student_id,
       username: userData.username || userData.name || "Student",
     });
   } catch (error) {

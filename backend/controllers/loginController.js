@@ -20,11 +20,11 @@ export const processLogin = async (req, res) => {
         username: store.UserName,
         name: store.name,
         email: store.email,
-        _id: store._id, // Fixed: use _id so planner and dashboard work!
+        student_id: store.student_id, // Use student_id for all user references
         department: store.department,
-        DateOfBirth: store.DateOfBirth,                                 //Still needs work to function properly
+        DateOfBirth: store.DateOfBirth, // Still needs work to function properly
         profilePic: store.profilePic
-      }
+      };
       req.session.userData = data;
       console.log('[DEBUG] Session userData after login:', req.session.userData);
       req.session.visited=true;

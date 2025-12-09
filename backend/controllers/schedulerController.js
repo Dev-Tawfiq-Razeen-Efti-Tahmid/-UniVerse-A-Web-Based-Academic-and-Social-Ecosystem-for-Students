@@ -47,17 +47,17 @@ export const autoCreateNotifications = async (taskId, deadline, userId) => {
 export const addTask = async (req, res) => {
   console.log("[DEBUG] /api/scheduler/add req.body:", req.body);
   try {
-    const { userId, title, description, deadline, priority, category, tags } =
-      req.body;
+    const { userId, title, description, deadline, priority, category, tags } = req.body;
+    // userId should be student_id (from session/frontend)
 
     if (!userId || !title || !deadline) {
       return res
         .status(400)
-        .json({ error: "Missing required fields: userId, title, deadline" });
+        .json({ error: "Missing required fields: userId (student_id), title, deadline" });
     }
 
     const newTask = await SchedulerModel.create({
-      userId,
+      userId, // stores student_id
       title,
       description: description || "",
       deadline: new Date(deadline),
@@ -67,7 +67,7 @@ export const addTask = async (req, res) => {
     });
 
     // Auto-create notifications for this task
-    await autoCreateNotifications(newTask._id, newTask.deadline, userId);
+    await autoCreateNotifications(newTask._id, newTask.deadline, userId); // userId is student_id
 
     res.status(201).json({ message: "Task added successfully", task: newTask });
   } catch (error) {
@@ -79,13 +79,13 @@ export const addTask = async (req, res) => {
 // Get all tasks for a user
 export const getTasks = async (req, res) => {
   try {
-    const { userId } = req.params;
+    const { userId } = req.params; // userId is student_id!
 
     if (!userId) {
-      return res.status(400).json({ error: "userId is required" });
+      return res.status(400).json({ error: "userId (student_id) is required" });
     }
 
-    const tasks = await SchedulerModel.find({ userId })
+    const tasks = await SchedulerModel.find({ userId }) // userId is student_id
       .sort({ deadline: 1 })
       .lean();
 
