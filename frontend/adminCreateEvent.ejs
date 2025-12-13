@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Event | UniVerse Admin</title>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Orbitron:wght@400;700&display=swap");
+    :root{--dark-bg:#050818;--dark-card:#11162b;--primary-blue:#00b4ff;--accent-violet:#b832ff;--text-light:#e0e7ff;--input-bg:#1a2140;--subtle:#9aa3d8;}
+    body{margin:0;font-family:Montserrat,sans-serif;background:radial-gradient(circle at top,#1b1f3b 0%,#050818 50%,#020312 100%);color:var(--text-light);min-height:100vh;}
+    .wrap{max-width:720px;margin:50px auto;padding:28px;background:rgba(17,22,43,.7);border:1px solid rgba(184,50,255,.35);border-radius:16px;box-shadow:0 10px 35px rgba(0,0,0,.45);backdrop-filter:blur(6px);}
+    h1{font-family:Orbitron,sans-serif;margin:0 0 14px;text-shadow:0 0 14px rgba(0,180,255,.6)}
+    label{display:block;margin:14px 0 6px;color:var(--subtle);font-size:.9em}
+    input,textarea,select{width:100%;padding:12px;border-radius:10px;border:1px solid rgba(0,180,255,.35);background:var(--input-bg);color:var(--text-light);outline:none;font-size:.95em}
+    input:focus,textarea:focus,select:focus{border-color:var(--accent-violet);box-shadow:0 0 10px rgba(184,50,255,.35)}
+    .row{display:flex;gap:14px;margin-top:10px}
+    .row>div{flex:1}
+    .btns{display:flex;gap:14px;margin-top:24px}
+    .btn{padding:12px 18px;border:0;border-radius:10px;cursor:pointer;font-weight:800;color:#fff;background:linear-gradient(90deg,var(--primary-blue),var(--accent-violet))}
+    .secondary{background:transparent;border:1px solid rgba(0,180,255,.45)}
+    .error{margin:10px 0 0;color:#ffb6c1;font-weight:700}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Create Event</h1>
+
+    <% if (error) { %>
+      <div class="error"><%= error %></div>
+    <% } %>
+
+    <form method="post" action="/api/admin/events">
+      <label>Title</label>
+      <input name="title" required />
+
+      <label>Location</label>
+      <input name="location" required />
+
+      <label>Category</label>
+      <select name="category">
+        <option value="other">Other</option>
+        <option value="workshop">Workshop</option>
+        <option value="seminar">Seminar</option>
+        <option value="club fest">Club Fest</option>
+      </select>
+
+      <label>Description</label>
+      <textarea name="description" rows="4"></textarea>
+
+      <div class="row">
+        <div>
+          <label>Start Time</label>
+          <input type="datetime-local" name="startTime" required />
+        </div>
+        <div>
+          <label>End Time (optional)</label>
+          <input type="datetime-local" name="endTime" />
+        </div>
+      </div>
+
+      <div class="btns">
+        <button class="btn" type="submit">Create Event (Auto-Approved)</button>
+        <button class="btn secondary" type="button" onclick="window.location.href='/api/admin/dashboard'">Cancel</button>
+      </div>
+    </form>
+  </div>
+</body>
+</html>

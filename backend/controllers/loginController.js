@@ -28,13 +28,17 @@ export const processLogin = async (req, res) => {
         student_id: store.student_id,
         department: store.department,
         DateOfBirth: store.DateOfBirth, // Still needs work to function properly
-        profilePic: store.profilePic
+        profilePic: store.profilePic,
+        role: store.role
       };
       req.session.userData = data;
-      console.log('[DEBUG] Session userData after login:', req.session.userData);
-      req.session.visited=true;
-      console.log("Session Data after login:", req.session.id);
-      res.redirect('/api/dashboard');
+      console.log("[DEBUG] Logged in role:", data.role);
+
+      if (data.role === "admin") {
+          return res.redirect("/api/admin/dashboard");
+      }
+
+      return res.redirect("/api/dashboard");
       
     }
     else{

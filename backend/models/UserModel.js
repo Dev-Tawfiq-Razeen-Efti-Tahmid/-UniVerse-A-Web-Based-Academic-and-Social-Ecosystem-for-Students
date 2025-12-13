@@ -36,11 +36,17 @@ const userSchema = new mongoose.Schema(
     },
     profilePic: {
       type: String,
-      required: false,
       default: null,
     },
+    role: {
+      type: String,
+      enum: ["user", "admin"],
+      default: "user",
+    },
   },
-  { timestamps: true } // automatically adds createdAt and updatedAt fields
+  {
+    timestamps: true, // ✅ CORRECT PLACE
+  }
 );
 
 // Create and export the model
