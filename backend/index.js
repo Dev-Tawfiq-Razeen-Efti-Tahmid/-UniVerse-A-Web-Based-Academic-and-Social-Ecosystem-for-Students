@@ -11,6 +11,7 @@ import { Server } from "socket.io";
 // ---- Routers ----
 import usersRouter from "./routes/users.js";
 import loginRouter from "./routes/login.js";
+import adminRouter from "./routes/admin.js";
 import dashboardRouter from "./routes/dashboard.js";
 import registerRouter from "./routes/register.js";
 import logoutRouter from "./routes/logout.js";
@@ -271,6 +272,7 @@ app.use("/api/login", loginRouter);
 app.use("/api/register", registerRouter);
 app.use("/api/dashboard", dashboardRouter);
 app.use("/dashboard", dashboardRouter);
+app.use("/api/admin", adminRouter);
 app.use("/api/logout", logoutRouter);
 app.use("/dashboard", eventsRouter);
 app.use("/api/scheduler", schedulerRouter);
