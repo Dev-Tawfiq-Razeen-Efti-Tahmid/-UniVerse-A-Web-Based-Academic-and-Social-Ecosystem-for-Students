@@ -28,6 +28,7 @@ import Message from "./models/forumMessage.js";
 // import socialApiRouter from "./routes/socialApiRouter.js";
 
 import socialRoutes from "./routes/socialRoutes.js";
+import chatRoutes from "./routes/chatRoutes.js";
 
 // Load env
 dotenv.config();
@@ -62,6 +63,35 @@ const io = new Server(httpServer, {
 });
 io.on("connection", (socket) => {
   console.log(`User connected: ${socket.id}`);
+
+  // ================= PRIVATE CHAT (1–1) =================
+
+  // Join user's private room
+  socket.on("joinChat", (userId) => {
+    if (!userId) return;
+    socket.join(userId);
+    console.log(`User ${userId} joined their chat room`);
+  });
+
+  // Send private message
+  socket.on("sendPrivateMessage", (data) => {
+    const { senderId, receiverId, message } = data;
+    if (!receiverId || !message) return;
+
+    // Send message to receiver's room in real-time
+    io.to(receiverId).emit("newPrivateMessage", {
+      ...message,
+      senderId,
+    });
+    console.log(`Message sent from ${senderId} to ${receiverId}`);
+  });
+
+  // Handle disconnect
+  socket.on("disconnect", () => {
+    console.log("User disconnected:", socket.id);
+  });
+
+  // ================= CHANNEL CHAT (GROUP) =================
 
   // Initialize global room users map if it doesn't exist
   if (!io.roomUsers) {
@@ -283,6 +313,9 @@ app.use("/dashboard/forumDash/ForumCreate", forumCreateRouter);
 app.use("/dashboard/forumDash/ForumMessaging/:channelId", ForumMessagingRouter);
 app.use("/api/dashboard", socialRoutes);
 
+app.use("/api/users", usersRouter);
+
+app.use("/api/chat", chatRoutes);
 
 // ---------- DB + SERVER ----------
 const PORT = process.env.PORT || 5000;
@@ -292,12 +325,12 @@ mongoose
   .connect(MONGO_URI)
   .then(() => {
     console.log("✅ MongoDB Atlas connected");
-    
+
     // Start background job to process notifications every minute
     setInterval(async () => {
       await processDueNotifications();
     }, 60000); // Run every 60 seconds
-    
+
     console.log("📬 Notification processor started (runs every 60 seconds)");
   })
   .catch((err) => console.error("❌ Mongo error:", err));
