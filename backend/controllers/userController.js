@@ -27,7 +27,7 @@ export const showProfilePage = async (req, res) => {
       return res.redirect("/api/login");
     }
 
-    // Fetch fresh user data from database
+    // Fetch user data
     const user = await User.findById(req.session.userData._id);
 
     if (!user) {
@@ -78,7 +78,7 @@ export const updateProfile = async (req, res) => {
       });
     }
 
-    // Check if username is taken by another user
+    // Check if username is taken
     if (username !== user.UserName) {
       const existingUser = await User.findOne({ UserName: username });
       if (existingUser) {
@@ -129,13 +129,11 @@ export const updateProfile = async (req, res) => {
       // }
 
       // Update password
-      user.password = newPassword; // In production, use bcrypt to hash this!
+      user.password = newPassword;
     }
 
-    // Update username
     user.UserName = username;
 
-    // Save changes
     await user.save();
 
     // Update session data
