@@ -352,9 +352,14 @@
     <div class="top-bar">
       <div class="logo">UniVerse</div>
       <div class="user-controls">
-        <button class="profile-btn" aria-label="Profile Settings">
+        <button
+          class="profile-btn"
+          aria-label="Profile Settings"
+          onclick="navigateTo('/api/users/profile')"
+        >
           <i class="fas fa-user-circle"></i>
         </button>
+
         <form method="get" action="/api/logout">
           <button class="logout-btn">Logout</button>
         </form>

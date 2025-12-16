@@ -8,10 +8,8 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
     />
-
     <style>
       @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Orbitron:wght@400;700&display=swap");
-
       :root {
         --dark-bg: #1a1a2e;
         --dark-card: #272c4a;
@@ -19,71 +17,21 @@
         --accent-violet: #8a2be2;
         --text-light: #e0e0e0;
         --input-bg: #3e4a6e;
-        --button-hover-blue: #0056b3;
-        --button-hover-violet: #6a1ba3;
-        --border-glow: rgba(138, 43, 226, 0.4);
         --subtle-text: #a0a0a0;
         --success-green: #00c878;
         --danger-red: #ff4757;
       }
-
       * {
         box-sizing: border-box;
         margin: 0;
         padding: 0;
       }
-
       body {
         font-family: "Montserrat", sans-serif;
-        margin: 0;
-        padding: 0;
         min-height: 100vh;
         background: linear-gradient(135deg, var(--dark-bg) 0%, #160e2c 100%);
         color: var(--text-light);
-        overflow-x: hidden;
-        position: relative;
-        display: flex;
-        flex-direction: column;
       }
-
-      /* Background dots */
-      .background-dots {
-        position: absolute;
-        inset: 0;
-        overflow: hidden;
-        pointer-events: none;
-        z-index: 0;
-        opacity: 0.3;
-      }
-
-      .dot {
-        position: absolute;
-        background: rgba(138, 43, 226, 0.2);
-        border-radius: 50%;
-        animation: moveDots 20s infinite linear;
-        opacity: 0;
-      }
-
-      .dot:nth-child(even) {
-        background: rgba(0, 123, 255, 0.2);
-        animation-delay: 10s;
-      }
-
-      @keyframes moveDots {
-        0% {
-          transform: translate(var(--x-start), var(--y-start)) scale(0);
-          opacity: 0;
-        }
-        50% {
-          opacity: 1;
-        }
-        100% {
-          transform: translate(var(--x-end), var(--y-end)) scale(1.5);
-          opacity: 0;
-        }
-      }
-
-      /* Top bar */
       .top-bar {
         background-color: var(--dark-card);
         padding: 15px 40px;
@@ -96,12 +44,10 @@
         top: 0;
         z-index: 1000;
       }
-
-      .top-bar .logo {
+      .logo {
         font-family: "Orbitron", sans-serif;
-        font-size: 2.2em;
+        font-size: 2em;
         font-weight: 700;
-        text-shadow: 0 0 10px var(--accent-violet), 0 0 20px var(--primary-blue);
         background: linear-gradient(
           45deg,
           var(--primary-blue),
@@ -109,58 +55,28 @@
         );
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        letter-spacing: 1.5px;
-        cursor: pointer;
-        transition: all 0.3s ease;
         display: flex;
         align-items: center;
         gap: 12px;
       }
-
-      .top-bar .logo:hover {
-        transform: scale(1.03);
-        text-shadow: 0 0 12px var(--accent-violet), 0 0 25px var(--primary-blue);
-      }
-
-      .user-controls {
-        display: flex;
-        align-items: center;
-        gap: 20px;
-      }
-
       .back-btn {
         background: transparent;
         border: 1px solid rgba(0, 123, 255, 0.6);
         color: var(--text-light);
         border-radius: 8px;
         padding: 8px 16px;
-        font-size: 0.95em;
-        font-weight: 500;
         cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        transition: all 0.3s ease;
+        transition: all 0.3s;
       }
-
       .back-btn:hover {
         background: rgba(0, 123, 255, 0.15);
-        border-color: var(--accent-violet);
         transform: translateY(-1px);
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
       }
-
-      /* Main content */
       .main-content {
         max-width: 1200px;
-        width: 100%;
         margin: 0 auto;
-        padding: 40px 20px 60px;
-        position: relative;
-        z-index: 1;
-        flex: 1;
+        padding: 40px 20px;
       }
-
       .page-header {
         display: flex;
         justify-content: space-between;
@@ -169,33 +85,17 @@
         flex-wrap: wrap;
         gap: 15px;
       }
-
-      .page-title-block {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-      }
-
       .page-title {
         font-family: "Orbitron", sans-serif;
-        font-size: 2.2em;
-        text-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+        font-size: 2em;
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 10px;
       }
-
-      .page-subtitle {
-        font-size: 0.98em;
-        color: var(--subtle-text);
-      }
-
       .action-buttons {
         display: flex;
         gap: 12px;
-        flex-wrap: wrap;
       }
-
       .action-btn {
         background: linear-gradient(
           90deg,
@@ -206,179 +106,76 @@
         border: none;
         border-radius: 8px;
         padding: 10px 20px;
-        font-size: 0.95em;
         font-weight: 600;
         cursor: pointer;
-        transition: all 0.3s ease;
-        letter-spacing: 0.5px;
-        display: inline-flex;
+        transition: all 0.3s;
+        display: flex;
         align-items: center;
         gap: 8px;
         position: relative;
       }
-
       .action-btn:hover {
-        background: linear-gradient(
-          90deg,
-          var(--button-hover-blue),
-          var(--button-hover-violet)
-        );
         transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
       }
-
       .action-btn.secondary {
         background: linear-gradient(90deg, #f59e0b, #d97706);
       }
-
-      .action-btn.secondary:hover {
-        background: linear-gradient(90deg, #d97706, #b45309);
-      }
-
       .badge {
         background: var(--danger-red);
         color: white;
         border-radius: 50%;
         padding: 2px 8px;
         font-size: 0.75em;
-        font-weight: bold;
-        min-width: 20px;
-        text-align: center;
         position: absolute;
         top: -6px;
         right: -6px;
-        animation: pulse 2s infinite;
       }
-
-      @keyframes pulse {
-        0%,
-        100% {
-          transform: scale(1);
-        }
-        50% {
-          transform: scale(1.1);
-        }
-      }
-
-      /* Search Section */
       .search-wrapper {
         background-color: rgba(23, 27, 54, 0.9);
         border-radius: 16px;
         padding: 24px;
         border: 1px solid rgba(0, 123, 255, 0.25);
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-        backdrop-filter: blur(6px);
-        margin-bottom: 30px;
       }
-
-      .search-header {
-        font-size: 1.3em;
-        font-weight: 600;
-        margin-bottom: 15px;
-        color: var(--text-light);
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-
-      .search-box {
-        position: relative;
-        margin-bottom: 20px;
-      }
-
       .search-input {
         width: 100%;
-        padding: 15px 50px 15px 20px;
+        padding: 15px 20px;
         border: 2px solid rgba(0, 123, 255, 0.4);
         border-radius: 10px;
         background-color: var(--input-bg);
         color: var(--text-light);
         font-size: 1em;
-        transition: all 0.3s ease;
-        font-family: "Montserrat", sans-serif;
+        transition: all 0.3s;
       }
-
       .search-input:focus {
         outline: none;
         border-color: var(--accent-violet);
-        box-shadow: 0 0 15px rgba(138, 43, 226, 0.3);
       }
-
-      .search-icon {
-        position: absolute;
-        right: 18px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: var(--subtle-text);
-        font-size: 1.1em;
-        pointer-events: none;
-      }
-
-      /* Results Section */
       .results-container {
         margin-top: 20px;
-        min-height: 100px;
       }
-
       .user-card {
         background-color: var(--dark-card);
         border-radius: 14px;
         padding: 18px;
         margin-bottom: 15px;
         border: 1px solid rgba(0, 123, 255, 0.35);
-        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
-        position: relative;
-        overflow: hidden;
         display: flex;
         align-items: center;
         justify-content: space-between;
         gap: 15px;
-        transition: all 0.25s ease;
-        animation: slideIn 0.3s ease;
+        transition: all 0.25s;
       }
-
-      @keyframes slideIn {
-        from {
-          opacity: 0;
-          transform: translateY(20px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-
-      .user-card::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background: radial-gradient(
-          circle at top left,
-          rgba(138, 43, 226, 0.35),
-          transparent 55%
-        );
-        opacity: 0;
-        transition: opacity 0.25s ease;
-        pointer-events: none;
-      }
-
       .user-card:hover {
-        transform: translateY(-4px) scale(1.01);
+        transform: translateY(-4px);
         box-shadow: 0 12px 30px rgba(0, 0, 0, 0.7);
-        border-color: var(--accent-violet);
       }
-
-      .user-card:hover::before {
-        opacity: 1;
-      }
-
       .user-info {
         display: flex;
         align-items: center;
         gap: 15px;
         flex: 1;
       }
-
       .user-avatar {
         width: 60px;
         height: 60px;
@@ -394,66 +191,30 @@
         color: white;
         font-size: 24px;
         font-weight: bold;
-        flex-shrink: 0;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        position: relative;
-        overflow: hidden;
       }
-
-      .user-avatar::after {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(
-          45deg,
-          transparent,
-          rgba(255, 255, 255, 0.1),
-          transparent
-        );
-        transform: translateX(-100%);
-        transition: transform 0.6s;
-      }
-
-      .user-card:hover .user-avatar::after {
-        transform: translateX(100%);
-      }
-
       .user-avatar img {
         width: 100%;
         height: 100%;
         border-radius: 50%;
         object-fit: cover;
       }
-
-      .user-details {
-        flex: 1;
-      }
-
       .user-details h3 {
         font-size: 1.15em;
-        color: var(--text-light);
         margin-bottom: 5px;
-        font-weight: 600;
       }
-
       .user-details p {
         font-size: 0.9em;
         color: var(--subtle-text);
-        margin-bottom: 5px;
       }
-
       .department-badge {
         display: inline-block;
         padding: 4px 12px;
         border-radius: 999px;
         font-size: 0.75em;
-        text-transform: uppercase;
-        letter-spacing: 0.06em;
         background: linear-gradient(90deg, #1e3b70, #29539b);
         border: 1px solid rgba(0, 123, 255, 0.5);
         margin-top: 5px;
       }
-
       .card-action-btn {
         padding: 10px 20px;
         border: none;
@@ -461,113 +222,60 @@
         cursor: pointer;
         font-size: 0.9em;
         font-weight: 600;
-        transition: all 0.3s ease;
-        display: inline-flex;
+        transition: all 0.3s;
+        display: flex;
         align-items: center;
         gap: 6px;
-        white-space: nowrap;
       }
-
       .add-friend-btn {
         background: linear-gradient(90deg, var(--success-green), #00a868);
         color: white;
       }
-
       .add-friend-btn:hover {
-        background: linear-gradient(90deg, #00a868, #008855);
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 200, 120, 0.4);
       }
-
       .requested-btn {
         background: rgba(106, 27, 163, 0.3);
         color: var(--subtle-text);
         cursor: not-allowed;
-        border: 1px solid rgba(138, 43, 226, 0.5);
       }
-
       .accept-btn {
         background: linear-gradient(90deg, var(--success-green), #00a868);
         color: white;
       }
-
       .accept-btn:hover {
-        background: linear-gradient(90deg, #00a868, #008855);
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 200, 120, 0.4);
       }
-
       .remove-friend-btn {
         background: linear-gradient(90deg, var(--danger-red), #ee5a6f);
         color: white;
       }
-
       .remove-friend-btn:hover {
-        background: linear-gradient(90deg, #ee5a6f, #dc3545);
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(255, 71, 87, 0.4);
       }
-
-      /* Empty State */
       .empty-state {
         text-align: center;
         padding: 60px 20px;
         color: var(--subtle-text);
       }
-
       .empty-state i {
         font-size: 4em;
         margin-bottom: 20px;
         opacity: 0.5;
-        background: linear-gradient(
-          45deg,
-          var(--primary-blue),
-          var(--accent-violet)
-        );
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
       }
-
-      .empty-state h3 {
-        font-size: 1.4em;
-        margin-bottom: 10px;
-        color: var(--text-light);
-      }
-
-      .empty-state p {
-        font-size: 1em;
-      }
-
-      /* Modal */
       .modal {
         display: none;
         position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
+        inset: 0;
         background: rgba(0, 0, 0, 0.7);
         z-index: 2000;
         justify-content: center;
         align-items: center;
         padding: 20px;
-        backdrop-filter: blur(5px);
-        animation: fadeIn 0.3s ease;
       }
-
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-        }
-        to {
-          opacity: 1;
-        }
-      }
-
       .modal.active {
         display: flex;
       }
-
       .modal-content {
         background: linear-gradient(135deg, var(--dark-card) 0%, #1f2447 100%);
         border-radius: 16px;
@@ -578,21 +286,7 @@
         overflow-y: auto;
         box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
         border: 1px solid rgba(138, 43, 226, 0.4);
-        position: relative;
-        animation: slideUp 0.3s ease;
       }
-
-      @keyframes slideUp {
-        from {
-          opacity: 0;
-          transform: translateY(50px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-
       .modal-header {
         display: flex;
         justify-content: space-between;
@@ -601,16 +295,13 @@
         padding-bottom: 15px;
         border-bottom: 1px solid rgba(0, 123, 255, 0.3);
       }
-
       .modal-header h2 {
         font-family: "Orbitron", sans-serif;
         font-size: 1.6em;
-        color: var(--text-light);
         display: flex;
         align-items: center;
         gap: 10px;
       }
-
       .close-btn {
         background: none;
         border: none;
@@ -618,156 +309,85 @@
         cursor: pointer;
         color: var(--subtle-text);
         padding: 0;
-        width: 35px;
-        height: 35px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 8px;
-        transition: all 0.3s ease;
+        transition: all 0.3s;
       }
-
       .close-btn:hover {
         color: var(--text-light);
-        background: rgba(255, 71, 87, 0.2);
         transform: rotate(90deg);
       }
-
       .loading {
         text-align: center;
         padding: 40px 20px;
         color: var(--subtle-text);
       }
-
-      .loading i {
-        font-size: 2.5em;
-        animation: spin 1s linear infinite;
-      }
-
-      @keyframes spin {
-        from {
-          transform: rotate(0deg);
-        }
-        to {
-          transform: rotate(360deg);
-        }
-      }
-
-      /* Scrollbar */
-      .modal-content::-webkit-scrollbar {
-        width: 8px;
-      }
-
-      .modal-content::-webkit-scrollbar-track {
-        background: rgba(0, 0, 0, 0.2);
-        border-radius: 10px;
-      }
-
-      .modal-content::-webkit-scrollbar-thumb {
-        background: linear-gradient(
-          180deg,
-          var(--primary-blue),
-          var(--accent-violet)
-        );
-        border-radius: 10px;
-      }
-
-      /* Confirm Dialog */
       .confirm-dialog {
         position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
+        inset: 0;
         background: rgba(0, 0, 0, 0.7);
         z-index: 3500;
         display: none;
         justify-content: center;
         align-items: center;
         padding: 20px;
-        backdrop-filter: blur(5px);
-        animation: fadeIn 0.2s ease;
       }
-
       .confirm-dialog.show {
         display: flex;
       }
-
       .confirm-dialog-content {
         background: linear-gradient(135deg, var(--dark-card) 0%, #1f2447 100%);
         border-radius: 16px;
         padding: 30px;
         max-width: 450px;
         width: 100%;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
         border: 1px solid rgba(138, 43, 226, 0.4);
-        animation: slideUp 0.3s ease;
       }
-
       .confirm-dialog-header {
         display: flex;
         align-items: center;
         gap: 12px;
         margin-bottom: 15px;
       }
-
       .confirm-dialog-icon {
         font-size: 2em;
         color: var(--danger-red);
       }
-
       .confirm-dialog-title {
         font-size: 1.3em;
         font-weight: 600;
-        color: var(--text-light);
       }
-
       .confirm-dialog-message {
         font-size: 0.95em;
         color: var(--subtle-text);
         margin-bottom: 25px;
-        line-height: 1.5;
       }
-
       .confirm-dialog-actions {
         display: flex;
         gap: 12px;
         justify-content: flex-end;
       }
-
       .confirm-btn {
         padding: 10px 24px;
         border: none;
         border-radius: 8px;
         cursor: pointer;
-        font-size: 0.95em;
         font-weight: 600;
-        transition: all 0.3s ease;
+        transition: all 0.3s;
       }
-
       .confirm-btn-cancel {
         background: transparent;
         border: 1px solid rgba(0, 123, 255, 0.6);
         color: var(--text-light);
       }
-
       .confirm-btn-cancel:hover {
         background: rgba(0, 123, 255, 0.15);
-        border-color: var(--accent-violet);
       }
-
       .confirm-btn-confirm {
         background: linear-gradient(90deg, var(--danger-red), #ee5a6f);
         color: white;
       }
-
       .confirm-btn-confirm:hover {
-        background: linear-gradient(90deg, #ee5a6f, #dc3545);
         transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(255, 71, 87, 0.4);
       }
-
-      /* Toast Notification */
       .toast {
         position: fixed;
         top: 100px;
@@ -783,95 +403,46 @@
         gap: 12px;
         min-width: 300px;
         z-index: 3000;
-        animation: slideInRight 0.4s ease, fadeOut 0.4s ease 2.6s;
         opacity: 0;
+        animation: slideIn 0.4s ease forwards, fadeOut 0.4s ease 2.6s forwards;
       }
-
-      .toast.show {
-        opacity: 1;
-      }
-
       .toast.success {
         border-color: var(--success-green);
-        background: linear-gradient(
-          135deg,
-          rgba(0, 200, 120, 0.2) 0%,
-          var(--dark-card) 100%
-        );
       }
-
       .toast.error {
         border-color: var(--danger-red);
-        background: linear-gradient(
-          135deg,
-          rgba(255, 71, 87, 0.2) 0%,
-          var(--dark-card) 100%
-        );
       }
-
-      .toast.info {
-        border-color: var(--primary-blue);
-        background: linear-gradient(
-          135deg,
-          rgba(0, 123, 255, 0.2) 0%,
-          var(--dark-card) 100%
-        );
-      }
-
       .toast-icon {
         font-size: 1.5em;
-        flex-shrink: 0;
       }
-
       .toast.success .toast-icon {
         color: var(--success-green);
       }
-
       .toast.error .toast-icon {
         color: var(--danger-red);
       }
-
       .toast.info .toast-icon {
         color: var(--primary-blue);
       }
-
       .toast-content {
         flex: 1;
       }
-
       .toast-title {
         font-weight: 600;
         margin-bottom: 3px;
-        font-size: 0.95em;
       }
-
       .toast-message {
         font-size: 0.85em;
         color: var(--subtle-text);
       }
-
       .toast-close {
         background: none;
         border: none;
         color: var(--subtle-text);
         cursor: pointer;
         font-size: 1.2em;
-        padding: 0;
-        width: 24px;
-        height: 24px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 4px;
-        transition: all 0.2s ease;
       }
-
-      .toast-close:hover {
-        background: rgba(255, 255, 255, 0.1);
-        color: var(--text-light);
-      }
-
-      @keyframes slideInRight {
+      @keyframes slideIn {
         from {
           transform: translateX(400px);
           opacity: 0;
@@ -881,142 +452,53 @@
           opacity: 1;
         }
       }
-
       @keyframes fadeOut {
-        from {
-          opacity: 1;
-        }
         to {
           opacity: 0;
           transform: translateX(400px);
         }
       }
-
-      /* Responsive */
       @media (max-width: 768px) {
+        .top-bar {
+          padding: 12px 18px;
+        }
+        .logo {
+          font-size: 1.6em;
+        }
+        .page-title {
+          font-size: 1.6em;
+        }
+        .user-card {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        .card-action-btn {
+          width: 100%;
+          justify-content: center;
+        }
         .toast {
           right: 15px;
           left: 15px;
           min-width: auto;
         }
-        .top-bar {
-          padding: 12px 18px;
-        }
-
-        .top-bar .logo {
-          font-size: 1.6em;
-        }
-
-        .main-content {
-          padding: 28px 16px 40px;
-        }
-
-        .page-title {
-          font-size: 1.6em;
-        }
-
-        .search-wrapper {
-          padding: 18px 16px;
-        }
-
-        .user-card {
-          flex-direction: column;
-          align-items: flex-start;
-          gap: 15px;
-        }
-
-        .card-action-btn {
-          width: 100%;
-          justify-content: center;
-        }
-
-        .action-buttons {
-          width: 100%;
-        }
-
-        .action-btn {
-          flex: 1;
-          justify-content: center;
-        }
       }
     </style>
   </head>
   <body>
-    <!-- Background Animation -->
-    <div class="background-dots">
-      <div
-        class="dot"
-        style="
-          width: 50px;
-          height: 50px;
-          --x-start: 10%;
-          --y-start: 20%;
-          --x-end: 80%;
-          --y-end: 90%;
-        "
-      ></div>
-      <div
-        class="dot"
-        style="
-          width: 70px;
-          height: 70px;
-          --x-start: 70%;
-          --y-start: 10%;
-          --x-end: 20%;
-          --y-end: 85%;
-        "
-      ></div>
-      <div
-        class="dot"
-        style="
-          width: 40px;
-          height: 40px;
-          --x-start: 30%;
-          --y-start: 60%;
-          --x-end: 90%;
-          --y-end: 30%;
-        "
-      ></div>
-      <div
-        class="dot"
-        style="
-          width: 60px;
-          height: 60px;
-          --x-start: 85%;
-          --y-start: 70%;
-          --x-end: 15%;
-          --y-end: 20%;
-        "
-      ></div>
-    </div>
-
-    <!-- Top Bar -->
     <div class="top-bar">
-      <div class="logo">
-        <i class="fas fa-share-alt"></i>
-        Social Hub
-      </div>
-      <div class="user-controls">
-        <button
-          class="back-btn"
-          onclick="window.location.href='/api/dashboard'"
-        >
-          <i class="fas fa-arrow-left"></i> Dashboard
-        </button>
-      </div>
+      <div class="logo"><i class="fas fa-share-alt"></i> Social Hub</div>
+      <button class="back-btn" onclick="window.location.href='/api/dashboard'">
+        <i class="fas fa-arrow-left"></i> Dashboard
+      </button>
     </div>
 
-    <!-- Main Content -->
     <div class="main-content">
       <div class="page-header">
-        <div class="page-title-block">
-          <div class="page-title">
-            <i class="fas fa-users"></i>
-            Find Friends
-          </div>
-          <div class="page-subtitle">Connect with students across campus</div>
-        </div>
+        <div class="page-title"><i class="fas fa-users"></i> Find Friends</div>
         <div class="action-buttons">
+          <button class="action-btn" onclick="window.location.href='/api/chat'">
+            <i class="fa-solid fa-message"></i> Chatting
+          </button>
           <button class="action-btn secondary" onclick="loadPendingRequests()">
             <i class="fas fa-clock"></i> Requests
             <span class="badge" id="requestBadge" style="display: none"></span>
@@ -1027,26 +509,17 @@
         </div>
       </div>
 
-      <!-- Search Section -->
       <div class="search-wrapper">
-        <div class="search-header">
-          <i class="fas fa-search"></i>
-          Search Students
-        </div>
-        <div class="search-box">
-          <input
-            type="text"
-            class="search-input"
-            id="searchInput"
-            placeholder="Search by name or username..."
-          />
-          <i class="fas fa-search search-icon"></i>
-        </div>
+        <input
+          type="text"
+          class="search-input"
+          id="searchInput"
+          placeholder="Search by name or username..."
+        />
         <div id="searchResults" class="results-container"></div>
       </div>
     </div>
 
-    <!-- Friend List Modal -->
     <div id="friendListModal" class="modal">
       <div class="modal-content">
         <div class="modal-header">
@@ -1057,7 +530,6 @@
       </div>
     </div>
 
-    <!-- Pending Requests Modal -->
     <div id="requestsModal" class="modal">
       <div class="modal-content">
         <div class="modal-header">
@@ -1071,268 +543,189 @@
     <script>
       let searchTimeout;
 
-      // Toast Notification System
-      function showToast(message, type = "info", title = "") {
-        // Remove any existing toast
-        const existingToast = document.querySelector(".toast");
-        if (existingToast) {
-          existingToast.remove();
-        }
-
-        const toast = document.createElement("div");
-        toast.className = `toast ${type}`;
+      function showToast(msg, type = "info") {
+        const existing = document.querySelector(".toast");
+        if (existing) existing.remove();
 
         const icons = {
           success: "fa-check-circle",
           error: "fa-exclamation-circle",
           info: "fa-info-circle",
         };
+        const titles = { success: "Success", error: "Error", info: "Info" };
 
-        const titles = {
-          success: title || "Success",
-          error: title || "Error",
-          info: title || "Info",
-        };
-
+        const toast = document.createElement("div");
+        toast.className = `toast ${type}`;
         toast.innerHTML = `
         <i class="fas ${icons[type]} toast-icon"></i>
         <div class="toast-content">
           <div class="toast-title">${titles[type]}</div>
-          <div class="toast-message">${message}</div>
+          <div class="toast-message">${msg}</div>
         </div>
-        <button class="toast-close" onclick="this.parentElement.remove()">
-          <i class="fas fa-times"></i>
-        </button>
+        <button class="toast-close" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
       `;
-
         document.body.appendChild(toast);
-
-        // Trigger animation
-        setTimeout(() => toast.classList.add("show"), 10);
-
-        // Auto remove after 3 seconds
-        setTimeout(() => {
-          if (toast.parentElement) {
-            toast.remove();
-          }
-        }, 3000);
+        setTimeout(() => toast.remove(), 3000);
       }
 
-      // Confirm Dialog System
-      function showConfirmDialog(title, message, onConfirm) {
-        // Remove any existing dialog
-        const existingDialog = document.querySelector(".confirm-dialog");
-        if (existingDialog) {
-          existingDialog.remove();
-        }
+      function showConfirmDialog(title, msg, onConfirm) {
+        const existing = document.querySelector(".confirm-dialog");
+        if (existing) existing.remove();
 
         const dialog = document.createElement("div");
         dialog.className = "confirm-dialog";
-
         dialog.innerHTML = `
         <div class="confirm-dialog-content">
           <div class="confirm-dialog-header">
             <i class="fas fa-exclamation-triangle confirm-dialog-icon"></i>
             <div class="confirm-dialog-title">${title}</div>
           </div>
-          <div class="confirm-dialog-message">${message}</div>
+          <div class="confirm-dialog-message">${msg}</div>
           <div class="confirm-dialog-actions">
-            <button class="confirm-btn confirm-btn-cancel" onclick="this.closest('.confirm-dialog').remove()">
-              Cancel
-            </button>
-            <button class="confirm-btn confirm-btn-confirm" id="confirmBtn">
-              Confirm
-            </button>
+            <button class="confirm-btn confirm-btn-cancel" onclick="this.closest('.confirm-dialog').remove()">Cancel</button>
+            <button class="confirm-btn confirm-btn-confirm" id="confirmBtn">Confirm</button>
           </div>
         </div>
       `;
-
         document.body.appendChild(dialog);
-
-        // Show dialog
         setTimeout(() => dialog.classList.add("show"), 10);
-
-        // Add confirm handler
         document.getElementById("confirmBtn").onclick = () => {
           dialog.remove();
           onConfirm();
         };
-
-        // Close on outside click
         dialog.onclick = (e) => {
-          if (e.target === dialog) {
-            dialog.remove();
-          }
+          if (e.target === dialog) dialog.remove();
         };
       }
 
-      // Real-time search
       document.getElementById("searchInput").addEventListener("input", (e) => {
         clearTimeout(searchTimeout);
         const query = e.target.value.trim();
-
-        if (query.length === 0) {
+        if (!query) {
           document.getElementById("searchResults").innerHTML = "";
           return;
         }
-
-        searchTimeout = setTimeout(() => {
-          searchUsers(query);
-        }, 300);
+        searchTimeout = setTimeout(() => searchUsers(query), 300);
       });
 
       async function searchUsers(query) {
         try {
-          const response = await fetch(
+          const res = await fetch(
             `/api/dashboard/social/search?query=${encodeURIComponent(query)}`
           );
-          const data = await response.json();
+          const data = await res.json();
           displaySearchResults(data.users);
-        } catch (error) {
-          console.error("Error:", error);
+        } catch (err) {
+          console.error("Error:", err);
         }
       }
 
       function displaySearchResults(users) {
         const container = document.getElementById("searchResults");
-
-        if (users.length === 0) {
-          container.innerHTML = `
-          <div class="empty-state">
-            <i class="fas fa-search"></i>
-            <h3>No users found</h3>
-            <p>Try searching with a different name or username</p>
-          </div>
-        `;
+        if (!users.length) {
+          container.innerHTML =
+            '<div class="empty-state"><i class="fas fa-search"></i><h3>No users found</h3></div>';
           return;
         }
-
         container.innerHTML = users
           .map(
-            (user) => `
+            (u) => `
         <div class="user-card">
           <div class="user-info">
-            <div class="user-avatar">
-              ${
-                user.profilePic
-                  ? `<img src="${user.profilePic}" alt="${user.name}">`
-                  : user.name.charAt(0).toUpperCase()
-              }
-            </div>
+            <div class="user-avatar">${
+              u.profilePic
+                ? `<img src="${u.profilePic}" alt="${u.name}">`
+                : u.name.charAt(0).toUpperCase()
+            }</div>
             <div class="user-details">
-              <h3>${user.name}</h3>
-              <p>@${user.username}</p>
-              <span class="department-badge">${user.department}</span>
+              <h3>${u.name}</h3>
+              <p>@${u.username}</p>
+              <span class="department-badge">${u.department}</span>
             </div>
           </div>
-          ${getActionButton(user)}
+          ${getActionButton(u)}
         </div>
       `
           )
           .join("");
       }
 
-      function getActionButton(user) {
-        switch (user.friendStatus) {
-          case "friends":
-            return `<button class="card-action-btn remove-friend-btn" onclick="removeFriend('${user._id}')">
-            <i class="fas fa-user-minus"></i> Unfriend
-          </button>`;
-          case "requested":
-            return `<button class="card-action-btn requested-btn" disabled>
-            <i class="fas fa-clock"></i> Request Sent
-          </button>`;
-          case "pending":
-            return `<button class="card-action-btn accept-btn" onclick="acceptRequestFromSearch('${user.requestId}')">
-            <i class="fas fa-user-check"></i> Accept
-          </button>`;
-          default:
-            return `<button class="card-action-btn add-friend-btn" onclick="sendRequest('${user._id}')">
-            <i class="fas fa-user-plus"></i> Add Friend
-          </button>`;
-        }
+      function getActionButton(u) {
+        if (u.friendStatus === "friends")
+          return `<button class="card-action-btn remove-friend-btn" onclick="removeFriend('${u._id}')"><i class="fas fa-user-minus"></i> Unfriend</button>`;
+        if (u.friendStatus === "requested")
+          return `<button class="card-action-btn requested-btn" disabled><i class="fas fa-clock"></i> Request Sent</button>`;
+        if (u.friendStatus === "pending")
+          return `<button class="card-action-btn accept-btn" onclick="acceptRequestFromSearch('${u.requestId}')"><i class="fas fa-user-check"></i> Accept</button>`;
+        return `<button class="card-action-btn add-friend-btn" onclick="sendRequest('${u._id}')"><i class="fas fa-user-plus"></i> Add Friend</button>`;
       }
 
-      async function sendRequest(recipientId) {
+      async function sendRequest(id) {
         try {
-          const response = await fetch("/api/dashboard/social/friend-request", {
+          const res = await fetch("/api/dashboard/social/friend-request", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ recipientId }),
+            body: JSON.stringify({ recipientId: id }),
           });
-          const data = await response.json();
-
-          if (response.ok) {
-            showToast(
-              data.message || "Friend request sent successfully!",
-              "success"
-            );
-          } else {
-            showToast(data.error || "Failed to send friend request", "error");
-          }
-
+          const data = await res.json();
+          showToast(
+            res.ok
+              ? data.message || "Friend request sent!"
+              : data.error || "Failed to send request",
+            res.ok ? "success" : "error"
+          );
           const query = document.getElementById("searchInput").value;
           if (query) searchUsers(query);
-        } catch (error) {
-          console.error("Error:", error);
-          showToast("Something went wrong. Please try again.", "error");
+        } catch (err) {
+          showToast("Something went wrong", "error");
         }
       }
 
-      async function acceptRequestFromSearch(requestId) {
+      async function acceptRequestFromSearch(id) {
         try {
-          const response = await fetch("/api/dashboard/social/accept-request", {
+          const res = await fetch("/api/dashboard/social/accept-request", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ requestId }),
+            body: JSON.stringify({ requestId: id }),
           });
-          const data = await response.json();
-
-          if (response.ok) {
-            showToast(data.message || "Friend request accepted!", "success");
-          } else {
-            showToast(data.error || "Failed to accept request", "error");
-          }
-
+          const data = await res.json();
+          showToast(
+            res.ok
+              ? data.message || "Request accepted!"
+              : data.error || "Failed to accept",
+            res.ok ? "success" : "error"
+          );
           const query = document.getElementById("searchInput").value;
           if (query) searchUsers(query);
           updateRequestBadge();
-        } catch (error) {
-          console.error("Error:", error);
-          showToast("Something went wrong. Please try again.", "error");
+        } catch (err) {
+          showToast("Something went wrong", "error");
         }
       }
 
-      async function removeFriend(friendId, callback) {
+      async function removeFriend(id, callback) {
         showConfirmDialog(
           "Remove Friend?",
-          "Are you sure you want to remove this friend? This action cannot be undone.",
+          "Are you sure you want to remove this friend?",
           async () => {
             try {
-              const response = await fetch(
-                "/api/dashboard/social/remove-friend",
-                {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ friendId }),
-                }
+              const res = await fetch("/api/dashboard/social/remove-friend", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ friendId: id }),
+              });
+              const data = await res.json();
+              showToast(
+                res.ok
+                  ? data.message || "Friend removed"
+                  : data.error || "Failed to remove",
+                res.ok ? "success" : "error"
               );
-              const data = await response.json();
-
-              if (response.ok) {
-                showToast(
-                  data.message || "Friend removed successfully",
-                  "success"
-                );
-                const query = document.getElementById("searchInput").value;
-                if (query) searchUsers(query);
-                if (callback) callback();
-              } else {
-                showToast(data.error || "Failed to remove friend", "error");
-              }
-            } catch (error) {
-              console.error("Error:", error);
-              showToast("Something went wrong. Please try again.", "error");
+              const query = document.getElementById("searchInput").value;
+              if (query) searchUsers(query);
+              if (callback) callback();
+            } catch (err) {
+              showToast("Something went wrong", "error");
             }
           }
         );
@@ -1341,55 +734,41 @@
       async function loadFriendList() {
         const modal = document.getElementById("friendListModal");
         const content = document.getElementById("friendListContent");
-
         modal.classList.add("active");
         content.innerHTML =
-          '<div class="loading"><i class="fas fa-spinner"></i><p>Loading friends...</p></div>';
-
+          '<div class="loading"><i class="fas fa-spinner"></i><p>Loading...</p></div>';
         try {
-          const response = await fetch("/api/dashboard/social/friends");
-          const data = await response.json();
-
-          if (data.friends.length === 0) {
-            content.innerHTML = `
-            <div class="empty-state">
-              <i class="fas fa-user-friends"></i>
-              <h3>No friends yet</h3>
-              <p>Start by searching and adding friends!</p>
-            </div>
-          `;
+          const res = await fetch("/api/dashboard/social/friends");
+          const data = await res.json();
+          if (!data.friends.length) {
+            content.innerHTML =
+              '<div class="empty-state"><i class="fas fa-user-friends"></i><h3>No friends yet</h3></div>';
             return;
           }
-
           content.innerHTML = data.friends
             .map(
-              (friend) => `
+              (f) => `
           <div class="user-card">
             <div class="user-info">
-              <div class="user-avatar">
-                ${
-                  friend.profilePic
-                    ? `<img src="${friend.profilePic}" alt="${friend.name}">`
-                    : friend.name.charAt(0).toUpperCase()
-                }
-              </div>
+              <div class="user-avatar">${
+                f.profilePic
+                  ? `<img src="${f.profilePic}" alt="${f.name}">`
+                  : f.name.charAt(0).toUpperCase()
+              }</div>
               <div class="user-details">
-                <h3>${friend.name}</h3>
-                <p>@${friend.username}</p>
-                <span class="department-badge">${friend.department}</span>
+                <h3>${f.name}</h3>
+                <p>@${f.username}</p>
+                <span class="department-badge">${f.department}</span>
               </div>
             </div>
             <button class="card-action-btn remove-friend-btn" onclick="removeFriend('${
-              friend._id
-            }', loadFriendList);">
-              <i class="fas fa-user-minus"></i> Remove
-            </button>
+              f._id
+            }', loadFriendList)"><i class="fas fa-user-minus"></i> Remove</button>
           </div>
         `
             )
             .join("");
-        } catch (error) {
-          console.error("Error:", error);
+        } catch (err) {
           content.innerHTML =
             '<div class="empty-state"><p>Error loading friends</p></div>';
         }
@@ -1402,161 +781,114 @@
       async function loadPendingRequests() {
         const modal = document.getElementById("requestsModal");
         const content = document.getElementById("requestsContent");
-
         modal.classList.add("active");
         content.innerHTML =
-          '<div class="loading"><i class="fas fa-spinner"></i><p>Loading requests...</p></div>';
-
+          '<div class="loading"><i class="fas fa-spinner"></i><p>Loading...</p></div>';
         try {
-          const response = await fetch(
-            "/api/dashboard/social/requests/pending"
-          );
-          const data = await response.json();
-
-          if (data.requests.length === 0) {
-            content.innerHTML = `
-            <div class="empty-state">
-              <i class="fas fa-inbox"></i>
-              <h3>No pending requests</h3>
-              <p>You're all caught up!</p>
-            </div>
-          `;
+          const res = await fetch("/api/dashboard/social/requests/pending");
+          const data = await res.json();
+          if (!data.requests.length) {
+            content.innerHTML =
+              '<div class="empty-state"><i class="fas fa-inbox"></i><h3>No pending requests</h3></div>';
             return;
           }
-
           content.innerHTML = data.requests
             .map(
-              (req) => `
+              (r) => `
           <div class="user-card">
             <div class="user-info">
-              <div class="user-avatar">
-                ${
-                  req.requester.profilePic
-                    ? `<img src="${req.requester.profilePic}" alt="${req.requester.name}">`
-                    : req.requester.name.charAt(0).toUpperCase()
-                }
-              </div>
+              <div class="user-avatar">${
+                r.requester.profilePic
+                  ? `<img src="${r.requester.profilePic}" alt="${r.requester.name}">`
+                  : r.requester.name.charAt(0).toUpperCase()
+              }</div>
               <div class="user-details">
-                <h3>${req.requester.name}</h3>
-                <p>@${req.requester.username}</p>
-                <span class="department-badge">${
-                  req.requester.department
-                }</span>
+                <h3>${r.requester.name}</h3>
+                <p>@${r.requester.username}</p>
+                <span class="department-badge">${r.requester.department}</span>
               </div>
             </div>
-            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
               <button class="card-action-btn accept-btn" onclick="acceptRequest('${
-                req._id
-              }'); setTimeout(loadPendingRequests, 500);">
-                <i class="fas fa-check"></i> Accept
-              </button>
+                r._id
+              }');setTimeout(loadPendingRequests,500)"><i class="fas fa-check"></i> Accept</button>
               <button class="card-action-btn remove-friend-btn" onclick="rejectRequest('${
-                req.requester._id
-              }'); setTimeout(loadPendingRequests, 500);">
-                <i class="fas fa-times"></i> Reject
-              </button>
+                r.requester._id
+              }');setTimeout(loadPendingRequests,500)"><i class="fas fa-times"></i> Reject</button>
             </div>
           </div>
         `
             )
             .join("");
-        } catch (error) {
-          console.error("Error:", error);
+        } catch (err) {
           content.innerHTML =
             '<div class="empty-state"><p>Error loading requests</p></div>';
         }
       }
 
-      async function acceptRequest(requestId) {
+      async function acceptRequest(id) {
         try {
-          const response = await fetch("/api/dashboard/social/accept-request", {
+          const res = await fetch("/api/dashboard/social/accept-request", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ requestId }),
+            body: JSON.stringify({ requestId: id }),
           });
-          const data = await response.json();
-
-          if (response.ok) {
-            showToast(data.message || "Friend request accepted!", "success");
-          } else {
-            showToast(data.error || "Failed to accept request", "error");
-          }
-
+          const data = await res.json();
+          showToast(
+            res.ok
+              ? data.message || "Request accepted!"
+              : data.error || "Failed",
+            res.ok ? "success" : "error"
+          );
           updateRequestBadge();
-        } catch (error) {
-          console.error("Error:", error);
-          showToast("Something went wrong. Please try again.", "error");
+        } catch (err) {
+          showToast("Something went wrong", "error");
         }
       }
 
-      async function rejectRequest(friendId) {
+      async function rejectRequest(id) {
         showConfirmDialog(
           "Reject Request?",
-          "Are you sure you want to reject this friend request?",
+          "Are you sure you want to reject this request?",
           async () => {
             try {
-              const response = await fetch(
-                "/api/dashboard/social/remove-friend",
-                {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ friendId }),
-                }
+              const res = await fetch("/api/dashboard/social/remove-friend", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ friendId: id }),
+              });
+              showToast(
+                res.ok ? "Request rejected" : "Failed to reject",
+                res.ok ? "info" : "error"
               );
-              const data = await response.json();
-
-              if (response.ok) {
-                showToast("Request rejected", "info");
-              } else {
-                showToast(data.error || "Failed to reject request", "error");
-              }
-
               updateRequestBadge();
-            } catch (error) {
-              console.error("Error:", error);
-              showToast("Something went wrong. Please try again.", "error");
+            } catch (err) {
+              showToast("Something went wrong", "error");
             }
           }
         );
       }
-
       function closeRequests() {
         document.getElementById("requestsModal").classList.remove("active");
       }
-
       async function updateRequestBadge() {
         try {
-          const response = await fetch(
-            "/api/dashboard/social/requests/pending"
-          );
-          const data = await response.json();
+          const res = await fetch("/api/dashboard/social/requests/pending");
+          const data = await res.json();
           const badge = document.getElementById("requestBadge");
-
-          if (data.requests && data.requests.length > 0) {
-            badge.textContent = data.requests.length;
-            badge.style.display = "inline-block";
-          } else {
-            badge.style.display = "none";
-          }
-        } catch (error) {
-          console.error("Error:", error);
+          badge.style.display =
+            data.requests?.length > 0 ? "inline-block" : "none";
+          badge.textContent = data.requests?.length || "";
+        } catch (err) {
+          console.error("Error:", err);
         }
       }
-
-      // Update badge on page load
       updateRequestBadge();
-
-      // Close modals when clicking outside
-      window.onclick = function (event) {
-        const friendModal = document.getElementById("friendListModal");
-        const requestModal = document.getElementById("requestsModal");
-
-        if (event.target == friendModal) {
+      window.onclick = (e) => {
+        if (e.target == document.getElementById("friendListModal"))
           closeFriendList();
-        }
-        if (event.target == requestModal) {
+        if (e.target == document.getElementById("requestsModal"))
           closeRequests();
-        }
       };
     </script>
   </body>

@@ -1,0 +1,299 @@
+<!-- Gemini -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Live Chat</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+      body {
+        margin: 0;
+        font-family: sans-serif;
+        display: flex;
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      /* SIDEBAR */
+      .sidebar {
+        width: 25%;
+        background: #f4f4f4;
+        border-right: 1px solid #ccc;
+        display: flex;
+        flex-direction: column;
+      }
+      .sidebar-header {
+        padding: 20px;
+        background: #ddd;
+        font-weight: bold;
+      }
+      .friends-list {
+        flex: 1;
+        overflow-y: auto;
+      }
+      .friend-item {
+        padding: 15px;
+        border-bottom: 1px solid #e0e0e0;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .friend-item:hover {
+        background: #e9e9e9;
+      }
+      .friend-item.active {
+        background: #d0e8ff;
+        border-left: 4px solid #007bff;
+      }
+
+      /* CHAT AREA */
+      .chat-area {
+        width: 75%;
+        display: flex;
+        flex-direction: column;
+        background: #fff;
+      }
+      .chat-header {
+        padding: 15px;
+        border-bottom: 1px solid #ccc;
+        background: #f9f9f9;
+        display: none;
+      } /* Hidden by default */
+      .messages-box {
+        flex: 1;
+        padding: 20px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        background: #fff;
+      }
+
+      /* Message Bubbles */
+      .message {
+        max-width: 60%;
+        padding: 10px 15px;
+        border-radius: 20px;
+        font-size: 14px;
+        line-height: 1.4;
+        word-wrap: break-word;
+      }
+      .message.sent {
+        align-self: flex-end;
+        background: #007bff;
+        color: white;
+        border-bottom-right-radius: 2px;
+      }
+      .message.received {
+        align-self: flex-start;
+        background: #e0e0e0;
+        color: #333;
+        border-bottom-left-radius: 2px;
+      }
+
+      /* INPUT AREA */
+      .input-area {
+        padding: 20px;
+        border-top: 1px solid #ccc;
+        display: none;
+        gap: 10px;
+      } /* Hidden by default */
+      .input-area input {
+        flex: 1;
+        padding: 10px;
+        border-radius: 20px;
+        border: 1px solid #ccc;
+        outline: none;
+      }
+      .input-area button {
+        padding: 10px 20px;
+        background: #007bff;
+        color: white;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+      }
+
+      /* Placeholder when no friend selected */
+      .no-chat-selected {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #888;
+        font-size: 1.2rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="sidebar">
+      <div class="sidebar-header">My Friends</div>
+      <div class="friends-list">
+        <% if(friends && friends.length > 0) { %> <% friends.forEach(friend => {
+        %>
+        <div
+          class="friend-item"
+          data-id="<%= friend._id %>"
+          data-name="<%= friend.name || friend.username %>"
+          onclick="selectFriend('<%= friend._id %>', '<%= friend.name || friend.username %>')"
+        >
+          <i class="fa-solid fa-user"></i>
+          <%= friend.name || friend.username %>
+        </div>
+        <% }) %> <% } else { %>
+        <div style="padding: 20px">No friends found.</div>
+        <% } %>
+      </div>
+    </div>
+
+    <div class="chat-area">
+      <div class="chat-header" id="chatHeader">
+        <span id="chatWithTitle"></span>
+      </div>
+
+      <div class="messages-box" id="messagesBox">
+        <div class="no-chat-selected">Select a friend to start chatting</div>
+      </div>
+
+      <div class="input-area" id="inputArea">
+        <input
+          type="text"
+          id="msgInput"
+          placeholder="Type a message..."
+          onkeypress="handleEnter(event)"
+        />
+        <button onclick="sendMessage()">Send</button>
+      </div>
+    </div>
+
+    <script>
+      // --- VARIABLES ---
+      const socket = io(); // Connect to Socket.io
+      const myId = "<%= myId %>"; // Passed from Controller
+      let currentChatFriendId = null;
+
+      // --- SOCKET INITIALIZATION ---
+      // 1. Join my own private room so others can message me
+      socket.emit("joinChat", myId);
+
+      // 2. Listen for incoming messages
+      socket.on("newPrivateMessage", (data) => {
+        // Only append message if I am currently chatting with the sender
+        if (currentChatFriendId === data.senderId) {
+          appendMessage(data.text, "received");
+          scrollToBottom();
+        } else {
+          // Optional: You could add a 'notification dot' to the friend in the sidebar here
+          alert(`New message from ${data.senderId}`);
+        }
+      });
+
+      //   --- FUNCTIONS ---
+
+      // 1. Select a friend from sidebar
+
+      async function selectFriend(friendId, friendName) {
+        currentChatFriendId = friendId;
+
+        // Update UI visuals
+        document.getElementById("chatHeader").style.display = "block";
+        document.getElementById("inputArea").style.display = "flex";
+        document.getElementById(
+          "chatWithTitle"
+        ).innerText = `Chatting with ${friendName}`;
+        document.getElementById("messagesBox").innerHTML =
+          '<div style="text-align:center; padding:20px;">Loading history...</div>';
+
+        // Highlight active friend
+        document
+          .querySelectorAll(".friend-item")
+          .forEach((el) => el.classList.remove("active"));
+        document
+          .querySelector(`.friend-item[data-id="${friendId}"]`)
+          .classList.add("active");
+
+        // Fetch History
+        try {
+          const res = await fetch(`/api/chat/history/${friendId}`);
+          const messages = await res.json();
+
+          // Render History
+          const msgBox = document.getElementById("messagesBox");
+          msgBox.innerHTML = ""; // Clear loader
+
+          messages.forEach((msg) => {
+            const type = msg.senderId === myId ? "sent" : "received";
+            appendMessage(msg.text, type);
+          });
+          scrollToBottom();
+        } catch (err) {
+          console.error("Error loading chat", err);
+        }
+      }
+
+      // Send Message
+      async function sendMessage() {
+        const input = document.getElementById("msgInput");
+        const text = input.value.trim();
+
+        if (!text || !currentChatFriendId) return;
+
+        // A. Optimistically append to UI (looks faster)
+        appendMessage(text, "sent");
+        scrollToBottom();
+        input.value = "";
+
+        try {
+          // B. Save to Database
+          const response = await fetch("/api/chat/send", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              receiverId: currentChatFriendId,
+              text: text,
+            }),
+          });
+
+          if (response.ok) {
+            // C. Emit via Socket so the other person gets it instantly
+            // Note: We send the text AND the receiverId so server knows where to route it
+            socket.emit("sendPrivateMessage", {
+              senderId: myId,
+              receiverId: currentChatFriendId,
+              message: { text: text },
+            });
+          } else {
+            console.error("Failed to save message");
+          }
+        } catch (err) {
+          console.error("Error sending message", err);
+        }
+      }
+
+      // Helper: Append HTML to chat box
+      function appendMessage(text, type) {
+        const msgBox = document.getElementById("messagesBox");
+        const div = document.createElement("div");
+        div.classList.add("message", type);
+        div.innerText = text;
+        msgBox.appendChild(div);
+      }
+
+      // Helper: Scroll to bottom
+      function scrollToBottom() {
+        const msgBox = document.getElementById("messagesBox");
+        msgBox.scrollTop = msgBox.scrollHeight;
+      }
+
+      // Helper: Send on Enter key
+      function handleEnter(e) {
+        if (e.key === "Enter") sendMessage();
+      }
+    </script>
+  </body>
+</html>
