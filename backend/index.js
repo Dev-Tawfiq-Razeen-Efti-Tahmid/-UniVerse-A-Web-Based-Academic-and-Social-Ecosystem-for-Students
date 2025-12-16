@@ -51,7 +51,7 @@ app.use(
 // Parse JSON and form data
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
+app.use(express.static("public"));
 //Socket.io setup
 
 const httpServer = http.createServer(app);
@@ -318,7 +318,7 @@ app.use("/api/users", usersRouter);
 
 app.use("/api/chat", chatRoutes);
 
-app.use("/api/resources", repositoryRoutes);
+app.use("/api/repository", repositoryRoutes);
 
 // ---------- DB + SERVER ----------
 const PORT = process.env.PORT || 5000;

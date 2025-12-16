@@ -1,7 +1,7 @@
 import User from "../models/UserModel.js";
 import Friend from "../models/FriendModel.js";
 
-// Show Social Hub page
+// Social Hub page
 export const showSocialHub = async (req, res) => {
   try {
     if (!req.session?.userData) {
@@ -18,7 +18,7 @@ export const showSocialHub = async (req, res) => {
   }
 };
 
-// Search users (real-time) - Limited to 5 results
+// Search users
 export const searchUsers = async (req, res) => {
   try {
     const { query } = req.query;
@@ -28,7 +28,7 @@ export const searchUsers = async (req, res) => {
       return res.json({ users: [] });
     }
 
-    // Search by name or username - limit to 5 results
+    // Search by name or username
     const users = await User.find({
       _id: { $ne: currentUserId }, // Exclude current user
       $or: [

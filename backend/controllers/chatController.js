@@ -1,13 +1,12 @@
-import FriendModel from "../models/FriendModel.js"; // Adjust path as needed
-import ChatModel from "../models/ChatModel.js"; // Adjust path as needed
-import User from "../models/UserModel.js"; // Adjust path as needed
+import FriendModel from "../models/FriendModel.js";
+import ChatModel from "../models/ChatModel.js";
+import User from "../models/UserModel.js";
 
-// 1. Render Chat Page (Fetches friends for the sidebar)
 export const renderChatPage = async (req, res) => {
   try {
     const currentUserId = req.session.userData._id;
 
-    // Find all accepted friendships where the user is either requester or recipient
+    // Find all accepted friendships
     const friendships = await FriendModel.find({
       $or: [{ requester: currentUserId }, { recipient: currentUserId }],
       status: "accepted",
@@ -15,7 +14,6 @@ export const renderChatPage = async (req, res) => {
 
     // Process the list to extract just the "Friend" info
     const friendsList = friendships.map((friendship) => {
-      // If I am the requester, the friend is the recipient, and vice versa
       const isRequester = friendship.requester._id.toString() === currentUserId;
       return isRequester ? friendship.recipient : friendship.requester;
     });
@@ -31,19 +29,19 @@ export const renderChatPage = async (req, res) => {
   }
 };
 
-// 2. Fetch Chat History
+// Fetch Chat History
 export const getChatHistory = async (req, res) => {
   try {
     const myId = req.session.userData._id;
     const friendId = req.params.friendId;
 
-    // Find messages between these two users (sent by either one)
+    // Find messages between these two users
     const messages = await ChatModel.find({
       $or: [
         { senderId: myId, receiverId: friendId },
         { senderId: friendId, receiverId: myId },
       ],
-    }).sort({ createdAt: 1 }); // Oldest first
+    }).sort({ createdAt: 1 });
 
     res.json(messages);
   } catch (error) {
