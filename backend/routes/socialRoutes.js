@@ -11,17 +11,8 @@ import {
   cancelFriendRequest,
 } from "../controllers/socialController.js";
 
+import { isAuthenticated } from "../middlewares/auth.js";
 const router = express.Router();
-
-// Middleware to check if user is logged in
-const isAuthenticated = (req, res, next) => {
-  if (req.session?.userData) {
-    next();
-  } else {
-    res.redirect("/api/login");
-  }
-};
-
 // Page route
 router.get("/social", isAuthenticated, showSocialHub);
 
