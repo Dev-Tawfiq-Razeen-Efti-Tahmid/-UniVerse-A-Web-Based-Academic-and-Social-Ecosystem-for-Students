@@ -1,11 +1,24 @@
 import Repository from "../models/RepositoryModel.js";
 import multer from "multer";
 import path from "path";
+import fs from "fs";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// ✅ Always upload to backend/public/uploads/repository
+const UPLOAD_DIR = path.join(__dirname, "..", "public", "uploads", "repository");
+
+// ✅ Ensure folder exists
+if (!fs.existsSync(UPLOAD_DIR)) {
+  fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+}
 
 // --- MULTER CONFIGURATION ---
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "public/uploads/repository/");
+    cb(null, UPLOAD_DIR);
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
@@ -13,28 +26,24 @@ const storage = multer.diskStorage({
   },
 });
 
-// File Filter (Allow zip, rar, pdf, docx, pptx)
+// File Filter (Allow zip, rar)
 const fileFilter = (req, file, cb) => {
   const allowedTypes = /rar|zip/;
   const extname = allowedTypes.test(
     path.extname(file.originalname).toLowerCase()
   );
 
-  if (extname) {
-    return cb(null, true);
-  } else {
-    cb(new Error("Error: Only archives (zip/rar) and documents are allowed!"));
-  }
+  if (extname) return cb(null, true);
+  cb(new Error("Error: Only archives (zip/rar) are allowed!"));
 };
 
 export const uploadMiddleware = multer({
-  storage: storage,
-  limits: { fileSize: 50 * 1024 * 1024 }, // 50MB limit
-  fileFilter: fileFilter,
+  storage,
+  limits: { fileSize: 50 * 1024 * 1024 }, // 50MB
+  fileFilter,
 }).single("resourceFile");
 
 // --- CONTROLLER FUNCTIONS ---
-
 export const renderUploadPage = (req, res) => {
   res.render("uploadRepository", {
     user: req.session.userData,
@@ -45,7 +54,6 @@ export const renderUploadPage = (req, res) => {
 
 export const uploadResource = async (req, res) => {
   try {
-    // Multer adds 'req.file'
     if (!req.file) {
       return res.render("uploadRepository", {
         user: req.session.userData,
