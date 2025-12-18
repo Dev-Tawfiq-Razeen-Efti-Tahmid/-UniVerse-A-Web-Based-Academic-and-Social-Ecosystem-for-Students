@@ -48,7 +48,11 @@
         font-family: "Orbitron", sans-serif;
         font-size: 2em;
         font-weight: 700;
-        background: linear-gradient(45deg, var(--primary-blue), var(--accent-violet));
+        background: linear-gradient(
+          45deg,
+          var(--primary-blue),
+          var(--accent-violet)
+        );
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         display: flex;
@@ -92,9 +96,14 @@
       .action-buttons {
         display: flex;
         gap: 12px;
+        flex-wrap: wrap;
       }
       .action-btn {
-        background: linear-gradient(90deg, var(--primary-blue), var(--accent-violet));
+        background: linear-gradient(
+          90deg,
+          var(--primary-blue),
+          var(--accent-violet)
+        );
         color: white;
         border: none;
         border-radius: 8px;
@@ -158,8 +167,12 @@
         margin-top: 14px;
         color: var(--subtle-text);
       }
-      .status.error { color: var(--danger-red); }
-      .status.success { color: var(--success-green); }
+      .status.error {
+        color: var(--danger-red);
+      }
+      .status.success {
+        color: var(--success-green);
+      }
 
       /* RESULT CARD */
       .result-card {
@@ -229,7 +242,9 @@
         justify-content: space-between;
         gap: 10px;
       }
-      summary::-webkit-details-marker { display: none; }
+      summary::-webkit-details-marker {
+        display: none;
+      }
       .summary-left {
         display: flex;
         align-items: center;
@@ -263,7 +278,9 @@
         margin-top: 8px;
         transition: transform 0.2s;
       }
-      .course-btn:hover { transform: translateY(-1px); }
+      .course-btn:hover {
+        transform: translateY(-1px);
+      }
       .course-right {
         display: flex;
         align-items: center;
@@ -292,11 +309,14 @@
         .layout {
           grid-template-columns: 1fr;
         }
-        .tree-scroll { max-height: 420px; }
+        .tree-scroll {
+          max-height: 420px;
+        }
       }
 
-      /* scrollbar (optional) */
-      .tree-scroll::-webkit-scrollbar { width: 8px; }
+      .tree-scroll::-webkit-scrollbar {
+        width: 8px;
+      }
       .tree-scroll::-webkit-scrollbar-thumb {
         background: rgba(138, 43, 226, 0.35);
         border-radius: 999px;
@@ -317,12 +337,18 @@
           <i class="fa-solid fa-book"></i> Course Resources
         </div>
 
+        <!-- ✅ My Downloads button is HERE (top-right) -->
         <div class="action-buttons">
           <a class="action-btn secondary" href="/api/repository/upload">
             <i class="fa-solid fa-upload"></i> Upload
           </a>
+
           <a class="action-btn" href="/api/repository/my-uploads">
             <i class="fa-solid fa-folder-open"></i> My Uploads
+          </a>
+
+          <a class="action-btn" href="/api/repository/my-downloads">
+            <i class="fa-solid fa-download"></i> My Downloads
           </a>
         </div>
       </div>
@@ -398,7 +424,11 @@
         }
 
         const label = fromLabel ? ` (${fromLabel})` : "";
-        setStatus(statusEl, `${items.length} resource(s) found${label}.`, "success");
+        setStatus(
+          statusEl,
+          `${items.length} resource(s) found${label}.`,
+          "success"
+        );
 
         searchResults.innerHTML = items
           .map((r) => {
@@ -447,7 +477,11 @@
           );
 
           if (!res.ok) {
-            setStatus(statusEl, "Failed to load results (are you logged in?).", "error");
+            setStatus(
+              statusEl,
+              "Failed to load results (are you logged in?).",
+              "error"
+            );
             searchResults.innerHTML = "";
             return;
           }
@@ -456,7 +490,11 @@
           renderResults(data.resources || [], "search");
         } catch (e) {
           console.error(e);
-          setStatus(statusEl, "Search failed due to network/server error.", "error");
+          setStatus(
+            statusEl,
+            "Search failed due to network/server error.",
+            "error"
+          );
           searchResults.innerHTML = "";
         }
       }
@@ -468,7 +506,6 @@
 
       // ===== TREE =====
       function countResourcesInNode(node) {
-        // node is: {semester:{course:[resources]}}
         let count = 0;
         for (const sem of Object.keys(node)) {
           for (const course of Object.keys(node[sem])) {
@@ -481,37 +518,49 @@
       function buildTreeUI(tree) {
         if (!tree || Object.keys(tree).length === 0) {
           treeEl.innerHTML = "";
-          setStatus(treeStatusEl, "No categories yet. Upload something first.", "error");
+          setStatus(
+            treeStatusEl,
+            "No categories yet. Upload something first.",
+            "error"
+          );
           return;
         }
 
         setStatus(treeStatusEl, "", "");
 
-        // Sort departments alphabetically
-        const departments = Object.keys(tree).sort((a, b) => a.localeCompare(b));
+        const departments = Object.keys(tree).sort((a, b) =>
+          a.localeCompare(b)
+        );
 
         treeEl.innerHTML = departments
           .map((dept) => {
             const deptNode = tree[dept] || {};
             const deptCount = countResourcesInNode(deptNode);
 
-            const semesters = Object.keys(deptNode).sort((a, b) => a.localeCompare(b));
+            const semesters = Object.keys(deptNode).sort((a, b) =>
+              a.localeCompare(b)
+            );
             const semesterHtml = semesters
               .map((sem) => {
                 const semNode = deptNode[sem] || {};
-                const courses = Object.keys(semNode).sort((a, b) => a.localeCompare(b));
+                const courses = Object.keys(semNode).sort((a, b) =>
+                  a.localeCompare(b)
+                );
 
-                const semCount = courses.reduce((acc, c) => acc + (semNode[c]?.length || 0), 0);
+                const semCount = courses.reduce(
+                  (acc, c) => acc + (semNode[c]?.length || 0),
+                  0
+                );
 
                 const courseHtml = courses
                   .map((course) => {
                     const items = semNode[course] || [];
                     return `
                       <button class="course-btn"
-                        data-dept="${escapeHtml(dept)}"
-                        data-sem="${escapeHtml(sem)}"
                         data-course="${escapeHtml(course)}">
-                        <span><i class="fa-solid fa-book-open"></i> <b>${escapeHtml(course)}</b></span>
+                        <span><i class="fa-solid fa-book-open"></i> <b>${escapeHtml(
+                          course
+                        )}</b></span>
                         <span class="course-right">
                           <span class="count">${items.length}</span>
                           <i class="fa-solid fa-chevron-left" style="opacity:0.6;"></i>
@@ -555,13 +604,11 @@
           })
           .join("");
 
-        // Add click handlers for courses
         treeEl.querySelectorAll(".course-btn").forEach((btn) => {
           btn.addEventListener("click", async () => {
             const course = btn.getAttribute("data-course");
             if (!course) return;
 
-            // optional: put course in search input for visibility
             searchInput.value = course;
 
             setStatus(statusEl, "Loading course resources...", "");
@@ -572,7 +619,6 @@
               );
               const data = await res.json();
               renderResults(data.resources || [], course);
-              // scroll to results
               window.scrollTo({ top: 0, behavior: "smooth" });
             } catch (e) {
               console.error(e);
@@ -605,8 +651,6 @@
       }
 
       refreshTreeBtn.addEventListener("click", loadTree);
-
-      // Load tree on page load
       loadTree();
     </script>
   </body>
