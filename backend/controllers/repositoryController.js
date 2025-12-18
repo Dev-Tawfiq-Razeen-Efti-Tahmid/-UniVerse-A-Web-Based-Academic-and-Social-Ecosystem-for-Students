@@ -2,6 +2,7 @@ import Repository from "../models/RepositoryModel.js";
 import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
+import DownloadHistory from "../models/DownloadHistoryModel.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -125,6 +126,12 @@ export const downloadResource = async (req, res) => {
       return res.status(404).send("File missing on server");
     }
 
+    // ✅ EXTRA: Log download history (do not block download if logging fails)
+    DownloadHistory.create({
+      user: req.session.userData._id,
+      resource: resource._id,
+    }).catch(() => {});
+
     // Increment download count (don’t block download if this fails)
     Repository.updateOne(
       { _id: resource._id },
@@ -137,6 +144,7 @@ export const downloadResource = async (req, res) => {
     return res.status(500).send("Download failed");
   }
 };
+
 export const renderMyUploadsPage = async (req, res) => {
   try {
     if (!req.session?.userData) return res.redirect("/api/login");
@@ -169,6 +177,7 @@ export const renderMyUploadsPage = async (req, res) => {
     });
   }
 };
+
 export const deleteResource = async (req, res) => {
   try {
     if (!req.session?.userData) return res.redirect("/api/login");
@@ -199,5 +208,57 @@ export const deleteResource = async (req, res) => {
   } catch (err) {
     console.error("Delete error:", err);
     return res.status(500).send("Delete failed");
+  }
+};
+
+// =====================
+// ✅ EXTRA: MY DOWNLOADS
+// =====================
+
+export const renderMyDownloadsPage = async (req, res) => {
+  try {
+    if (!req.session?.userData) return res.redirect("/api/login");
+
+    const userId = req.session.userData._id;
+
+    const downloads = await DownloadHistory.find({ user: userId })
+      .sort({ downloadedAt: -1 })
+      .populate("resource");
+
+    const safeDownloads = downloads.filter((d) => d.resource);
+
+    return res.render("myDownloads", {
+      user: req.session.userData,
+      downloads: safeDownloads,
+      error: null,
+    });
+  } catch (err) {
+    console.error("My downloads error:", err);
+    return res.status(500).render("myDownloads", {
+      user: req.session?.userData,
+      downloads: [],
+      error: "Failed to load your downloads",
+    });
+  }
+};
+
+export const removeDownloadHistory = async (req, res) => {
+  try {
+    if (!req.session?.userData) return res.redirect("/api/login");
+
+    const userId = String(req.session.userData._id);
+    const history = await DownloadHistory.findById(req.params.id);
+
+    if (!history) return res.redirect("/api/repository/my-downloads");
+
+    if (String(history.user) !== userId) {
+      return res.status(403).send("Not allowed");
+    }
+
+    await DownloadHistory.findByIdAndDelete(req.params.id);
+    return res.redirect("/api/repository/my-downloads");
+  } catch (err) {
+    console.error("Remove download history error:", err);
+    return res.status(500).send("Failed to remove history");
   }
 };
