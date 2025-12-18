@@ -47,3 +47,28 @@ const repositorySchema = new mongoose.Schema(
 repositorySchema.index({ courseCode: 1, semester: 1, voteScore: -1 });
 
 export default mongoose.model("Repository", repositorySchema);
+export const apiRepositoryTree = async (req, res) => {
+  try {
+    const resources = await Repository.find({})
+      .sort({ createdAt: -1 })
+      .select("title courseCode semester department originalFileName fileUrl createdAt uploadedBy voteScore downloadCount");
+
+    const tree = {};
+    for (const r of resources) {
+      const dept = r.department || "UNKNOWN";
+      const sem = r.semester || "UNKNOWN";
+      const course = r.courseCode || "UNKNOWN";
+
+      if (!tree[dept]) tree[dept] = {};
+      if (!tree[dept][sem]) tree[dept][sem] = {};
+      if (!tree[dept][sem][course]) tree[dept][sem][course] = [];
+
+      tree[dept][sem][course].push(r);
+    }
+
+    return res.json({ tree });
+  } catch (err) {
+    console.error("Tree API error:", err);
+    return res.status(500).json({ error: "Failed to load tree" });
+  }
+};

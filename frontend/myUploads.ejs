@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Uploads - Repository</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Orbitron:wght@400;700&display=swap");
+      :root {
+        --dark-bg: #1a1a2e;
+        --dark-card: #272c4a;
+        --primary-blue: #007bff;
+        --accent-violet: #8a2be2;
+        --text-light: #e0e0e0;
+        --subtle-text: #a0a0a0;
+        --danger-red: #ff4757;
+      }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        font-family: "Montserrat", sans-serif;
+        min-height: 100vh;
+        background: linear-gradient(135deg, var(--dark-bg) 0%, #160e2c 100%);
+        color: var(--text-light);
+      }
+      .top-bar {
+        background-color: var(--dark-card);
+        padding: 15px 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--accent-violet);
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+      }
+      .logo {
+        font-family: "Orbitron", sans-serif;
+        font-size: 1.8em;
+        font-weight: 700;
+        background: linear-gradient(45deg, var(--primary-blue), var(--accent-violet));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .btn {
+        background: transparent;
+        border: 1px solid rgba(0, 123, 255, 0.6);
+        color: var(--text-light);
+        border-radius: 10px;
+        padding: 8px 14px;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .btn:hover { background: rgba(0, 123, 255, 0.12); transform: translateY(-1px); }
+      .container {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 30px 20px;
+      }
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 18px;
+      }
+      .title {
+        font-family: "Orbitron", sans-serif;
+        font-size: 1.6em;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .card {
+        margin-top: 12px;
+        padding: 14px;
+        border: 1px solid rgba(0, 123, 255, 0.25);
+        border-radius: 14px;
+        background: rgba(39, 44, 74, 0.55);
+      }
+      .row {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .meta {
+        color: var(--subtle-text);
+        margin-top: 6px;
+        font-size: 0.95em;
+        line-height: 1.35;
+      }
+      .actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      .action-btn {
+        border: none;
+        border-radius: 10px;
+        padding: 10px 14px;
+        cursor: pointer;
+        font-weight: 600;
+        color: white;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+        transition: transform 0.2s;
+        background: linear-gradient(90deg, var(--primary-blue), var(--accent-violet));
+      }
+      .action-btn:hover { transform: translateY(-2px); }
+      .danger {
+        background: linear-gradient(90deg, #ff4757, #ff6b81);
+      }
+      .muted { color: var(--subtle-text); margin-top: 12px; }
+      .error { color: var(--danger-red); margin-top: 12px; }
+    </style>
+  </head>
+  <body>
+    <div class="top-bar">
+      <div class="logo"><i class="fa-solid fa-folder-open"></i> My Uploads</div>
+      <div style="display:flex; gap:10px; align-items:center;">
+        <a class="btn" href="/api/repository"><i class="fa-solid fa-database"></i> Repository</a>
+        <a class="btn" href="/api/dashboard"><i class="fa-solid fa-arrow-left"></i> Dashboard</a>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="header">
+        <div class="title"><i class="fa-solid fa-upload"></i> Your Uploaded Resources</div>
+        <a class="action-btn" href="/api/repository/upload">
+          <i class="fa-solid fa-plus"></i> Upload New
+        </a>
+      </div>
+
+      <% if (error) { %>
+        <div class="error"><%= error %></div>
+      <% } %>
+
+      <% if (!resources || resources.length === 0) { %>
+        <div class="muted">You haven’t uploaded anything yet.</div>
+      <% } else { %>
+        <% resources.forEach(r => { %>
+          <div class="card">
+            <div class="row">
+              <div>
+                <div style="font-weight:700; font-size:1.05em;"><%= r.title %></div>
+                <div class="meta">
+                  <b><%= r.courseCode %></b> | <%= r.department %> | <%= r.semester %><br/>
+                  File: <%= r.originalFileName %>
+                </div>
+              </div>
+
+              <div class="actions">
+                <a class="action-btn" href="/api/repository/<%= r._id %>/download">
+                  <i class="fa-solid fa-download"></i> Download
+                </a>
+
+                <form method="POST" action="/api/repository/<%= r._id %>/delete"
+                      onsubmit="return confirm('Delete this resource? This cannot be undone.');">
+                  <button type="submit" class="action-btn danger">
+                    <i class="fa-solid fa-trash"></i> Delete
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        <% }) %>
+      <% } %>
+    </div>
+  </body>
+</html>

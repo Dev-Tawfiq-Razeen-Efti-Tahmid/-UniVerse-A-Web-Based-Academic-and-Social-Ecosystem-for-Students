@@ -68,6 +68,7 @@
         background: rgba(0, 123, 255, 0.15);
         transform: translateY(-1px);
       }
+
       .main-content {
         max-width: 1200px;
         margin: 0 auto;
@@ -113,13 +114,24 @@
       .action-btn.secondary {
         background: linear-gradient(90deg, #f59e0b, #d97706);
       }
-      .search-wrapper {
+
+      /* ====== LAYOUT: LEFT SEARCH + RIGHT TREE ====== */
+      .layout {
+        display: grid;
+        grid-template-columns: 1fr 360px;
+        gap: 18px;
+        align-items: start;
+      }
+
+      .panel {
         background-color: rgba(23, 27, 54, 0.9);
         border-radius: 16px;
-        padding: 24px;
+        padding: 22px;
         border: 1px solid rgba(0, 123, 255, 0.25);
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
       }
+
+      /* SEARCH */
       .search-input {
         width: 100%;
         padding: 15px 20px;
@@ -134,15 +146,22 @@
         outline: none;
         border-color: var(--accent-violet);
       }
-      .results-container {
-        margin-top: 18px;
-      }
       .hint {
         margin-top: 10px;
         color: var(--subtle-text);
         font-size: 0.95em;
       }
+      .results-container {
+        margin-top: 18px;
+      }
+      .status {
+        margin-top: 14px;
+        color: var(--subtle-text);
+      }
+      .status.error { color: var(--danger-red); }
+      .status.success { color: var(--success-green); }
 
+      /* RESULT CARD */
       .result-card {
         margin-top: 12px;
         padding: 14px;
@@ -168,27 +187,119 @@
         margin-top: 6px;
         font-size: 0.92em;
       }
-      .status {
-        margin-top: 14px;
+
+      /* ====== RIGHT TREE ====== */
+      .tree-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 10px;
+      }
+      .tree-title {
+        font-family: "Orbitron", sans-serif;
+        font-size: 1.2em;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .tree-subtitle {
         color: var(--subtle-text);
+        font-size: 0.9em;
+        margin-bottom: 14px;
       }
-      .status.error {
-        color: var(--danger-red);
-      }
-      .status.success {
-        color: var(--success-green);
+      .tree-scroll {
+        max-height: 520px;
+        overflow: auto;
+        padding-right: 6px;
       }
 
-      @media (max-width: 768px) {
-        .top-bar {
-          padding: 12px 18px;
+      details {
+        border: 1px solid rgba(0, 123, 255, 0.18);
+        border-radius: 12px;
+        background: rgba(39, 44, 74, 0.35);
+        margin-bottom: 10px;
+      }
+      summary {
+        list-style: none;
+        cursor: pointer;
+        padding: 12px 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+      summary::-webkit-details-marker { display: none; }
+      .summary-left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .pill {
+        font-size: 0.78em;
+        color: white;
+        background: rgba(0, 123, 255, 0.25);
+        border: 1px solid rgba(0, 123, 255, 0.35);
+        padding: 3px 10px;
+        border-radius: 999px;
+        white-space: nowrap;
+      }
+      .tree-inner {
+        padding: 0 14px 12px 14px;
+      }
+      .course-btn {
+        width: 100%;
+        text-align: left;
+        padding: 10px 12px;
+        border-radius: 10px;
+        border: 1px solid rgba(0, 123, 255, 0.18);
+        background: rgba(23, 27, 54, 0.5);
+        color: var(--text-light);
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        margin-top: 8px;
+        transition: transform 0.2s;
+      }
+      .course-btn:hover { transform: translateY(-1px); }
+      .course-right {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .count {
+        color: var(--subtle-text);
+        font-size: 0.85em;
+      }
+
+      .small-btn {
+        background: transparent;
+        border: 1px solid rgba(0, 123, 255, 0.35);
+        color: var(--text-light);
+        border-radius: 10px;
+        padding: 7px 10px;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .small-btn:hover {
+        background: rgba(0, 123, 255, 0.12);
+        transform: translateY(-1px);
+      }
+
+      @media (max-width: 1000px) {
+        .layout {
+          grid-template-columns: 1fr;
         }
-        .logo {
-          font-size: 1.6em;
-        }
-        .page-title {
-          font-size: 1.6em;
-        }
+        .tree-scroll { max-height: 420px; }
+      }
+
+      /* scrollbar (optional) */
+      .tree-scroll::-webkit-scrollbar { width: 8px; }
+      .tree-scroll::-webkit-scrollbar-thumb {
+        background: rgba(138, 43, 226, 0.35);
+        border-radius: 999px;
       }
     </style>
   </head>
@@ -203,30 +314,54 @@
     <div class="main-content">
       <div class="page-header">
         <div class="page-title">
-          <i class="fa-solid fa-book"></i> Search Course Resources
+          <i class="fa-solid fa-book"></i> Course Resources
         </div>
 
         <div class="action-buttons">
           <a class="action-btn secondary" href="/api/repository/upload">
             <i class="fa-solid fa-upload"></i> Upload
           </a>
+          <a class="action-btn" href="/api/repository/my-uploads">
+            <i class="fa-solid fa-folder-open"></i> My Uploads
+          </a>
         </div>
       </div>
 
-      <div class="search-wrapper">
-        <input
-          type="text"
-          class="search-input"
-          id="searchInput"
-          placeholder="Search by Course Code (e.g., CSE110, CSE370)..."
-          autocomplete="off"
-        />
-        <div class="hint">
-          Type a course code. Matching uploads will appear with a Download button.
+      <div class="layout">
+        <!-- LEFT: SEARCH + RESULTS -->
+        <div class="panel">
+          <input
+            type="text"
+            class="search-input"
+            id="searchInput"
+            placeholder="Search by Course Code (e.g., CSE110, CSE370)..."
+            autocomplete="off"
+          />
+          <div class="hint">
+            Use search for quick access, or browse departments on the right.
+          </div>
+
+          <div id="status" class="status"></div>
+          <div id="searchResults" class="results-container"></div>
         </div>
 
-        <div id="status" class="status"></div>
-        <div id="searchResults" class="results-container"></div>
+        <!-- RIGHT: TREE -->
+        <div class="panel">
+          <div class="tree-header">
+            <div class="tree-title">
+              <i class="fa-solid fa-school"></i> BRACU Categories
+            </div>
+            <button id="refreshTreeBtn" class="small-btn" title="Refresh">
+              <i class="fa-solid fa-rotate"></i>
+            </button>
+          </div>
+          <div class="tree-subtitle">
+            Department → Semester → Course (click course to load resources)
+          </div>
+
+          <div id="treeStatus" class="status"></div>
+          <div id="repoTree" class="tree-scroll"></div>
+        </div>
       </div>
     </div>
 
@@ -234,6 +369,10 @@
       const searchInput = document.getElementById("searchInput");
       const searchResults = document.getElementById("searchResults");
       const statusEl = document.getElementById("status");
+
+      const treeEl = document.getElementById("repoTree");
+      const treeStatusEl = document.getElementById("treeStatus");
+      const refreshTreeBtn = document.getElementById("refreshTreeBtn");
 
       let debounceTimer = null;
 
@@ -246,19 +385,20 @@
           .replaceAll("'", "&#039;");
       }
 
-      function setStatus(msg, kind) {
-        statusEl.className = "status" + (kind ? " " + kind : "");
-        statusEl.textContent = msg || "";
+      function setStatus(el, msg, kind) {
+        el.className = "status" + (kind ? " " + kind : "");
+        el.textContent = msg || "";
       }
 
-      function renderResults(items) {
+      function renderResults(items, fromLabel) {
         if (!items || items.length === 0) {
           searchResults.innerHTML = "";
-          setStatus("No resources found.", "error");
+          setStatus(statusEl, "No resources found.", "error");
           return;
         }
 
-        setStatus(`${items.length} resource(s) found.`, "success");
+        const label = fromLabel ? ` (${fromLabel})` : "";
+        setStatus(statusEl, `${items.length} resource(s) found${label}.`, "success");
 
         searchResults.innerHTML = items
           .map((r) => {
@@ -293,31 +433,30 @@
         const q = searchInput.value.trim();
 
         if (!q) {
-          setStatus("");
+          setStatus(statusEl, "");
           searchResults.innerHTML = "";
           return;
         }
 
-        setStatus("Searching...", "");
+        setStatus(statusEl, "Searching...", "");
 
         try {
           const res = await fetch(
             `/api/repository/api/resources?q=${encodeURIComponent(q)}`,
-            { headers: { "Accept": "application/json" } }
+            { headers: { Accept: "application/json" } }
           );
 
           if (!res.ok) {
-            // If session expired, backend might redirect to login; res.ok may be false.
-            setStatus("Failed to load results (are you logged in?).", "error");
+            setStatus(statusEl, "Failed to load results (are you logged in?).", "error");
             searchResults.innerHTML = "";
             return;
           }
 
           const data = await res.json();
-          renderResults(data.resources || []);
+          renderResults(data.resources || [], "search");
         } catch (e) {
           console.error(e);
-          setStatus("Search failed due to network/server error.", "error");
+          setStatus(statusEl, "Search failed due to network/server error.", "error");
           searchResults.innerHTML = "";
         }
       }
@@ -326,6 +465,149 @@
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(searchNow, 250);
       });
+
+      // ===== TREE =====
+      function countResourcesInNode(node) {
+        // node is: {semester:{course:[resources]}}
+        let count = 0;
+        for (const sem of Object.keys(node)) {
+          for (const course of Object.keys(node[sem])) {
+            count += (node[sem][course] || []).length;
+          }
+        }
+        return count;
+      }
+
+      function buildTreeUI(tree) {
+        if (!tree || Object.keys(tree).length === 0) {
+          treeEl.innerHTML = "";
+          setStatus(treeStatusEl, "No categories yet. Upload something first.", "error");
+          return;
+        }
+
+        setStatus(treeStatusEl, "", "");
+
+        // Sort departments alphabetically
+        const departments = Object.keys(tree).sort((a, b) => a.localeCompare(b));
+
+        treeEl.innerHTML = departments
+          .map((dept) => {
+            const deptNode = tree[dept] || {};
+            const deptCount = countResourcesInNode(deptNode);
+
+            const semesters = Object.keys(deptNode).sort((a, b) => a.localeCompare(b));
+            const semesterHtml = semesters
+              .map((sem) => {
+                const semNode = deptNode[sem] || {};
+                const courses = Object.keys(semNode).sort((a, b) => a.localeCompare(b));
+
+                const semCount = courses.reduce((acc, c) => acc + (semNode[c]?.length || 0), 0);
+
+                const courseHtml = courses
+                  .map((course) => {
+                    const items = semNode[course] || [];
+                    return `
+                      <button class="course-btn"
+                        data-dept="${escapeHtml(dept)}"
+                        data-sem="${escapeHtml(sem)}"
+                        data-course="${escapeHtml(course)}">
+                        <span><i class="fa-solid fa-book-open"></i> <b>${escapeHtml(course)}</b></span>
+                        <span class="course-right">
+                          <span class="count">${items.length}</span>
+                          <i class="fa-solid fa-chevron-left" style="opacity:0.6;"></i>
+                        </span>
+                      </button>
+                    `;
+                  })
+                  .join("");
+
+                return `
+                  <details style="margin-top:10px;">
+                    <summary>
+                      <span class="summary-left">
+                        <i class="fa-solid fa-calendar"></i>
+                        <b>${escapeHtml(sem)}</b>
+                      </span>
+                      <span class="pill">${semCount}</span>
+                    </summary>
+                    <div class="tree-inner">
+                      ${courseHtml || `<div class="hint">No courses found.</div>`}
+                    </div>
+                  </details>
+                `;
+              })
+              .join("");
+
+            return `
+              <details>
+                <summary>
+                  <span class="summary-left">
+                    <i class="fa-solid fa-building-columns"></i>
+                    <b>${escapeHtml(dept)}</b>
+                  </span>
+                  <span class="pill">${deptCount}</span>
+                </summary>
+                <div class="tree-inner">
+                  ${semesterHtml || `<div class="hint">No semesters found.</div>`}
+                </div>
+              </details>
+            `;
+          })
+          .join("");
+
+        // Add click handlers for courses
+        treeEl.querySelectorAll(".course-btn").forEach((btn) => {
+          btn.addEventListener("click", async () => {
+            const course = btn.getAttribute("data-course");
+            if (!course) return;
+
+            // optional: put course in search input for visibility
+            searchInput.value = course;
+
+            setStatus(statusEl, "Loading course resources...", "");
+            try {
+              const res = await fetch(
+                `/api/repository/api/resources?q=${encodeURIComponent(course)}`,
+                { headers: { Accept: "application/json" } }
+              );
+              const data = await res.json();
+              renderResults(data.resources || [], course);
+              // scroll to results
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            } catch (e) {
+              console.error(e);
+              setStatus(statusEl, "Failed to load course resources.", "error");
+            }
+          });
+        });
+      }
+
+      async function loadTree() {
+        setStatus(treeStatusEl, "Loading categories...", "");
+        treeEl.innerHTML = "";
+
+        try {
+          const res = await fetch(`/api/repository/api/tree`, {
+            headers: { Accept: "application/json" },
+          });
+
+          if (!res.ok) {
+            setStatus(treeStatusEl, "Failed to load tree (login required).", "error");
+            return;
+          }
+
+          const data = await res.json();
+          buildTreeUI(data.tree || {});
+        } catch (e) {
+          console.error(e);
+          setStatus(treeStatusEl, "Tree load failed due to network/server error.", "error");
+        }
+      }
+
+      refreshTreeBtn.addEventListener("click", loadTree);
+
+      // Load tree on page load
+      loadTree();
     </script>
   </body>
 </html>

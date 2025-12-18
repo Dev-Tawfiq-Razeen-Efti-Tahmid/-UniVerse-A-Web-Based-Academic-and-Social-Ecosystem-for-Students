@@ -63,6 +63,19 @@ export const uploadResource = async (req, res) => {
     }
 
     const { title, courseCode, semester, department } = req.body;
+    const courseCodeClean = (courseCode || "").trim().toUpperCase();
+
+    const departmentClean = (department || "").trim().toUpperCase();
+
+// Normalize semester:
+// - trims spaces
+// - collapses multiple spaces
+// - standardizes casing like "Spring 2025"
+    const semesterClean = (semester || "")
+      .trim()
+      .replace(/\s+/g, " ")
+      .toLowerCase()
+      .replace(/\b\w/g, (c) => c.toUpperCase());
 
     const newResource = new Repository({
       title,
