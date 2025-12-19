@@ -49,10 +49,11 @@ export const apiSearchResources = async (req, res) => {
       filter.semester = semester.trim();
     }
 
+    // ✅ FIX: include upvotedBy/downvotedBy so frontend can show separate counts
     const resources = await Repository.find(filter)
       .sort({ createdAt: -1 })
       .select(
-        "title courseCode semester department originalFileName fileUrl createdAt uploadedBy voteScore downloadCount"
+        "title courseCode semester department originalFileName fileUrl createdAt uploadedBy voteScore downloadCount upvotedBy downvotedBy"
       );
 
     return res.json({ resources });
@@ -76,11 +77,11 @@ export const apiRepositoryTree = async (req, res) => {
       filter.semester = semester.trim();
     }
 
-    // Pull everything needed for UI
+    // ✅ FIX: include upvotedBy/downvotedBy here too (browse uses this data)
     const resources = await Repository.find(filter)
       .sort({ createdAt: -1 })
       .select(
-        "title courseCode semester department originalFileName fileUrl createdAt uploadedBy voteScore downloadCount"
+        "title courseCode semester department originalFileName fileUrl createdAt uploadedBy voteScore downloadCount upvotedBy downvotedBy"
       );
 
     // Build nested tree
@@ -261,4 +262,108 @@ export const removeDownloadHistory = async (req, res) => {
     console.error("Remove download history error:", err);
     return res.status(500).send("Failed to remove history");
   }
+};
+
+// =====================
+// ✅ VOTES (FIXED COUNTS)
+// =====================
+
+export const upvoteResource = async (req, res) => {
+  try {
+    const userId = req.session.userData._id;
+    const resourceId = req.params.id;
+
+    const resource = await Repository.findById(resourceId);
+    if (!resource) return res.status(404).json({ error: "Not found" });
+
+    const hasUpvoted = resource.upvotedBy.includes(userId);
+    const hasDownvoted = resource.downvotedBy.includes(userId);
+
+    if (hasUpvoted) {
+      // remove upvote
+      resource.upvotedBy.pull(userId);
+      resource.voteScore -= 1;
+    } else {
+      // add upvote
+      resource.upvotedBy.push(userId);
+      resource.voteScore += 1;
+
+      // remove downvote if exists
+      if (hasDownvoted) {
+        resource.downvotedBy.pull(userId);
+        resource.voteScore += 1;
+      }
+    }
+
+    await resource.save();
+
+    // ✅ FIX: return separate counts (frontend needs this)
+    return res.json({
+      voteScore: resource.voteScore,
+      upvotes: resource.upvotedBy.length,
+      downvotes: resource.downvotedBy.length,
+    });
+  } catch (err) {
+    console.error("Upvote error:", err);
+    return res.status(500).json({ error: "Vote failed" });
+  }
+};
+
+export const downvoteResource = async (req, res) => {
+  try {
+    const userId = req.session.userData._id;
+    const resourceId = req.params.id;
+
+    const resource = await Repository.findById(resourceId);
+    if (!resource) return res.status(404).json({ error: "Not found" });
+
+    const hasDownvoted = resource.downvotedBy.includes(userId);
+    const hasUpvoted = resource.upvotedBy.includes(userId);
+
+    if (hasDownvoted) {
+      // remove downvote
+      resource.downvotedBy.pull(userId);
+      resource.voteScore += 1;
+    } else {
+      // add downvote
+      resource.downvotedBy.push(userId);
+      resource.voteScore -= 1;
+
+      // remove upvote if exists
+      if (hasUpvoted) {
+        resource.upvotedBy.pull(userId);
+        resource.voteScore -= 1;
+      }
+    }
+
+    await resource.save();
+
+    // ✅ FIX: return separate counts (frontend needs this)
+    return res.json({
+      voteScore: resource.voteScore,
+      upvotes: resource.upvotedBy.length,
+      downvotes: resource.downvotedBy.length,
+    });
+  } catch (err) {
+    console.error("Downvote error:", err);
+    return res.status(500).json({ error: "Vote failed" });
+  }
+};
+
+export const getTopResourcesAllTime = async (req, res) => {
+  const resources = await Repository.find({}).sort({ voteScore: -1 }).limit(10);
+  res.json({ resources });
+};
+
+export const getTopResourcesThisWeek = async (req, res) => {
+  const oneWeekAgo = new Date();
+  oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+  const resources = await Repository.find({
+    createdAt: { $gte: oneWeekAgo },
+  })
+    .sort({ voteScore: -1 })
+    .limit(10);
+
+  res.json({ resources });
 };
