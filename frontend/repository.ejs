@@ -124,7 +124,6 @@
         background: linear-gradient(90deg, #f59e0b, #d97706);
       }
 
-      /* ====== LAYOUT: LEFT SEARCH + RIGHT TREE ====== */
       .layout {
         display: grid;
         grid-template-columns: 1fr 360px;
@@ -140,7 +139,6 @@
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
       }
 
-      /* SEARCH */
       .search-input {
         width: 100%;
         padding: 15px 20px;
@@ -174,7 +172,6 @@
         color: var(--success-green);
       }
 
-      /* RESULT CARD */
       .result-card {
         margin-top: 12px;
         padding: 14px;
@@ -201,7 +198,6 @@
         font-size: 0.92em;
       }
 
-      /* ====== RIGHT TREE ====== */
       .tree-header {
         display: flex;
         align-items: center;
@@ -323,6 +319,7 @@
       }
     </style>
   </head>
+
   <body>
     <div class="top-bar">
       <div class="logo"><i class="fa-solid fa-database"></i> Repository</div>
@@ -337,7 +334,6 @@
           <i class="fa-solid fa-book"></i> Course Resources
         </div>
 
-        <!-- ✅ My Downloads button is HERE (top-right) -->
         <div class="action-buttons">
           <a class="action-btn secondary" href="/api/repository/upload">
             <i class="fa-solid fa-upload"></i> Upload
@@ -354,7 +350,6 @@
       </div>
 
       <div class="layout">
-        <!-- LEFT: SEARCH + RESULTS -->
         <div class="panel">
           <input
             type="text"
@@ -371,7 +366,6 @@
           <div id="searchResults" class="results-container"></div>
         </div>
 
-        <!-- RIGHT: TREE -->
         <div class="panel">
           <div class="tree-header">
             <div class="tree-title">
@@ -424,11 +418,7 @@
         }
 
         const label = fromLabel ? ` (${fromLabel})` : "";
-        setStatus(
-          statusEl,
-          `${items.length} resource(s) found${label}.`,
-          "success"
-        );
+        setStatus(statusEl, `${items.length} resource(s) found${label}.`, "success");
 
         searchResults.innerHTML = items
           .map((r) => {
@@ -437,6 +427,9 @@
             const semester = escapeHtml(r.semester);
             const department = escapeHtml(r.department);
             const originalFileName = escapeHtml(r.originalFileName);
+
+            const upCount = (r.upvotedBy || []).length;
+            const downCount = (r.downvotedBy || []).length;
 
             return `
               <div class="result-card">
@@ -449,9 +442,19 @@
                     <div class="filename">File: ${originalFileName}</div>
                   </div>
 
-                  <a class="action-btn" href="/api/repository/${r._id}/download">
-                    <i class="fa-solid fa-download"></i> Download
-                  </a>
+                  <div style="display:flex; gap:10px; align-items:center;">
+                    <button class="small-btn" onclick="vote('${r._id}', 'up')">
+                      👍 <span id="up-${r._id}">${upCount}</span>
+                    </button>
+
+                    <button class="small-btn" onclick="vote('${r._id}', 'down')">
+                      👎 <span id="down-${r._id}">${downCount}</span>
+                    </button>
+
+                    <a class="action-btn" href="/api/repository/${r._id}/download">
+                      <i class="fa-solid fa-download"></i> Download
+                    </a>
+                  </div>
                 </div>
               </div>
             `;
@@ -477,11 +480,7 @@
           );
 
           if (!res.ok) {
-            setStatus(
-              statusEl,
-              "Failed to load results (are you logged in?).",
-              "error"
-            );
+            setStatus(statusEl, "Failed to load results (are you logged in?).", "error");
             searchResults.innerHTML = "";
             return;
           }
@@ -490,11 +489,7 @@
           renderResults(data.resources || [], "search");
         } catch (e) {
           console.error(e);
-          setStatus(
-            statusEl,
-            "Search failed due to network/server error.",
-            "error"
-          );
+          setStatus(statusEl, "Search failed due to network/server error.", "error");
           searchResults.innerHTML = "";
         }
       }
@@ -503,6 +498,28 @@
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(searchNow, 250);
       });
+
+      // ✅ vote() updates both counts
+      async function vote(id, type) {
+        try {
+          const res = await fetch(`/api/repository/${id}/${type}vote`, {
+            method: "POST",
+            headers: { Accept: "application/json" },
+          });
+
+          if (!res.ok) return;
+
+          const data = await res.json();
+
+          const upEl = document.getElementById(`up-${id}`);
+          const downEl = document.getElementById(`down-${id}`);
+
+          if (upEl) upEl.textContent = data.upvotes;
+          if (downEl) downEl.textContent = data.downvotes;
+        } catch (e) {
+          console.error("Vote failed", e);
+        }
+      }
 
       // ===== TREE =====
       function countResourcesInNode(node) {
@@ -518,49 +535,33 @@
       function buildTreeUI(tree) {
         if (!tree || Object.keys(tree).length === 0) {
           treeEl.innerHTML = "";
-          setStatus(
-            treeStatusEl,
-            "No categories yet. Upload something first.",
-            "error"
-          );
+          setStatus(treeStatusEl, "No categories yet. Upload something first.", "error");
           return;
         }
 
         setStatus(treeStatusEl, "", "");
 
-        const departments = Object.keys(tree).sort((a, b) =>
-          a.localeCompare(b)
-        );
+        const departments = Object.keys(tree).sort((a, b) => a.localeCompare(b));
 
         treeEl.innerHTML = departments
           .map((dept) => {
             const deptNode = tree[dept] || {};
             const deptCount = countResourcesInNode(deptNode);
 
-            const semesters = Object.keys(deptNode).sort((a, b) =>
-              a.localeCompare(b)
-            );
+            const semesters = Object.keys(deptNode).sort((a, b) => a.localeCompare(b));
             const semesterHtml = semesters
               .map((sem) => {
                 const semNode = deptNode[sem] || {};
-                const courses = Object.keys(semNode).sort((a, b) =>
-                  a.localeCompare(b)
-                );
+                const courses = Object.keys(semNode).sort((a, b) => a.localeCompare(b));
 
-                const semCount = courses.reduce(
-                  (acc, c) => acc + (semNode[c]?.length || 0),
-                  0
-                );
+                const semCount = courses.reduce((acc, c) => acc + (semNode[c]?.length || 0), 0);
 
                 const courseHtml = courses
                   .map((course) => {
                     const items = semNode[course] || [];
                     return `
-                      <button class="course-btn"
-                        data-course="${escapeHtml(course)}">
-                        <span><i class="fa-solid fa-book-open"></i> <b>${escapeHtml(
-                          course
-                        )}</b></span>
+                      <button class="course-btn" data-course="${escapeHtml(course)}">
+                        <span><i class="fa-solid fa-book-open"></i> <b>${escapeHtml(course)}</b></span>
                         <span class="course-right">
                           <span class="count">${items.length}</span>
                           <i class="fa-solid fa-chevron-left" style="opacity:0.6;"></i>

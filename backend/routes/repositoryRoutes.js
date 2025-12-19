@@ -8,7 +8,14 @@ import {
   downloadResource,
   deleteResource,
   renderMyDownloadsPage,      
-  removeDownloadHistory
+  removeDownloadHistory,
+  
+  upvoteResource,
+  downvoteResource,
+  getTopResourcesAllTime,
+  getTopResourcesThisWeek,
+
+
 } from "../controllers/repositoryController.js";
 import {
   renderUploadPage,
@@ -35,5 +42,11 @@ router.post("/:id/delete", isAuthenticated, deleteResource);
 
 router.get("/my-downloads", isAuthenticated, renderMyDownloadsPage);
 router.post("/my-downloads/:id/remove", isAuthenticated, removeDownloadHistory);
+router.post("/:id/upvote", isAuthenticated, upvoteResource);
+router.post("/:id/downvote", isAuthenticated, downvoteResource);
+
+router.get("/api/top/all-time", isAuthenticated, getTopResourcesAllTime);
+router.get("/api/top/week", isAuthenticated, getTopResourcesThisWeek);
+
 
 export default router;
