@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Notifications | UniVerse</title>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Orbitron:wght@400;700&display=swap");
+    :root {
+      --dark-bg: #050818;
+      --dark-card: #11162b;
+      --primary-blue: #00b4ff;
+      --accent-violet: #b832ff;
+      --text-light: #e0e7ff;
+      --subtle: #9aa3d8;
+      --danger: #ff5050;
+      --warning: #ffa500;
+      --success: #00d084;
+    }
+
+    body {
+      margin: 0;
+      font-family: Montserrat, sans-serif;
+      background: radial-gradient(circle at top, #1b1f3b 0%, #050818 50%, #020312 100%);
+      color: var(--text-light);
+      min-height: 100vh;
+    }
+
+    .navbar {
+      background: rgba(17, 22, 43, 0.85);
+      border-bottom: 1px solid rgba(184, 50, 255, 0.4);
+      padding: 18px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      backdrop-filter: blur(6px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      font-family: Orbitron, sans-serif;
+      font-size: 2em;
+      font-weight: 700;
+      background: linear-gradient(45deg, var(--primary-blue), var(--accent-violet));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .btn {
+      background: linear-gradient(90deg, var(--primary-blue), var(--accent-violet));
+      color: #fff;
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 18px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform 0.3s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .btn-back {
+      background: rgba(0, 180, 255, 0.2);
+      border: 1px solid rgba(0, 180, 255, 0.5);
+      color: var(--primary-blue);
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 0 25px;
+    }
+
+    h1 {
+      font-family: Orbitron, sans-serif;
+      text-shadow: 0 0 12px rgba(0, 180, 255, 0.6);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .action-btn {
+      padding: 8px 15px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.9em;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+    }
+
+    .btn-filter {
+      background: rgba(0, 180, 255, 0.2);
+      color: var(--primary-blue);
+      border: 1px solid rgba(0, 180, 255, 0.3);
+    }
+
+    .btn-filter:hover {
+      background: rgba(0, 180, 255, 0.3);
+      border-color: rgba(0, 180, 255, 0.5);
+    }
+
+    .btn-filter.active {
+      background: rgba(0, 180, 255, 0.4);
+      border-color: rgba(0, 180, 255, 0.6);
+    }
+
+    .btn-mark-all {
+      background: rgba(0, 208, 132, 0.2);
+      color: var(--success);
+      border: 1px solid rgba(0, 208, 132, 0.3);
+    }
+
+    .btn-mark-all:hover {
+      background: rgba(0, 208, 132, 0.3);
+    }
+
+    .btn-delete-all {
+      background: rgba(255, 80, 80, 0.2);
+      color: var(--danger);
+      border: 1px solid rgba(255, 80, 80, 0.3);
+    }
+
+    .btn-delete-all:hover {
+      background: rgba(255, 80, 80, 0.3);
+    }
+
+    .notifications-container {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .notification-card {
+      background: rgba(17, 22, 43, 0.65);
+      border: 1px solid rgba(184, 50, 255, 0.35);
+      border-radius: 14px;
+      padding: 25px;
+      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(5px);
+      transition: all 0.3s ease;
+    }
+
+    .notification-card:hover {
+      transform: translateX(5px);
+      border-color: rgba(0, 180, 255, 0.5);
+    }
+
+    .notification-card.unread {
+      background: rgba(0, 180, 255, 0.1);
+      border-color: rgba(0, 180, 255, 0.5);
+    }
+
+    .notification-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 15px;
+    }
+
+    .notification-title {
+      font-size: 1.2em;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .notification-type {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.8em;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .type-general {
+      background: rgba(0, 180, 255, 0.2);
+      color: var(--primary-blue);
+    }
+
+    .type-warning {
+      background: rgba(255, 165, 0, 0.2);
+      color: var(--warning);
+    }
+
+    .type-suspension {
+      background: rgba(255, 165, 0, 0.2);
+      color: var(--warning);
+    }
+
+    .type-ban {
+      background: rgba(255, 80, 80, 0.2);
+      color: var(--danger);
+    }
+
+    .type-account-update {
+      background: rgba(0, 208, 132, 0.2);
+      color: var(--success);
+    }
+
+    .notification-meta {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 15px;
+      color: var(--subtle);
+      font-size: 0.9em;
+    }
+
+    .notification-sender {
+      font-weight: 600;
+    }
+
+    .notification-message {
+      color: var(--text-light);
+      line-height: 1.6;
+      margin-bottom: 15px;
+    }
+
+    .notification-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 15px;
+      border-top: 1px solid rgba(184, 50, 255, 0.15);
+    }
+
+    .notification-time {
+      color: var(--subtle);
+      font-size: 0.85em;
+    }
+
+    .notification-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .notification-action-btn {
+      padding: 6px 12px;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.85em;
+      transition: all 0.3s ease;
+    }
+
+    .btn-mark {
+      background: rgba(0, 208, 132, 0.2);
+      color: var(--success);
+      border: 1px solid rgba(0, 208, 132, 0.3);
+    }
+
+    .btn-mark:hover {
+      background: rgba(0, 208, 132, 0.3);
+    }
+
+    .btn-delete {
+      background: rgba(255, 80, 80, 0.2);
+      color: var(--danger);
+      border: 1px solid rgba(255, 80, 80, 0.3);
+    }
+
+    .btn-delete:hover {
+      background: rgba(255, 80, 80, 0.3);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      background: rgba(17, 22, 43, 0.65);
+      border: 1px solid rgba(184, 50, 255, 0.35);
+      border-radius: 14px;
+    }
+
+    .empty-state-icon {
+      font-size: 3em;
+      margin-bottom: 20px;
+    }
+
+    .empty-state-text {
+      color: var(--subtle);
+      font-size: 1.2em;
+    }
+
+    .unread-badge {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      background: var(--primary-blue);
+      border-radius: 50%;
+      margin-right: 10px;
+    }
+
+    .alert {
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+
+    .alert-info {
+      background: rgba(0, 180, 255, 0.2);
+      border: 1px solid rgba(0, 180, 255, 0.5);
+      color: var(--primary-blue);
+    }
+
+    @media (max-width: 768px) {
+      .navbar {
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      h1 {
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      .header-actions {
+        width: 100%;
+        flex-direction: column;
+      }
+
+      .notification-header {
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .notification-meta {
+        flex-direction: column;
+        gap: 5px;
+      }
+
+      .notification-footer {
+        flex-direction: column;
+        gap: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="logo">UniVerse</div>
+    <button class="btn btn-back" onclick="window.location.href='/api/dashboard'">← Back to Dashboard</button>
+  </nav>
+
+  <div class="container">
+    <h1>
+      <span>
+        Notifications
+        <% if (unreadCount > 0) { %>
+          <span style="font-size: 0.6em; background: rgba(0, 180, 255, 0.2); padding: 8px 16px; border-radius: 20px; margin-left: 15px; white-space: nowrap;"><%= unreadCount %> Unread</span>
+        <% } %>
+      </span>
+      <div class="header-actions">
+        <button class="action-btn btn-filter" id="filterAll" onclick="filterNotifications('all')" style="background: rgba(0, 180, 255, 0.3); color: var(--primary-blue);">📋 All</button>
+        <button class="action-btn btn-filter" id="filterUnread" onclick="filterNotifications('unread')">📬 Unread</button>
+        <button class="action-btn btn-filter" id="filterRead" onclick="filterNotifications('read')">✓ Read</button>
+        <% if (notifications && notifications.length > 0) { %>
+          <button class="action-btn btn-mark-all" onclick="markAllAsRead()">✓ Mark All as Read</button>
+          <button class="action-btn btn-delete-all" onclick="deleteAllNotifications()">🗑 Clear All</button>
+        <% } %>
+      </div>
+    </h1>
+
+    <% if (error) { %>
+      <div class="alert alert-info">
+        Note: <%= error %>
+      </div>
+    <% } %>
+
+    <div class="notifications-container">
+      <% if (notifications && notifications.length > 0) { %>
+        <% notifications.forEach(notification => { %>
+          <div class="notification-card <%= notification.isRead ? '' : 'unread' %>" id="notif-<%= notification._id %>" data-status="<%= notification.isRead ? 'read' : 'unread' %>">
+            <div class="notification-header">
+              <h3 class="notification-title">
+                <% if (!notification.isRead) { %>
+                  <span class="unread-badge"></span>
+                <% } %>
+                <%= notification.title %>
+              </h3>
+              <span class="notification-type type-<%= notification.type %>"><%= notification.type %></span>
+            </div>
+
+            <div class="notification-meta">
+              <span class="notification-sender">From: <strong><%= notification.senderUsername %></strong></span>
+              <span>
+                <%= new Date(notification.createdAt).toLocaleDateString() %>
+                at <%= new Date(notification.createdAt).toLocaleTimeString() %>
+              </span>
+              <% if (notification.isRead) { %>
+                <span style="color: var(--success);">✓ Read on <%= new Date(notification.readAt).toLocaleDateString() %></span>
+              <% } %>
+            </div>
+
+            <div class="notification-message">
+              <%= notification.message %>
+            </div>
+
+            <div class="notification-footer">
+              <span class="notification-time">ID: <%= notification._id.toString().slice(-8) %></span>
+              <div class="notification-actions">
+                <% if (!notification.isRead) { %>
+                  <button class="notification-action-btn btn-mark" onclick="markAsRead('<%= notification._id %>')">✓ Mark as Read</button>
+                <% } %>
+                <button class="notification-action-btn btn-delete" onclick="deleteNotification('<%= notification._id %>')">🗑 Delete</button>
+              </div>
+            </div>
+          </div>
+        <% }) %>
+      <% } else { %>
+        <div class="empty-state">
+          <div class="empty-state-icon">📭</div>
+          <div class="empty-state-text">No notifications yet</div>
+          <div style="color: var(--subtle); margin-top: 10px;">Admin notifications will appear here</div>
+        </div>
+      <% } %>
+    </div>
+  </div>
+
+  <script>
+    const totalNotifications = <%= notifications ? notifications.length : 0 %>;
+    const unreadNotificationCount = <%= unreadCount || 0 %>;
+    
+    console.log("Notifications page loaded");
+    console.log("Total notifications:", totalNotifications);
+    console.log("Unread count:", unreadNotificationCount);
+
+    function markAsRead(notificationId) {
+      fetch('/api/admin/notifications/mark-as-read', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ notificationId })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          document.getElementById(`notif-${notificationId}`).classList.remove('unread');
+          location.reload();
+        } else {
+          alert('Error: ' + data.message);
+        }
+      })
+      .catch(err => alert('Error marking notification as read'));
+    }
+
+    function markAllAsRead() {
+      if (confirm('Mark all notifications as read?')) {
+        fetch('/api/admin/notifications/mark-all-as-read', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({})
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            location.reload();
+          } else {
+            alert('Error: ' + data.message);
+          }
+        })
+        .catch(err => alert('Error marking notifications as read'));
+      }
+    }
+
+    function deleteNotification(notificationId) {
+      if (confirm('Delete this notification?')) {
+        fetch('/api/admin/notifications/delete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ notificationId })
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            document.getElementById(`notif-${notificationId}`).remove();
+          } else {
+            alert('Error: ' + data.message);
+          }
+        })
+        .catch(err => alert('Error deleting notification'));
+      }
+    }
+
+    function deleteAllNotifications() {
+      if (confirm('Delete all notifications? This action cannot be undone.')) {
+        fetch('/api/admin/notifications/delete-all', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({})
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            location.reload();
+          } else {
+            alert('Error: ' + data.message);
+          }
+        })
+        .catch(err => alert('Error deleting notifications'));
+      }
+    }
+
+    function filterNotifications(filter) {
+      const cards = document.querySelectorAll('.notification-card');
+      let visibleCount = 0;
+
+      // Update active button styling
+      document.querySelectorAll('.btn-filter').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      
+      if (filter === 'all') {
+        document.getElementById('filterAll').classList.add('active');
+      } else if (filter === 'unread') {
+        document.getElementById('filterUnread').classList.add('active');
+      } else if (filter === 'read') {
+        document.getElementById('filterRead').classList.add('active');
+      }
+
+      // Filter and show/hide cards
+      cards.forEach(card => {
+        const status = card.getAttribute('data-status');
+        let shouldShow = false;
+
+        if (filter === 'all') {
+          shouldShow = true;
+        } else if (filter === 'unread' && status === 'unread') {
+          shouldShow = true;
+        } else if (filter === 'read' && status === 'read') {
+          shouldShow = true;
+        }
+
+        if (shouldShow) {
+          card.style.display = 'block';
+          visibleCount++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+
+      // Show empty state if no notifications match filter
+      if (visibleCount === 0 && cards.length > 0) {
+        let emptyMsg = 'No notifications';
+        if (filter === 'unread') {
+          emptyMsg = 'No unread notifications';
+        } else if (filter === 'read') {
+          emptyMsg = 'No read notifications';
+        }
+        
+        const container = document.querySelector('.notifications-container');
+        if (!container.querySelector('.empty-filter-state')) {
+          const emptyDiv = document.createElement('div');
+          emptyDiv.className = 'empty-filter-state';
+          emptyDiv.innerHTML = `<div style="text-align: center; padding: 40px 20px; color: var(--subtle); font-size: 1.1em;">📭 ${emptyMsg}</div>`;
+          container.appendChild(emptyDiv);
+        }
+      } else {
+        const emptyDiv = document.querySelector('.empty-filter-state');
+        if (emptyDiv) {
+          emptyDiv.remove();
+        }
+      }
+    }
+  </script>
+</body>
+</html>

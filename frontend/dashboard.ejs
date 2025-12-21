@@ -64,14 +64,14 @@
 
       @keyframes moveDots {
         0% {
-          transform: translate(var(--x-start), var(--y-start)) scale(0);
+          transform: translate(0, 0) scale(0);
           opacity: 0;
         }
         50% {
           opacity: 1;
         }
         100% {
-          transform: translate(var(--x-end), var(--y-end)) scale(1.5);
+          transform: translate(100vw, 100vh) scale(1.5);
           opacity: 0;
         }
       }
@@ -101,6 +101,7 @@
           var(--accent-violet)
         );
         -webkit-background-clip: text;
+        background-clip: text;
         -webkit-text-fill-color: transparent;
         letter-spacing: 1.5px;
         cursor: pointer;
@@ -334,18 +335,7 @@
   <body>
     <div class="background-dots">
       <% for(let i=0; i<25; i++) { %>
-      <div
-        class="dot"
-        style="
-          width: <%= Math.floor(Math.random() * 25) + 15 %>px;
-          height: <%= Math.floor(Math.random() * 25) + 15 %>px;
-          --x-start: <%= Math.random() * 100 %>vw;
-          --y-start: <%= Math.random() * 100 %>vh;
-          --x-end: <%= Math.random() * 100 %>vw;
-          --y-end: <%= Math.random() * 100 %>vh;
-          animation-delay: <%= Math.random() * 15 %>s;
-        "
-      ></div>
+      <div class="dot" style="width: <%= Math.floor(Math.random() * 25) + 15 %>px; height: <%= Math.floor(Math.random() * 25) + 15 %>px; animation-delay: <%= Math.random() * 15 %>s;"></div>
       <% } %>
     </div>
 
@@ -358,6 +348,15 @@
           onclick="navigateTo('/api/users/profile')"
         >
           <i class="fas fa-user-circle"></i>
+        </button>
+
+        <button
+          class="profile-btn"
+          aria-label="Admin Notifications"
+          onclick="navigateTo('/api/admin/notifications')"
+          title="View admin notifications"
+        >
+          <i class="fas fa-bell"></i>
         </button>
 
         <form method="get" action="/api/logout">
@@ -402,22 +401,12 @@
     </div>
 
     <script>
-      // Placeholder for user data passed from the backend
+
 
       function navigateTo(path) {
         console.log(`Navigating to: ${path}`);
-        // In a real application, this would navigate to the specified path
-        window.location.href = path; // Example redirection
-        // For a Single Page Application (SPA) with client-side routing,
-        // you might use history.pushState or a router library here.
+        window.location.href = path; 
       }
-
-      // Example of passing data to EJS (this would be in your backend Express route)
-      // app.get('/dashboard', (req, res) => {
-      //   // Assuming you have user data from a session or token
-      //   const user = req.user || { name: 'Guest' }; // Replace with actual user logic
-      //   res.render('dashboard', { userName: user.name });
-      // });
     </script>
   </body>
 </html>

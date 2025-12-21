@@ -12,13 +12,16 @@ import { Server } from "socket.io";
 import usersRouter from "./routes/users.js";
 import loginRouter from "./routes/login.js";
 import adminRouter from "./routes/admin.js";
+import userManagementRouter from "./routes/userManagement.js";
 import dashboardRouter from "./routes/dashboard.js";
 import registerRouter from "./routes/register.js";
 import logoutRouter from "./routes/logout.js";
 import eventsRouter from "./routes/events.js";
 import schedulerRouter from "./routes/scheduler.js";
 import notificationsRouter from "./routes/notifications.js";
+import adminNotificationsRouter from "./routes/adminNotifications.js";
 import { processDueNotifications } from "./controllers/notificationController.js";
+import { autoReactivateExpiredSuspensions } from "./utils/suspensionUtils.js";
 import forumRouter from "./routes/forum.js";
 import forumApiRouter from "./routes/forumApi.js";
 import forumCreateRouter from "./routes/forumCreate.js";
@@ -304,6 +307,8 @@ app.use("/api/register", registerRouter);
 app.use("/api/dashboard", dashboardRouter);
 app.use("/dashboard", dashboardRouter);
 app.use("/api/admin", adminRouter);
+app.use("/api/admin/users", userManagementRouter);
+app.use("/api/admin/notifications", adminNotificationsRouter);
 app.use("/api/logout", logoutRouter);
 app.use("/dashboard", eventsRouter);
 app.use("/api/scheduler", schedulerRouter);
@@ -335,6 +340,13 @@ mongoose
     }, 60000); // Run every 60 seconds
 
     console.log("📬 Notification processor started (runs every 60 seconds)");
+
+    // Start background job to auto-reactivate expired suspensions every 30 minutes
+    setInterval(async () => {
+      await autoReactivateExpiredSuspensions();
+    }, 1800000); // Run every 30 minutes (1800000 ms)
+
+    console.log("⏰ Suspension auto-reactivation started (runs every 30 minutes)");
   })
   .catch((err) => console.error("❌ Mongo error:", err));
 

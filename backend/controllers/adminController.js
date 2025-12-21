@@ -1,4 +1,25 @@
 import Event from "../models/EventModel.js";
+import User from "../models/UserModel.js";
+import HelpTicket from "../models/HelpTicketModel.js";
+import channelObj from "../models/channel.js";
+
+export const showAdminLanding = async (req, res) => {
+  try {
+    const userCount = await User.countDocuments();
+    const channelCount = await channelObj.countDocuments();
+    const ticketCount = await HelpTicket.countDocuments();
+
+    res.render("adminLanding", {
+      username: req.session.userData.username,
+      userCount,
+      channelCount,
+      ticketCount,
+    });
+  } catch (err) {
+    console.error("Admin landing error:", err);
+    res.status(500).send("Failed to load admin landing page");
+  }
+};
 
 export const showAdminDashboard = async (req, res) => {
   try {
