@@ -300,12 +300,51 @@
 
     /* Responsive adjustments */
     @media (max-width: 768px) {
+      .dot:nth-child(even) {
+        background: rgba(0, 123, 255, 0.2);
+        animation-delay: 10s;
+      }
+
+      @keyframes moveDots {
+        0% {
+          transform: translate(0, 0) scale(0);
+          opacity: 0;
+        }
+        50% {
+          opacity: 1;
+        }
+        100% {
+          transform: translate(100vw, 100vh) scale(1.5);
+          opacity: 0;
+        }
+      }
+
+      /* Top Navigation Bar */
       .top-bar {
         padding: 15px 20px;
       }
 
       .top-bar .logo {
         font-size: 1.8em;
+        font-family: "Orbitron", sans-serif;
+        font-size: 2.2em;
+        font-weight: 700;
+        text-shadow: 0 0 10px var(--accent-violet), 0 0 20px var(--primary-blue);
+        background: linear-gradient(
+          45deg,
+          var(--primary-blue),
+          var(--accent-violet)
+        );
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        letter-spacing: 1.5px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+      .top-bar .logo:hover {
+        transform: scale(1.03);
+        text-shadow: 0 0 12px var(--accent-violet), 0 0 25px var(--primary-blue);
       }
 
       .user-controls {
@@ -377,6 +416,12 @@
           --y-end: <%= Math.random() * 100 %>vh;
           animation-delay: <%= Math.random() * 15 %>s;
         "></div>
+    </style>
+  </head>
+  <body>
+    <div class="background-dots">
+      <% for(let i=0; i<25; i++) { %>
+      <div class="dot" style="width: <%= Math.floor(Math.random() * 25) + 15 %>px; height: <%= Math.floor(Math.random() * 25) + 15 %>px; animation-delay: <%= Math.random() * 15 %>s;"></div>
       <% } %>
   </div>
 
@@ -405,6 +450,29 @@
       <div class="service-card" onclick="navigateTo('/dashboard/resources')">
         <i class="fas fa-boxes service-icon"></i>
         <div class="service-name">Resource Repository</div>
+    <div class="top-bar">
+      <div class="logo">UniVerse</div>
+      <div class="user-controls">
+        <button
+          class="profile-btn"
+          aria-label="Profile Settings"
+          onclick="navigateTo('/api/users/profile')"
+        >
+          <i class="fas fa-user-circle"></i>
+        </button>
+
+        <button
+          class="profile-btn"
+          aria-label="Admin Notifications"
+          onclick="navigateTo('/api/admin/notifications')"
+          title="View admin notifications"
+        >
+          <i class="fas fa-bell"></i>
+        </button>
+
+        <form method="get" action="/api/logout">
+          <button class="logout-btn">Logout</button>
+        </form>
       </div>
 
       <div class="service-card" onclick="navigateTo('/dashboard/events')">
@@ -415,6 +483,32 @@
       <div class="service-card" onclick="navigateTo('/dashboard/forumDash')">
         <i class="fas fa-comments service-icon"></i>
         <div class="service-name">Discussion Forum</div>
+      <h2 class="section-title">Explore UniVerse Services</h2>
+      <div class="service-grid">
+        <div class="service-card" onclick="navigateTo('/api/repository')">
+          <i class="fas fa-boxes service-icon"></i>
+          <div class="service-name">Resource Repository</div>
+        </div>
+
+        <div class="service-card" onclick="navigateTo('/dashboard/events')">
+          <i class="fas fa-calendar-alt service-icon"></i>
+          <div class="service-name">Events</div>
+        </div>
+
+        <div class="service-card" onclick="navigateTo('/dashboard/forumDash')">
+          <i class="fas fa-comments service-icon"></i>
+          <div class="service-name">Discussion Forum</div>
+        </div>
+
+        <div class="service-card" onclick="navigateTo('/dashboard/planner')">
+          <i class="fas fa-brain service-icon"></i>
+          <div class="service-name">Study Planner</div>
+        </div>
+
+        <div class="service-card" onclick="navigateTo('dashboard/social')">
+          <i class="fas fa-share-alt service-icon"></i>
+          <div class="service-name">Social Hub</div>
+        </div>
       </div>
 
       <div class="service-card" onclick="navigateTo('/dashboard/planner')">
@@ -454,4 +548,14 @@
   </script>
 </body>
 
+</html>
+    <script>
+
+
+      function navigateTo(path) {
+        console.log(`Navigating to: ${path}`);
+        window.location.href = path; 
+      }
+    </script>
+  </body>
 </html>

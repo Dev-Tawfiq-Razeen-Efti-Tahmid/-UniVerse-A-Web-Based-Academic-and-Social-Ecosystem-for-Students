@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Update Profile - Student Portal</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Orbitron:wght@400;700&display=swap");
+      :root {
+        --dark-bg: #1a1a2e;
+        --dark-card: #272c4a;
+        --primary-blue: #007bff;
+        --accent-violet: #8a2be2;
+        --text-light: #e0e0e0;
+        --input-bg: #3e4a6e;
+        --subtle-text: #a0a0a0;
+        --success-green: #00c878;
+        --danger-red: #ff4757;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: "Montserrat", sans-serif;
+        min-height: 100vh;
+        background: linear-gradient(135deg, var(--dark-bg) 0%, #160e2c 100%);
+        color: var(--text-light);
+        display: flex;
+        flex-direction: column;
+      }
+      .top-bar {
+        background-color: var(--dark-card);
+        padding: 15px 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        border-bottom: 1px solid var(--accent-violet);
+      }
+      .logo {
+        font-family: "Orbitron", sans-serif;
+        font-size: 2em;
+        font-weight: 700;
+        background: linear-gradient(
+          45deg,
+          var(--primary-blue),
+          var(--accent-violet)
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .back-btn {
+        background: transparent;
+        border: 1px solid rgba(0, 123, 255, 0.6);
+        color: var(--text-light);
+        border-radius: 8px;
+        padding: 8px 16px;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .back-btn:hover {
+        background: rgba(0, 123, 255, 0.15);
+      }
+      .main-content {
+        max-width: 600px;
+        margin: 40px auto;
+        padding: 0 20px;
+        width: 100%;
+      }
+      .profile-card {
+        background: rgba(23, 27, 54, 0.9);
+        border-radius: 16px;
+        padding: 40px;
+        border: 1px solid rgba(0, 123, 255, 0.25);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      }
+      .profile-header {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+      .profile-avatar {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: linear-gradient(
+          135deg,
+          var(--primary-blue),
+          var(--accent-violet)
+        );
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 48px;
+        font-weight: bold;
+        margin: 0 auto 15px;
+      }
+      .profile-header h2 {
+        font-family: "Orbitron", sans-serif;
+        font-size: 1.8em;
+        margin-bottom: 5px;
+      }
+      .profile-header p {
+        color: var(--subtle-text);
+        font-size: 0.95em;
+      }
+      .form-section {
+        margin-bottom: 30px;
+      }
+      .section-title {
+        font-size: 1.2em;
+        font-weight: 600;
+        margin-bottom: 15px;
+        color: var(--text-light);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .form-group {
+        margin-bottom: 20px;
+      }
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: var(--text-light);
+      }
+      .form-group input {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid rgba(0, 123, 255, 0.4);
+        border-radius: 8px;
+        background-color: var(--input-bg);
+        color: var(--text-light);
+        font-size: 1em;
+        transition: all 0.3s;
+      }
+      .form-group input:focus {
+        outline: none;
+        border-color: var(--accent-violet);
+      }
+      .form-group input:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      .alert {
+        padding: 12px 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .alert-success {
+        background: rgba(0, 200, 120, 0.2);
+        border: 1px solid var(--success-green);
+        color: var(--success-green);
+      }
+      .alert-error {
+        background: rgba(255, 71, 87, 0.2);
+        border: 1px solid var(--danger-red);
+        color: var(--danger-red);
+      }
+      .btn-submit {
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(
+          90deg,
+          var(--primary-blue),
+          var(--accent-violet)
+        );
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1.1em;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+      .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      }
+      @media (max-width: 768px) {
+        .top-bar {
+          padding: 12px 18px;
+        }
+        .logo {
+          font-size: 1.6em;
+        }
+        .profile-card {
+          padding: 30px 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="top-bar">
+      <div class="logo">
+        <i class="fas fa-user-circle"></i> Profile Settings
+      </div>
+      <a href="/api/dashboard" class="back-btn"
+        ><i class="fas fa-arrow-left"></i> Dashboard</a
+      >
+    </div>
+
+    <div class="main-content">
+      <div class="profile-card">
+        <div class="profile-header">
+          <!-- <div class="profile-avatar">
+            //<%= user.profilePic ? `<img
+              //src="${user.profilePic}"
+              //alt="${user.name}"
+            //>` : user.name.charAt(0).toUpperCase() %>
+          </div> -->
+          <h2><%= user.name %></h2>
+          <p><%= user.email %> • <%= user.student_id %></p>
+        </div>
+
+        <% if (error) { %>
+        <div class="alert alert-error">
+          <i class="fas fa-exclamation-circle"></i>
+          <%= error %>
+        </div>
+        <% } %> <% if (success) { %>
+        <div class="alert alert-success">
+          <i class="fas fa-check-circle"></i>
+          <%= success %>
+        </div>
+        <% } %>
+
+        <form action="/api/users/update-profile" method="POST">
+          <div class="form-section">
+            <div class="section-title">
+              <i class="fas fa-user"></i>
+              Account Information
+            </div>
+
+            <div class="form-group">
+              <label for="name">Full Name</label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                value="<%= user.name %>"
+                disabled
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value="<%= user.email %>"
+                disabled
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="username">Username</label>
+              <input
+                type="text"
+                id="username"
+                name="username"
+                value="<%= user.username %>"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="form-section">
+            <div class="section-title">
+              <i class="fas fa-lock"></i>
+              Change Password (Optional)
+            </div>
+
+            <div class="form-group">
+              <label for="currentPassword">Current Password</label>
+              <input
+                type="password"
+                id="currentPassword"
+                name="currentPassword"
+                placeholder="Enter current password"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="newPassword">New Password</label>
+              <input
+                type="password"
+                id="newPassword"
+                name="newPassword"
+                placeholder="Enter new password"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="confirmPassword">Confirm New Password</label>
+              <input
+                type="password"
+                id="confirmPassword"
+                name="confirmPassword"
+                placeholder="Confirm new password"
+              />
+            </div>
+          </div>
+
+          <button type="submit" class="btn-submit">
+            <i class="fas fa-save"></i> Update Profile
+          </button>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>

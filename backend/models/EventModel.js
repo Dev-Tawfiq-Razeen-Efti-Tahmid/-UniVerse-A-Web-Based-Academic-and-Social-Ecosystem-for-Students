@@ -11,10 +11,12 @@ const eventSchema = new mongoose.Schema(
     description: {
       type: String,
       trim: true,
+      default: "",
     },
     location: {
       type: String,
       required: true,
+      trim: true,
     },
     // When the event starts
     startTime: {
@@ -24,6 +26,7 @@ const eventSchema = new mongoose.Schema(
     // Optional end time
     endTime: {
       type: Date,
+      default: null,
     },
     // workshop / club fest / seminar / other
     category: {
@@ -34,17 +37,17 @@ const eventSchema = new mongoose.Schema(
     // who created the event (optional for now)
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User", // matches your User model name
+      ref: "User",
       required: false,
     },
-    // only approved events should show to students
+    // ✅ Model A: events are approved by default
     isApproved: {
       type: Boolean,
-      default: false,
+      default: true,
     },
   },
   {
-    timestamps: true, // createdAt, updatedAt
+    timestamps: true,
   }
 );
 

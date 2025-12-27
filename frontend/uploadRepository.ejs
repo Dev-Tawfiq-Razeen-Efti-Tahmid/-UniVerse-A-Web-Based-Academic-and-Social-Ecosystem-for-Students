@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Upload Resource - Student Portal</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Orbitron:wght@400;700&display=swap");
+      :root {
+        --dark-bg: #1a1a2e;
+        --dark-card: #272c4a;
+        --primary-blue: #007bff;
+        --accent-violet: #8a2be2;
+        --text-light: #e0e0e0;
+        --input-bg: #3e4a6e;
+        --subtle-text: #a0a0a0;
+        --success-green: #00c878;
+        --danger-red: #ff4757;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: "Montserrat", sans-serif;
+        min-height: 100vh;
+        background: linear-gradient(135deg, var(--dark-bg) 0%, #160e2c 100%);
+        color: var(--text-light);
+        display: flex;
+        flex-direction: column;
+      }
+      .top-bar {
+        background-color: var(--dark-card);
+        padding: 15px 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        border-bottom: 1px solid var(--accent-violet);
+      }
+      .logo {
+        font-family: "Orbitron", sans-serif;
+        font-size: 2em;
+        font-weight: 700;
+        background: linear-gradient(
+          45deg,
+          var(--primary-blue),
+          var(--accent-violet)
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .back-link-top {
+        background: transparent;
+        border: 1px solid rgba(0, 123, 255, 0.6);
+        color: var(--text-light);
+        border-radius: 8px;
+        padding: 8px 16px;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .back-link-top:hover {
+        background: rgba(0, 123, 255, 0.15);
+      }
+      .main-content {
+        max-width: 700px;
+        margin: 40px auto;
+        padding: 0 20px;
+        width: 100%;
+        flex: 1;
+      }
+      .upload-card {
+        background: rgba(23, 27, 54, 0.9);
+        border-radius: 16px;
+        padding: 40px;
+        border: 1px solid rgba(0, 123, 255, 0.25);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      }
+      .upload-card h2 {
+        font-family: "Orbitron", sans-serif;
+        font-size: 2em;
+        margin-bottom: 30px;
+        text-align: center;
+        background: linear-gradient(
+          45deg,
+          var(--primary-blue),
+          var(--accent-violet)
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+      }
+      .alert {
+        padding: 12px 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        animation: slideDown 0.3s ease;
+      }
+      @keyframes slideDown {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .alert-success {
+        background: rgba(0, 200, 120, 0.2);
+        border: 1px solid var(--success-green);
+        color: var(--success-green);
+      }
+      .alert-error {
+        background: rgba(255, 71, 87, 0.2);
+        border: 1px solid var(--danger-red);
+        color: var(--danger-red);
+      }
+      .alert::before {
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        font-size: 1.2em;
+      }
+      .alert-success::before {
+        content: "\f058";
+      }
+      .alert-error::before {
+        content: "\f06a";
+      }
+      .form-group {
+        margin-bottom: 25px;
+      }
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: var(--text-light);
+        font-size: 0.95em;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .form-group label::before {
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        color: var(--primary-blue);
+        font-size: 0.9em;
+      }
+      .form-group label:has(+ input[name="title"])::before {
+        content: "\f02d";
+      }
+      .form-group label:has(+ input[name="courseCode"])::before {
+        content: "\f19d";
+      }
+      .form-group label:has(+ select)::before {
+        content: "\f19c";
+      }
+      .form-group label:has(+ input[name="semester"])::before {
+        content: "\f133";
+      }
+      .form-group label:has(+ input[type="file"])::before {
+        content: "\f15b";
+      }
+      .form-group input,
+      .form-group select {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid rgba(0, 123, 255, 0.4);
+        border-radius: 8px;
+        background-color: var(--input-bg);
+        color: var(--text-light);
+        font-size: 1em;
+        transition: all 0.3s;
+        font-family: "Montserrat", sans-serif;
+      }
+      .form-group input:focus,
+      .form-group select:focus {
+        outline: none;
+        border-color: var(--accent-violet);
+        box-shadow: 0 0 10px rgba(138, 43, 226, 0.3);
+      }
+      .form-group input::placeholder {
+        color: var(--subtle-text);
+      }
+      .form-group select {
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23a0a0a0' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 15px center;
+        padding-right: 40px;
+      }
+      .form-group select option {
+        background: var(--dark-card);
+        color: var(--text-light);
+      }
+      .form-group input[type="file"] {
+        padding: 10px;
+        cursor: pointer;
+        border-style: dashed;
+      }
+      .form-group input[type="file"]::file-selector-button {
+        background: linear-gradient(
+          90deg,
+          var(--primary-blue),
+          var(--accent-violet)
+        );
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        margin-right: 15px;
+        transition: all 0.3s;
+      }
+      .form-group input[type="file"]::file-selector-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      }
+      button[type="submit"] {
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(
+          90deg,
+          var(--primary-blue),
+          var(--accent-violet)
+        );
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1.1em;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-top: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+      }
+      button[type="submit"]::before {
+        content: "\f093";
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+      }
+      button[type="submit"]:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      }
+      .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 25px;
+        color: var(--primary-blue);
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s;
+        padding: 10px 15px;
+        border-radius: 8px;
+        border: 1px solid rgba(0, 123, 255, 0.4);
+        width: 100%;
+        justify-content: center;
+      }
+      .back-link::before {
+        content: "\f060";
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+      }
+      .back-link:hover {
+        background: rgba(0, 123, 255, 0.1);
+        border-color: var(--accent-violet);
+      }
+      @media (max-width: 768px) {
+        .top-bar {
+          padding: 12px 18px;
+        }
+        .logo {
+          font-size: 1.6em;
+        }
+        .upload-card {
+          padding: 30px 20px;
+        }
+        .upload-card h2 {
+          font-size: 1.6em;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="top-bar">
+      <div class="logo">
+        <i class="fas fa-cloud-upload-alt"></i> Upload Resource
+      </div>
+      <a href="/api/repository" class="back-link-top">
+        <i class="fas fa-arrow-left"></i> Repository
+      </a>
+    </div>
+
+    <div class="main-content">
+      <div class="upload-card">
+        <h2><i class="fas fa-file-upload"></i> Upload Material</h2>
+
+        <% if (error) { %>
+        <div class="alert alert-error"><%= error %></div>
+        <% } %> <% if (success) { %>
+        <div class="alert alert-success"><%= success %></div>
+        <% } %>
+
+        <form
+          action="/api/repository/upload"
+          method="POST"
+          enctype="multipart/form-data"
+        >
+          <div class="form-group">
+            <label>Title / Description</label>
+            <input
+              type="text"
+              name="title"
+              placeholder="e.g. Data Structures Notes"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Course Code</label>
+            <input
+              type="text"
+              name="courseCode"
+              placeholder="e.g. CSE-101"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Department</label>
+            <select name="department" required>
+              <option value="" disabled selected>Select Department</option>
+              <option value="CSE">CSE</option>
+              <option value="EEE">EEE</option>
+              <option value="BBA">BBA</option>
+              <option value="English">English</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Semester</label>
+            <input
+              type="text"
+              name="semester"
+              placeholder="e.g. Fall 2023"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label>File (ZIP/RAR)</label>
+            <input
+              type="file"
+              name="resourceFile"
+              required
+              accept=".zip,.rar"
+            />
+          </div>
+
+          <button type="submit">Upload Resource</button>
+        </form>
+
+        <a href="/api/repository" class="back-link">Back to Repository</a>
+      </div>
+    </div>
+  </body>
+</html>

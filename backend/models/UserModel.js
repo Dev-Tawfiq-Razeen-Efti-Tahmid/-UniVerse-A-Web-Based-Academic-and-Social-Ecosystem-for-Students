@@ -36,11 +36,42 @@ const userSchema = new mongoose.Schema(
     },
     profilePic: {
       type: String,
-      required: false,
       default: null,
     },
+    role: {
+      type: String,
+      enum: ["user", "admin"],
+      default: "user",
+    },
+    accountStatus: {
+      type: String,
+      enum: ["active", "suspended", "banned"],
+      default: "active",
+    },
+    suspendedAt: {
+      type: Date,
+      default: null,
+    },
+    bannedAt: {
+      type: Date,
+      default: null,
+    },
+    suspensionReason: {
+      type: String,
+      default: null,
+    },
+    suspensionDuration: {
+      type: Number,
+      default: null, // Duration in hours (null = permanent suspension)
+    },
+    suspensionExpiresAt: {
+      type: Date,
+      default: null, // When suspension expires
+    },
   },
-  { timestamps: true } // automatically adds createdAt and updatedAt fields
+  {
+    timestamps: true, // ✅ CORRECT PLACE
+  }
 );
 
 // Create and export the model
