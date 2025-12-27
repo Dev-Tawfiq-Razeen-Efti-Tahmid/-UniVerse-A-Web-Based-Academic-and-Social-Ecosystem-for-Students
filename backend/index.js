@@ -31,6 +31,8 @@ import Message from "./models/forumMessage.js";
 // import socialApiRouter from "./routes/socialApiRouter.js";
 
 import socialRoutes from "./routes/socialRoutes.js";
+import routineRouter from "./routes/routine.js";
+
 import chatRoutes from "./routes/chatRoutes.js";
 import repositoryRoutes from "./routes/repositoryRoutes.js";
 
@@ -318,6 +320,7 @@ app.use("/dashboard/forumDash/api", forumApiRouter);
 app.use("/dashboard/forumDash/ForumCreate", forumCreateRouter);
 app.use("/dashboard/forumDash/ForumMessaging/:channelId", ForumMessagingRouter);
 app.use("/api/dashboard", socialRoutes);
+app.use("/api/routine", routineRouter);
 
 app.use("/api/users", usersRouter);
 

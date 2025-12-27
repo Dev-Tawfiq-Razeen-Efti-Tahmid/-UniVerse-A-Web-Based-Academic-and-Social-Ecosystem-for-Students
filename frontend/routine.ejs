@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Routine Maker - UniVerse</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Orbitron:wght@400;700&display=swap");
+
+        :root {
+            --dark-bg: #1a1a2e;
+            --dark-card: #272c4a;
+            --primary-blue: #007bff;
+            --accent-violet: #8a2be2;
+            --text-light: #e0e0e0;
+            --subtle-text: #a0a0a0;
+            --border-glow: rgba(138, 43, 226, 0.4);
+        }
+
+        body {
+            font-family: "Montserrat", sans-serif;
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #160e2c 100%);
+            color: var(--text-light);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-family: "Orbitron", sans-serif;
+            font-size: 2.5em;
+            background: linear-gradient(45deg, var(--primary-blue), var(--accent-violet));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 10px rgba(138, 43, 226, 0.3);
+        }
+
+        .back-btn {
+            background: var(--dark-card);
+            color: var(--text-light);
+            border: 1px solid var(--primary-blue);
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px var(--primary-blue);
+            border-color: var(--accent-violet);
+        }
+
+        .routine-grid {
+            display: grid;
+            grid-template-columns: 120px repeat(7, 1fr);
+            gap: 10px;
+            background: var(--dark-card);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 123, 255, 0.2);
+            overflow-x: auto;
+        }
+
+        .grid-header {
+            font-weight: bold;
+            text-align: center;
+            padding: 15px;
+            color: var(--primary-blue);
+            font-family: "Orbitron", sans-serif;
+            border-bottom: 2px solid var(--accent-violet);
+        }
+
+        .time-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: var(--subtle-text);
+            font-size: 0.85em;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 6px;
+        }
+
+        .slot {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px dashed rgba(255, 255, 255, 0.1);
+            min-height: 80px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .slot:hover {
+            background: rgba(138, 43, 226, 0.1);
+            border-color: var(--accent-violet);
+        }
+
+        .slot input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: var(--text-light);
+            text-align: center;
+            font-family: inherit;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+
+        .slot input:focus {
+            outline: none;
+        }
+
+        .slot input::placeholder {
+            color: rgba(255, 255, 255, 0.2);
+            font-weight: 400;
+        }
+
+        .save-indicator {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            font-size: 0.7em;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .slot.saving .save-indicator {
+            opacity: 1;
+            color: var(--primary-blue);
+        }
+
+        .slot.saved .save-indicator {
+            opacity: 1;
+            color: #28a745;
+        }
+
+        .slot.changed {
+            border-color: var(--primary-blue);
+            background: rgba(0, 123, 255, 0.05);
+        }
+
+        /* Mobile adjustments */
+        @media (max-width: 900px) {
+            .routine-grid {
+                grid-template-columns: 80px repeat(7, 150px);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Routine Maker</h1>
+            <div style="display: flex; gap: 15px;">
+                <button id="saveBtn" class="back-btn" style="background: var(--primary-blue);" onclick="saveAll()">
+                    <i class="fas fa-save"></i> Save Routine
+                </button>
+                <a href="/dashboard" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+            </div>
+        </header>
+
+        <div class="routine-grid" id="routineGrid">
+            <!-- Headers -->
+            <div class="grid-header">Time</div>
+            <div class="grid-header">Mon</div>
+            <div class="grid-header">Tue</div>
+            <div class="grid-header">Wed</div>
+            <div class="grid-header">Thu</div>
+            <div class="grid-header">Fri</div>
+            <div class="grid-header">Sat</div>
+            <div class="grid-header">Sun</div>
+
+            <!-- Grid content will be generated by JS -->
+        </div>
+    </div>
+
+    <script>
+        const userId = "<%= userId %>";
+        const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+        const timeSlots = [
+            "08:00 - 09:20",
+            "09:30 - 10:50",
+            "11:00 - 12:20",
+            "12:30 - 01:50",
+            "02:00 - 03:20",
+            "03:30 - 04:50"
+        ];
+
+        const grid = document.getElementById('routineGrid');
+        let routineData = {};
+
+        async function init() {
+            await fetchRoutine();
+            renderGrid();
+        }
+
+        async function fetchRoutine() {
+            try {
+                const res = await fetch(`/api/routine/${userId}`);
+                const data = await res.json();
+                data.forEach(item => {
+                    if (!routineData[item.day]) routineData[item.day] = {};
+                    routineData[item.day][item.timeSlot] = item.courseName;
+                });
+            } catch (err) {
+                console.error("Failed to fetch routine:", err);
+            }
+        }
+
+        function renderGrid() {
+            timeSlots.forEach(slot => {
+                // Time label
+                const label = document.createElement('div');
+                label.className = 'time-label';
+                label.textContent = slot;
+                grid.appendChild(label);
+
+                // For each day
+                days.forEach(day => {
+                    const cell = document.createElement('div');
+                    cell.className = 'slot';
+                    cell.dataset.day = day;
+                    cell.dataset.slot = slot;
+
+                    const value = (routineData[day] && routineData[day][slot]) || '';
+
+                    cell.innerHTML = `
+                        <input type="text" placeholder="Course Code" value="${value}" 
+                               oninput="markChanged(this)"
+                               onblur="saveSlot(this, '${day}', '${slot}')">
+                        <span class="save-indicator"><i class="fas fa-check"></i></span>
+                    `;
+                    grid.appendChild(cell);
+                });
+            });
+        }
+
+        function markChanged(input) {
+            const cell = input.parentElement;
+            const day = cell.dataset.day;
+            const slot = cell.dataset.slot;
+            const newValue = input.value.trim();
+            const oldValue = (routineData[day] && routineData[day][slot]) || '';
+
+            if (newValue !== oldValue) {
+                cell.classList.add('changed');
+            } else {
+                cell.classList.remove('changed');
+            }
+        }
+
+        async function saveAll() {
+            const saveBtn = document.getElementById('saveBtn');
+            const originalContent = saveBtn.innerHTML;
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            saveBtn.disabled = true;
+
+            const changedSlots = document.querySelectorAll('.slot.changed input');
+            const promises = Array.from(changedSlots).map(input => {
+                const cell = input.parentElement;
+                return saveSlot(input, cell.dataset.day, cell.dataset.slot);
+            });
+
+            await Promise.all(promises);
+
+            saveBtn.innerHTML = '<i class="fas fa-check"></i> Saved!';
+            setTimeout(() => {
+                saveBtn.innerHTML = originalContent;
+                saveBtn.disabled = false;
+            }, 2000);
+        }
+
+        async function saveSlot(input, day, timeSlot) {
+            const courseName = input.value.trim();
+            const cell = input.parentElement;
+
+            if (courseName === (routineData[day] && routineData[day][timeSlot] || '')) {
+                cell.classList.remove('changed');
+                return;
+            }
+
+            cell.classList.add('saving');
+            cell.classList.remove('changed');
+
+            try {
+                const res = await fetch('/api/routine', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId, day, timeSlot, courseName })
+                });
+
+                if (res.ok) {
+                    if (!routineData[day]) routineData[day] = {};
+                    routineData[day][timeSlot] = courseName;
+                    cell.classList.remove('saving');
+                    cell.classList.add('saved');
+                    setTimeout(() => cell.classList.remove('saved'), 2000);
+                }
+            } catch (err) {
+                console.error("Save failed:", err);
+                cell.classList.remove('saving');
+                cell.classList.add('changed'); // Re-mark as changed if failed
+            }
+        }
+
+        init();
+    </script>
+</body>
+
+</html>
