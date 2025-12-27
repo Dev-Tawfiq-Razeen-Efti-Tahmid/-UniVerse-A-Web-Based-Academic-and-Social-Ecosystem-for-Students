@@ -27,6 +27,8 @@ import Message from "./models/forumMessage.js";
 // import socialApiRouter from "./routes/socialApiRouter.js";
 
 import socialRoutes from "./routes/socialRoutes.js";
+import routineRouter from "./routes/routine.js";
+
 
 // Load env
 dotenv.config();
@@ -280,7 +282,7 @@ app.use("/dashboard/forumDash/api", forumApiRouter);
 app.use("/dashboard/forumDash/ForumCreate", forumCreateRouter);
 app.use("/dashboard/forumDash/ForumMessaging/:channelId", ForumMessagingRouter);
 app.use("/api/dashboard", socialRoutes);
-
+app.use("/api/routine", routineRouter);
 
 // ---------- DB + SERVER ----------
 const PORT = process.env.PORT || 5000;
@@ -290,12 +292,12 @@ mongoose
   .connect(MONGO_URI)
   .then(() => {
     console.log("✅ MongoDB Atlas connected");
-    
+
     // Start background job to process notifications every minute
     setInterval(async () => {
       await processDueNotifications();
     }, 60000); // Run every 60 seconds
-    
+
     console.log("📬 Notification processor started (runs every 60 seconds)");
   })
   .catch((err) => console.error("❌ Mongo error:", err));
