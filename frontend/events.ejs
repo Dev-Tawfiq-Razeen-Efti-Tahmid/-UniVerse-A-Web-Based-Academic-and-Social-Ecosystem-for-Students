@@ -156,11 +156,7 @@
     }
 
     .logout-btn:hover {
-      background: linear-gradient(
-        90deg,
-        var(--button-hover-blue),
-        var(--button-hover-violet)
-      );
+      background: linear-gradient(90deg, var(--button-hover-blue), var(--button-hover-violet));
       transform: translateY(-2px);
       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     }
@@ -179,7 +175,7 @@
     .page-header {
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      align-items: flex-end;
       margin-bottom: 25px;
       flex-wrap: wrap;
       gap: 15px;
@@ -189,6 +185,7 @@
       display: flex;
       flex-direction: column;
       gap: 4px;
+      max-width: 820px;
     }
 
     .page-title {
@@ -202,29 +199,50 @@
       color: var(--subtle-text);
     }
 
-    .filters {
+    /* ✅ RIGHT SIDE: only My Reminders button now */
+    .header-actions {
       display: flex;
+      align-items: center;
+      justify-content: flex-end;
       gap: 12px;
       flex-wrap: wrap;
-      align-items: center;
     }
 
-    .filter-pill {
-      background-color: #222744;
-      border-radius: 999px;
-      padding: 6px 14px;
-      border: 1px solid rgba(0, 123, 255, 0.4);
-      font-size: 0.85em;
-      color: var(--subtle-text);
+    /* ✅ Moderate sized button + hover glow */
+    .reminders-btn {
+      background: linear-gradient(90deg, var(--primary-blue), var(--accent-violet));
+      border: none;
+      border-radius: 12px;
+      padding: 10px 18px;      /* moderate */
+      font-size: 0.95em;       /* moderate */
+      font-weight: 700;
+      color: white;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      cursor: default;
+      gap: 10px;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.25s ease, filter 0.25s ease;
+      letter-spacing: 0.3px;
+      user-select: none;
     }
 
-    .filter-pill i {
-      font-size: 0.9em;
-      color: var(--primary-blue);
+    .reminders-btn i {
+      font-size: 1.05em;
+    }
+
+    .reminders-btn:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.05);
+      box-shadow:
+        0 0 12px rgba(0, 123, 255, 0.55),
+        0 0 24px rgba(138, 43, 226, 0.45);
+    }
+
+    .reminders-btn:active {
+      transform: translateY(0);
+      box-shadow:
+        0 0 8px rgba(0, 123, 255, 0.45),
+        0 0 16px rgba(138, 43, 226, 0.35);
     }
 
     .events-wrapper {
@@ -261,11 +279,7 @@
       content: "";
       position: absolute;
       inset: 0;
-      background: radial-gradient(
-        circle at top left,
-        rgba(138, 43, 226, 0.35),
-        transparent 55%
-      );
+      background: radial-gradient(circle at top left, rgba(138, 43, 226, 0.35), transparent 55%);
       opacity: 0;
       transition: opacity 0.25s ease;
       pointer-events: none;
@@ -379,32 +393,6 @@
       box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
     }
 
-    .reminders-btn {
-      background: transparent;
-      border-radius: 999px;
-      padding: 6px 14px;
-      font-size: 0.85em;
-      border: 1px solid rgba(0, 123, 255, 0.6);
-      color: var(--text-light);
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .reminders-btn i {
-      font-size: 0.9em;
-      color: var(--primary-blue);
-    }
-
-    .reminders-btn:hover {
-      background: rgba(0, 123, 255, 0.15);
-      border-color: var(--accent-violet);
-      transform: translateY(-1px);
-      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
-    }
-
     .no-events {
       text-align: center;
       padding: 40px 16px 20px;
@@ -465,6 +453,11 @@
       .events-wrapper {
         padding: 18px 16px 24px;
       }
+
+      .header-actions {
+        width: 100%;
+        justify-content: flex-start;
+      }
     }
   </style>
 </head>
@@ -523,16 +516,8 @@
         </p>
       </div>
 
-      <div class="filters">
-        <div class="filter-pill">
-          <i class="fas fa-clock"></i>
-          Showing future, approved events
-        </div>
-        <div class="filter-pill">
-          <i class="fas fa-calendar-day"></i>
-          Sorted by start time
-        </div>
-
+      <!-- ✅ ONLY My Reminders on the right -->
+      <div class="header-actions">
         <button
           type="button"
           class="reminders-btn"
