@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manage Support Tickets | UniVerse Admin</title>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Orbitron:wght@400;700&display=swap");
+    :root {
+      --dark-bg: #050818;
+      --dark-card: #11162b;
+      --primary-blue: #00b4ff;
+      --accent-violet: #b832ff;
+      --text-light: #e0e7ff;
+      --subtle: #9aa3d8;
+      --danger: #ff4757;
+      --success: #2ed573;
+      --warning: #ffa502;
+    }
+
+    body {
+      margin: 0;
+      font-family: Montserrat, sans-serif;
+      background: radial-gradient(circle at top, #1b1f3b 0%, #050818 50%, #020312 100%);
+      color: var(--text-light);
+      min-height: 100vh;
+    }
+
+    .navbar {
+      background: rgba(17, 22, 43, 0.85);
+      border-bottom: 1px solid rgba(184, 50, 255, 0.4);
+      padding: 18px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      backdrop-filter: blur(6px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      font-family: Orbitron, sans-serif;
+      font-size: 2em;
+      font-weight: 700;
+      background: linear-gradient(45deg, var(--primary-blue), var(--accent-violet));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .navbar-buttons {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+
+    .btn {
+      background: linear-gradient(90deg, var(--primary-blue), var(--accent-violet));
+      color: #fff;
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 18px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: transform 0.3s ease;
+      font-family: Montserrat, sans-serif;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+      background: rgba(0, 180, 255, 0.2);
+      border: 1px solid rgba(0, 180, 255, 0.5);
+      color: var(--primary-blue);
+    }
+
+    .btn-back {
+      background: rgba(184, 50, 255, 0.2);
+      border: 1px solid rgba(184, 50, 255, 0.5);
+      color: var(--accent-violet);
+    }
+
+    .btn-small {
+      padding: 8px 12px;
+      font-size: 0.85em;
+      border-radius: 6px;
+    }
+
+    .btn-status {
+      padding: 6px 12px;
+      font-size: 0.8em;
+      border-radius: 4px;
+      border: 1px solid transparent;
+      cursor: pointer;
+    }
+
+    .status-unchosen {
+      background: rgba(255, 165, 2, 0.2);
+      border-color: rgba(255, 165, 2, 0.6);
+      color: var(--warning);
+    }
+
+    .status-processing {
+      background: rgba(0, 180, 255, 0.2);
+      border-color: rgba(0, 180, 255, 0.6);
+      color: var(--primary-blue);
+    }
+
+    .status-completed {
+      background: rgba(46, 213, 115, 0.2);
+      border-color: rgba(46, 213, 115, 0.6);
+      color: var(--success);
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 40px auto;
+      padding: 0 25px;
+    }
+
+    h1 {
+      font-family: Orbitron, sans-serif;
+      text-shadow: 0 0 12px rgba(0, 180, 255, 0.6);
+      margin-bottom: 30px;
+    }
+
+    .controls-section {
+      background: rgba(17, 22, 43, 0.65);
+      border: 1px solid rgba(0, 180, 255, 0.35);
+      border-radius: 14px;
+      padding: 25px;
+      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(5px);
+      margin-bottom: 30px;
+    }
+
+    .controls-group {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .search-input,
+    .filter-select {
+      padding: 12px 16px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(0, 180, 255, 0.3);
+      border-radius: 8px;
+      color: var(--text-light);
+      font-family: Montserrat, sans-serif;
+      font-size: 0.95em;
+    }
+
+    .search-input::placeholder {
+      color: var(--subtle);
+    }
+
+    .search-input:focus,
+    .filter-select:focus {
+      outline: none;
+      border-color: var(--primary-blue);
+      box-shadow: 0 0 10px rgba(0, 180, 255, 0.3);
+    }
+
+    .tickets-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: rgba(17, 22, 43, 0.65);
+      border: 1px solid rgba(184, 50, 255, 0.35);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.45);
+    }
+
+    .tickets-table thead {
+      background: rgba(0, 0, 0, 0.3);
+      border-bottom: 2px solid rgba(0, 180, 255, 0.4);
+    }
+
+    .tickets-table th {
+      padding: 18px;
+      text-align: left;
+      font-weight: 700;
+      color: var(--primary-blue);
+      font-family: Orbitron, sans-serif;
+    }
+
+    .tickets-table td {
+      padding: 16px 18px;
+      border-top: 1px solid rgba(184, 50, 255, 0.2);
+      color: var(--text-light);
+    }
+
+    .tickets-table tbody tr:hover {
+      background: rgba(0, 180, 255, 0.05);
+    }
+
+    .ticket-id {
+      font-family: monospace;
+      font-size: 0.85em;
+      color: var(--primary-blue);
+    }
+
+    .ticket-title {
+      font-weight: 600;
+      color: var(--text-light);
+    }
+
+    .ticket-type {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 0.8em;
+      font-weight: 600;
+    }
+
+    .type-report {
+      background: rgba(255, 71, 87, 0.2);
+      color: var(--danger);
+      border: 1px solid rgba(255, 71, 87, 0.5);
+    }
+
+    .type-custom {
+      background: rgba(0, 180, 255, 0.2);
+      color: var(--primary-blue);
+      border: 1px solid rgba(0, 180, 255, 0.5);
+    }
+
+    .priority-low {
+      color: var(--success);
+    }
+
+    .priority-medium {
+      color: var(--warning);
+    }
+
+    .priority-high {
+      color: #ff9500;
+    }
+
+    .priority-critical {
+      color: var(--danger);
+      font-weight: 700;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-view {
+      background: rgba(0, 180, 255, 0.2);
+      border: 1px solid rgba(0, 180, 255, 0.5);
+      color: var(--primary-blue);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--subtle);
+    }
+
+    .empty-state-icon {
+      font-size: 4em;
+      margin-bottom: 20px;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      overflow: auto;
+    }
+
+    .modal.show {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content {
+      background: var(--dark-card);
+      border: 1px solid rgba(184, 50, 255, 0.5);
+      border-radius: 14px;
+      padding: 30px;
+      max-width: 600px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+    }
+
+    .modal-header {
+      font-family: Orbitron, sans-serif;
+      font-size: 1.6em;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: var(--primary-blue);
+      border-bottom: 2px solid rgba(0, 180, 255, 0.3);
+      padding-bottom: 15px;
+    }
+
+    .modal-section {
+      margin-bottom: 20px;
+    }
+
+    .modal-label {
+      color: var(--subtle);
+      font-size: 0.85em;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+
+    .modal-value {
+      color: var(--text-light);
+      font-size: 1em;
+      line-height: 1.6;
+    }
+
+    .textarea {
+      width: 100%;
+      padding: 12px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(0, 180, 255, 0.3);
+      border-radius: 8px;
+      color: var(--text-light);
+      font-family: Montserrat, sans-serif;
+      font-size: 0.95em;
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .textarea:focus {
+      outline: none;
+      border-color: var(--primary-blue);
+      box-shadow: 0 0 10px rgba(0, 180, 255, 0.3);
+    }
+
+    .screenshot-gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 12px;
+    }
+
+    .screenshot-item {
+      position: relative;
+      border-radius: 8px;
+      overflow: hidden;
+      background: rgba(0, 180, 255, 0.1);
+      border: 1px solid rgba(0, 180, 255, 0.3);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .screenshot-item:hover {
+      border-color: var(--primary-blue);
+      box-shadow: 0 0 12px rgba(0, 180, 255, 0.3);
+    }
+
+    .screenshot-item img {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+    }
+
+    .screenshot-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .screenshot-item:hover .screenshot-overlay {
+      opacity: 1;
+    }
+
+    .screenshot-overlay button {
+      background: var(--primary-blue);
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .screenshot-overlay button:hover {
+      background: var(--accent-violet);
+    }
+
+    .fullscreen-modal {
+      display: none;
+      position: fixed;
+      z-index: 10001;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.95);
+    }
+
+    .fullscreen-modal.show {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .fullscreen-image {
+      max-width: 90%;
+      max-height: 90%;
+      object-fit: contain;
+    }
+
+    .fullscreen-close {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      color: white;
+      font-size: 2.5em;
+      cursor: pointer;
+      background: none;
+      border: none;
+      z-index: 10002;
+    }
+
+    .fullscreen-close:hover {
+      color: var(--primary-blue);
+    }
+
+    .modal-footer {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      margin-top: 25px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(0, 180, 255, 0.2);
+    }
+
+    .btn-cancel {
+      background: rgba(0, 180, 255, 0.2);
+      border: 1px solid rgba(0, 180, 255, 0.5);
+      color: var(--primary-blue);
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 700;
+      font-family: Montserrat, sans-serif;
+    }
+
+    .btn-update {
+      background: linear-gradient(90deg, var(--primary-blue), var(--accent-violet));
+      border: 0;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 700;
+      font-family: Montserrat, sans-serif;
+    }
+
+    .message {
+      padding: 15px 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+    .success-message {
+      background: rgba(46, 213, 115, 0.1);
+      border: 1px solid rgba(46, 213, 115, 0.5);
+      color: var(--success);
+    }
+
+    .error-message {
+      background: rgba(255, 71, 87, 0.1);
+      border: 1px solid rgba(255, 71, 87, 0.5);
+      color: var(--danger);
+    }
+
+    @media (max-width: 768px) {
+      .controls-group {
+        flex-direction: column;
+      }
+
+      .search-input,
+      .filter-select {
+        width: 100%;
+      }
+
+      .tickets-table {
+        font-size: 0.9em;
+      }
+
+      .tickets-table th,
+      .tickets-table td {
+        padding: 12px 10px;
+      }
+
+      .actions {
+        flex-direction: column;
+      }
+
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="logo">UniVerse Admin</div>
+    <div class="navbar-buttons">
+      <button class="btn btn-back" onclick="window.location.href='/api/admin/landing'">
+        ← Back to Dashboard
+      </button>
+      <form action="/api/logout" method="get" style="margin: 0">
+        <button class="btn" type="submit">Logout</button>
+      </form>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h1>🎫 Support Ticket Management</h1>
+
+    <div id="messageContainer"></div>
+
+    <div class="controls-section">
+      <div class="controls-group">
+        <input
+          type="text"
+          id="searchInput"
+          class="search-input"
+          placeholder="Search by ticket ID, title, or username..."
+          onkeyup="searchTickets()"
+        />
+        <select id="statusFilter" class="filter-select" onchange="filterTickets()">
+          <option value="all">All Status</option>
+          <option value="unchosen">Unchosen</option>
+          <option value="processing">Processing</option>
+          <option value="completed">Completed</option>
+        </select>
+        <select id="typeFilter" class="filter-select" onchange="filterTickets()">
+          <option value="all">All Types</option>
+          <option value="custom">Custom Tickets</option>
+          <option value="report">Report Tickets</option>
+        </select>
+        <select id="sortFilter" class="filter-select" onchange="filterTickets()">
+          <option value="newest">Newest First</option>
+          <option value="oldest">Oldest First</option>
+          <option value="priority">Priority</option>
+        </select>
+      </div>
+    </div>
+
+    <table class="tickets-table" id="ticketsTable">
+      <thead>
+        <tr>
+          <th>Ticket ID</th>
+          <th>Type</th>
+          <th>Title</th>
+          <th>User</th>
+          <th>Status</th>
+          <th>Priority</th>
+          <th>Assigned To</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="ticketsBody">
+        <tr>
+          <td colspan="8" style="text-align: center; padding: 40px">Loading tickets...</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Ticket Details Modal -->
+  <div id="ticketModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header" id="modalTitle"></div>
+
+      <div class="modal-section">
+        <div class="modal-label">Type</div>
+        <div class="modal-value" id="modalType"></div>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-label">Status</div>
+        <select id="statusSelect" class="filter-select" style="width: 100%">
+          <option value="unchosen">Unchosen</option>
+          <option value="processing">Processing</option>
+          <option value="completed">Completed</option>
+        </select>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-label">Priority</div>
+        <div class="modal-value" id="modalPriority"></div>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-label">User</div>
+        <div class="modal-value" id="modalUser"></div>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-label">Created</div>
+        <div class="modal-value" id="modalCreated"></div>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-label">Description</div>
+        <div class="modal-value" id="modalDescription" style="white-space: pre-wrap"></div>
+      </div>
+
+      <div class="modal-section" id="reportSection" style="display: none">
+        <div class="modal-label">Reported User</div>
+        <div class="modal-value" id="modalReportedUser"></div>
+      </div>
+
+      <div class="modal-section" id="resolutionSection">
+        <div class="modal-label">Resolution Notes</div>
+        <textarea id="resolutionText" class="textarea" placeholder="Add resolution notes here..."></textarea>
+      </div>
+
+      <div class="modal-section" id="responseSection" style="display: none">
+        <div class="modal-label">Response to User (Shown in Notifications)</div>
+        <textarea id="responseText" class="textarea" placeholder="Write a response message that will be sent to the user via notification..."></textarea>
+      </div>
+
+      <div class="modal-section" id="screenshotSection" style="display: none">
+        <div class="modal-label">Screenshots</div>
+        <div id="screenshotGallery" class="screenshot-gallery"></div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+        <button class="btn-update" onclick="updateTicketStatus()">Update Ticket</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fullscreen Screenshot Modal -->
+  <div id="fullscreenModal" class="fullscreen-modal">
+    <button class="fullscreen-close" onclick="closeFullscreenModal()">✕</button>
+    <img id="fullscreenImage" class="fullscreen-image" alt="Screenshot" />
+  </div>
+
+  <script>
+    let allTickets = [];
+    let currentTicketId = null;
+
+    async function loadTickets() {
+      try {
+        const response = await fetch('/api/admin/tickets/all');
+        const data = await response.json();
+
+        if (data.success) {
+          allTickets = data.tickets;
+          displayTickets(allTickets);
+        } else {
+          showMessage(data.message || 'Failed to load tickets', 'error');
+        }
+      } catch (error) {
+        console.error('Error loading tickets:', error);
+        showMessage('An error occurred while loading tickets', 'error');
+      }
+    }
+
+    function displayTickets(tickets) {
+      const tbody = document.getElementById('ticketsBody');
+
+      if (tickets.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8">
+              <div class="empty-state">
+                <div class="empty-state-icon">📭</div>
+                <h3>No Tickets Found</h3>
+                <p>There are no tickets matching your criteria.</p>
+              </div>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = tickets
+        .map(
+          (ticket) => `
+        <tr>
+          <td><span class="ticket-id">${ticket._id.slice(-8)}</span></td>
+          <td>
+            <span class="ticket-type type-${ticket.ticketType}">
+              ${ticket.ticketType === 'report' ? '🚨 Report' : '📝 Custom'}
+            </span>
+          </td>
+          <td><span class="ticket-title">${escapeHtml(ticket.title)}</span></td>
+          <td>${escapeHtml(ticket.username)}</td>
+          <td>
+            <button class="btn-status status-${ticket.status}">
+              ${ticket.status === 'unchosen' ? '⏳' : ticket.status === 'processing' ? '⚙️' : '✅'}
+              ${ticket.status.charAt(0).toUpperCase() + ticket.status.slice(1)}
+            </button>
+          </td>
+          <td>
+            <span class="priority-${ticket.priority}">
+              ${ticket.priority.toUpperCase()}
+            </span>
+          </td>
+          <td>${ticket.assignedAdmin ? escapeHtml(ticket.assignedAdmin) : '—'}</td>
+          <td>
+            <div class="actions">
+              <button class="btn btn-secondary btn-small" onclick="openTicketModal('${ticket._id}')">
+                View Details
+              </button>
+            </div>
+          </td>
+        </tr>
+      `
+        )
+        .join('');
+    }
+
+    async function openTicketModal(ticketId) {
+      try {
+        const response = await fetch(`/api/admin/tickets/${ticketId}`);
+        const data = await response.json();
+
+        if (!data.success) {
+          showMessage('Failed to load ticket details', 'error');
+          return;
+        }
+
+        const ticket = data.ticket;
+        currentTicketId = ticketId;
+
+        document.getElementById('modalTitle').textContent = `Ticket #${ticket._id.slice(-8)}`;
+        document.getElementById('modalType').textContent =
+          ticket.ticketType === 'report' ? '🚨 Report Ticket' : '📝 Custom Ticket';
+        document.getElementById('modalPriority').textContent =
+          ticket.priority.charAt(0).toUpperCase() + ticket.priority.slice(1);
+        document.getElementById('modalUser').textContent = escapeHtml(ticket.username);
+        document.getElementById('modalCreated').textContent = new Date(ticket.createdAt).toLocaleString();
+        document.getElementById('modalDescription').textContent = escapeHtml(ticket.description);
+        document.getElementById('resolutionText').value = ticket.resolution || '';
+        document.getElementById('responseText').value = ticket.adminResponse || '';
+        document.getElementById('statusSelect').value = ticket.status;
+
+        // Add change listener to status select to show/hide response section
+        document.getElementById('statusSelect').addEventListener('change', function() {
+          if (this.value === 'completed') {
+            document.getElementById('responseSection').style.display = 'block';
+          } else {
+            document.getElementById('responseSection').style.display = 'none';
+          }
+        }, { once: true });
+
+        // Show response section only when status is completed
+        if (ticket.status === 'completed') {
+          document.getElementById('responseSection').style.display = 'block';
+        } else {
+          document.getElementById('responseSection').style.display = 'none';
+        }
+
+        // Show report section for report tickets
+        if (ticket.ticketType === 'report' && ticket.reportedUser) {
+          document.getElementById('reportSection').style.display = 'block';
+          document.getElementById('modalReportedUser').textContent = escapeHtml(ticket.reportedUser);
+        } else if (ticket.reportedUserName) {
+          document.getElementById('reportSection').style.display = 'block';
+          document.getElementById('modalReportedUser').textContent = escapeHtml(ticket.reportedUserName);
+        } else {
+          document.getElementById('reportSection').style.display = 'none';
+        }
+
+        // Display screenshots if available
+        if (ticket.screenshotPaths && ticket.screenshotPaths.length > 0) {
+          const gallery = document.getElementById('screenshotGallery');
+          gallery.innerHTML = '';
+          ticket.screenshotPaths.forEach((path) => {
+            const item = document.createElement('div');
+            item.className = 'screenshot-item';
+            item.innerHTML = `
+              <img src="${path}" alt="Screenshot" onclick="openFullscreenModal('${path}')" />
+              <div class="screenshot-overlay">
+                <button onclick="downloadScreenshot('${path}')">
+                  <i class="fas fa-download"></i> Download
+                </button>
+              </div>
+            `;
+            gallery.appendChild(item);
+          });
+          document.getElementById('screenshotSection').style.display = 'block';
+        } else {
+          document.getElementById('screenshotSection').style.display = 'none';
+        }
+
+        document.getElementById('ticketModal').classList.add('show');
+      } catch (error) {
+        console.error('Error opening ticket modal:', error);
+        showMessage('An error occurred', 'error');
+      }
+    }
+
+    function closeModal() {
+      document.getElementById('ticketModal').classList.remove('show');
+      currentTicketId = null;
+    }
+
+    async function updateTicketStatus() {
+      if (!currentTicketId) return;
+
+      const status = document.getElementById('statusSelect').value;
+      const resolution = document.getElementById('resolutionText').value;
+      const adminResponse = document.getElementById('responseText').value;
+
+      try {
+        const response = await fetch(`/api/admin/tickets/${currentTicketId}/status`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status, resolution, adminResponse }),
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          closeModal();
+          showMessage('Ticket updated successfully', 'success');
+          loadTickets();
+        } else {
+          showMessage(data.message || 'Failed to update ticket', 'error');
+        }
+      } catch (error) {
+        console.error('Error updating ticket:', error);
+        showMessage('An error occurred while updating the ticket', 'error');
+      }
+    }
+
+    function openFullscreenModal(imagePath) {
+      document.getElementById('fullscreenImage').src = imagePath;
+      document.getElementById('fullscreenModal').classList.add('show');
+    }
+
+    function closeFullscreenModal() {
+      document.getElementById('fullscreenModal').classList.remove('show');
+    }
+
+    function downloadScreenshot(imagePath) {
+      const filename = imagePath.split('/').pop();
+      const link = document.createElement('a');
+      link.href = imagePath;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    // Close fullscreen modal when clicking outside the image
+    document.addEventListener('DOMContentLoaded', function() {
+      const fullscreenModal = document.getElementById('fullscreenModal');
+      if (fullscreenModal) {
+        fullscreenModal.addEventListener('click', function(e) {
+          if (e.target === this) {
+            closeFullscreenModal();
+          }
+        });
+      }
+    });
+
+    function searchTickets() {
+      const query = document.getElementById('searchInput').value.toLowerCase();
+      const filtered = allTickets.filter(
+        (ticket) =>
+          ticket._id.toLowerCase().includes(query) ||
+          ticket.title.toLowerCase().includes(query) ||
+          ticket.username.toLowerCase().includes(query)
+      );
+      applyFiltersToList(filtered);
+    }
+
+    function filterTickets() {
+      applyFiltersToList(allTickets);
+    }
+
+    function applyFiltersToList(tickets) {
+      const statusFilter = document.getElementById('statusFilter').value;
+      const typeFilter = document.getElementById('typeFilter').value;
+      const sortFilter = document.getElementById('sortFilter').value;
+
+      let filtered = tickets;
+
+      if (statusFilter !== 'all') {
+        filtered = filtered.filter((t) => t.status === statusFilter);
+      }
+
+      if (typeFilter !== 'all') {
+        filtered = filtered.filter((t) => t.ticketType === typeFilter);
+      }
+
+      let sorted = [...filtered];
+      switch (sortFilter) {
+        case 'oldest':
+          sorted.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+          break;
+        case 'priority':
+          const priorityOrder = { critical: 0, high: 1, medium: 2, low: 3 };
+          sorted.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
+          break;
+        default: // newest
+          sorted.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      }
+
+      displayTickets(sorted);
+    }
+
+    function showMessage(message, type) {
+      const container = document.getElementById('messageContainer');
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `message ${type}-message`;
+      messageDiv.textContent = message;
+      container.innerHTML = '';
+      container.appendChild(messageDiv);
+      setTimeout(() => messageDiv.remove(), 5000);
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    window.onclick = function (event) {
+      const modal = document.getElementById('ticketModal');
+      if (event.target === modal) {
+        closeModal();
+      }
+    };
+
+    document.addEventListener('DOMContentLoaded', loadTickets);
+  </script>
+</body>
+</html>

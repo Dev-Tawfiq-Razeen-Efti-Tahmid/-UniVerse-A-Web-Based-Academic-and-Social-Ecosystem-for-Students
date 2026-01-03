@@ -279,6 +279,34 @@
         transition: all 0.3s ease;
       }
 
+      /* Footer */
+      .footer {
+        background-color: var(--dark-card);
+        border-top: 1px solid var(--accent-violet);
+        padding: 20px 40px;
+        text-align: center;
+        margin-top: auto;
+      }
+
+      .footer-content {
+        color: var(--subtle-text);
+        font-size: 0.95em;
+      }
+
+      .footer-link {
+        color: var(--primary-blue);
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border-bottom: 1px solid transparent;
+      }
+
+      .footer-link:hover {
+        color: var(--accent-violet);
+        border-bottom-color: var(--accent-violet);
+        text-shadow: 0 0 5px rgba(138, 43, 226, 0.5);
+      }
+
       /* Responsive adjustments */
       @media (max-width: 768px) {
         .top-bar {
@@ -397,6 +425,12 @@
           <i class="fas fa-share-alt service-icon"></i>
           <div class="service-name">Social Hub</div>
         </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="footer-content">
+        <p>Need assistance? <a href="/api/tickets/create" class="footer-link">Create a Support Ticket</a></p>
       </div>
     </div>
 
