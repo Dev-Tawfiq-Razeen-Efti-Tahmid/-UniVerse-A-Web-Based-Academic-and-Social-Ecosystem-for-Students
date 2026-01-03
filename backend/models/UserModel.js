@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
+import bcrypt from "bcrypt";
 
-// Define the structure (schema) of a User document
 const userSchema = new mongoose.Schema(
   {
     name: {
@@ -62,17 +62,32 @@ const userSchema = new mongoose.Schema(
     },
     suspensionDuration: {
       type: Number,
-      default: null, // Duration in hours (null = permanent suspension)
+      default: null,
     },
     suspensionExpiresAt: {
       type: Date,
-      default: null, // When suspension expires
+      default: null,
     },
   },
   {
-    timestamps: true, // ✅ CORRECT PLACE
+    timestamps: true,
   }
 );
 
-// Create and export the model
+// Hash password before saving
+userSchema.pre("save", async function (next) {
+  // Only hash if password is modified
+  if (!this.isModified("password")) {
+    return next();
+  }
+
+  try {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+
 export default mongoose.model("User", userSchema);
