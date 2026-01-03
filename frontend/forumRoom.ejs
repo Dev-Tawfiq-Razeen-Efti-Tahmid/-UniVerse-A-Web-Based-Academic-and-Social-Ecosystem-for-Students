@@ -57,8 +57,7 @@
             font-weight: 700;
             text-shadow: 0 0 10px var(--accent-violet), 0 0 20px var(--primary-blue);
             background: linear-gradient(45deg, var(--primary-blue), var(--accent-violet));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            -webkit-background-clip: text;            background-clip: text;            -webkit-text-fill-color: transparent;
             letter-spacing: 1.5px;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -333,6 +332,104 @@
             margin-bottom: 15px;
             color: var(--primary-blue);
         }
+
+        /* Report Modal Styles */
+        .report-modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+
+        .report-modal-backdrop.show {
+            display: flex;
+        }
+
+        .report-modal-content {
+            background-color: var(--dark-card);
+            padding: 30px;
+            border-radius: 12px;
+            border: 2px solid var(--report-red);
+            max-width: 450px;
+            width: 90%;
+        }
+
+        .report-modal-content h2 {
+            color: var(--report-red);
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .report-reason {
+            margin-bottom: 15px;
+        }
+
+        .report-reason label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-light);
+            font-weight: 600;
+        }
+
+        .report-reason select,
+        .report-reason textarea {
+            width: 100%;
+            padding: 10px;
+            background-color: var(--input-bg);
+            border: 1px solid var(--accent-violet);
+            border-radius: 6px;
+            color: var(--text-light);
+            font-family: inherit;
+            font-size: 0.95em;
+            box-sizing: border-box;
+        }
+
+        .report-reason textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .report-reason select:focus,
+        .report-reason textarea:focus {
+            outline: none;
+            border-color: var(--report-red);
+        }
+
+        .report-modal-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            justify-content: flex-end;
+        }
+
+        .report-modal-buttons button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+
+        .report-modal-buttons button:hover {
+            transform: translateY(-2px);
+        }
+
+        .report-btn-cancel {
+            background-color: var(--subtle-text);
+            color: var(--dark-card);
+        }
+
+        .report-btn-submit {
+            background-color: var(--report-red);
+            color: white;
+        }
         
         @media (max-width: 800px) {
             .main-layout {
@@ -394,7 +491,7 @@
                             </div>
                             <span class="message-text"><%= message.content %></span>
                         </div>
-                        <button class="report-btn" data-message-id="<%= message._id %>" onclick="reportMessage('<%= message._id %>', this)">
+                        <button class="report-btn" data-message-id="<%= message._id %>" onclick="window.openReportModal('<%= message._id %>', '<%= message.username %>')">
                             <i class="fas fa-flag"></i> Report
                         </button>
                     </div>
@@ -415,6 +512,34 @@
             <p id="messageBoxContent"></p>
             <div style="margin-top: 20px;">
                 <button class="btn" onclick="closeMessageBox()" style="padding: 10px 20px;">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Report Message Modal -->
+    <div class="report-modal-backdrop" id="reportModalBackdrop">
+        <div class="report-modal-content">
+            <h2>🚨 Report Inappropriate Message</h2>
+            <div class="report-reason">
+                <label for="reportReason">Select Reason:</label>
+                <select id="reportReason">
+                    <option value="">-- Choose a reason --</option>
+                    <option value="spam">Spam</option>
+                    <option value="harassment">Harassment or Bullying</option>
+                    <option value="hate-speech">Hate Speech or Discrimination</option>
+                    <option value="explicit">Explicit or Adult Content</option>
+                    <option value="misinformation">Misinformation</option>
+                    <option value="threats">Threats or Violence</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <div class="report-reason">
+                <label for="reportDescription">Additional Details (Optional):</label>
+                <textarea id="reportDescription" placeholder="Provide any additional context about why you're reporting this message..."></textarea>
+            </div>
+            <div class="report-modal-buttons">
+                <button class="report-btn-cancel" onclick="closeReportModal()">Cancel</button>
+                <button class="report-btn-submit" onclick="submitReport()">Submit Report</button>
             </div>
         </div>
     </div>
@@ -441,6 +566,8 @@
             
             // Global State
             let activeUsers = [];
+            let reportingMessageId = null;
+            let reportedMessageUsername = null;
 
             // --- UTILITY: Custom Message Box (Replaces alert/confirm) ---
             const messageBox = document.getElementById('messageBox');
@@ -455,6 +582,78 @@
 
             window.closeMessageBox = function() { // Made global to be accessible from inline onClick
                 messageBox.style.display = 'none';
+            }
+
+            // --- REPORT MODAL FUNCTIONS ---
+            const reportModalBackdrop = document.getElementById('reportModalBackdrop');
+            const reportReasonSelect = document.getElementById('reportReason');
+            const reportDescriptionTextarea = document.getElementById('reportDescription');
+
+            window.openReportModal = function(messageId, messageUsername) {
+                reportingMessageId = messageId;
+                reportedMessageUsername = messageUsername;
+                reportReasonSelect.value = '';
+                reportDescriptionTextarea.value = '';
+                reportModalBackdrop.classList.add('show');
+            }
+
+            window.closeReportModal = function() {
+                reportModalBackdrop.classList.remove('show');
+                reportingMessageId = null;
+                reportedMessageUsername = null;
+            }
+
+            window.submitReport = async function() {
+                const reason = reportReasonSelect.value;
+                const description = reportDescriptionTextarea.value;
+
+                if (!reason) {
+                    showMessageBox('Missing Information', 'Please select a reason for reporting this message.');
+                    return;
+                }
+
+                if (!reportingMessageId) {
+                    showMessageBox('Error', 'Unable to report message. Please try again.');
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/api/tickets/report-message', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            messageId: reportingMessageId,
+                            channelId: channelId,
+                            reportedUsername: reportedMessageUsername,
+                            reason: reason,
+                            reason: reason,
+                            additionalDetails: description
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        closeReportModal();
+                        showMessageBox('✅ Report Submitted', 'Thank you for reporting this message. Our moderators will review it shortly.');
+                        
+                        // Update the button to show it's been reported
+                        const reportBtn = document.querySelector(`button.report-btn[data-message-id="${reportingMessageId}"]`);
+                        if (reportBtn) {
+                            reportBtn.innerText = "Reported!";
+                            reportBtn.disabled = true;
+                            reportBtn.style.color = 'var(--report-red)';
+                            reportBtn.style.opacity = '1';
+                        }
+                    } else {
+                        showMessageBox('Error', data.message || 'Failed to submit report. Please try again.');
+                    }
+                } catch (error) {
+                    console.error('Error submitting report:', error);
+                    showMessageBox('Error', 'An error occurred while submitting the report.');
+                }
             }
 
             // --- 0. SOCKET.IO CONNECTION & ROOM JOIN ---
@@ -528,7 +727,7 @@
                             </div>
                             <span class="message-text">${content}</span>
                         </div>
-                        <button class="report-btn" data-message-id="${messageId}" onclick="reportMessage('${messageId}', this)">
+                        <button class="report-btn" data-message-id="${messageId}" onclick="window.openReportModal('${messageId}', '${username}')">
                             <i class="fas fa-flag"></i> Report
                         </button>
                     </div>
@@ -560,27 +759,6 @@
                 }
             });
 
-            // --- REPORT MESSAGE FUNCTIONALITY ---
-            window.reportMessage = function(messageId, buttonElement) {
-                // Using showMessageBox as a simple notification instead of prompt/confirm
-                showMessageBox(
-                    'Report Submitted', 
-                    `Message ID ${messageId} has been reported. Moderators will review it shortly.`
-                );
-                
-                // Emit report event to the server
-                socket.emit('reportMessage', { 
-                    messageId: messageId, 
-                    reportingUserId: userId 
-                });
-
-                // Visually update the button
-                buttonElement.innerText = "Reported!";
-                buttonElement.disabled = true;
-                buttonElement.style.color = 'var(--report-red)';
-                buttonElement.style.opacity = '1';
-            }
-            
             // --- LOGOUT DISCONNECTION ---
             window.handleLogout = function() {
                 // 1. Notify the server the user is leaving the room before navigating

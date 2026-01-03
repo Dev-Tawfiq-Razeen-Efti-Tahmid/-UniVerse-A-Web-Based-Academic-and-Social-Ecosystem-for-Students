@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manage Forum Channels | UniVerse Admin</title>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Orbitron:wght@400;700&display=swap");
+    :root {
+      --dark-bg: #050818;
+      --dark-card: #11162b;
+      --primary-blue: #00b4ff;
+      --accent-violet: #b832ff;
+      --text-light: #e0e7ff;
+      --subtle: #9aa3d8;
+      --danger: #ff4757;
+      --success: #2ed573;
+    }
+
+    body {
+      margin: 0;
+      font-family: Montserrat, sans-serif;
+      background: radial-gradient(circle at top, #1b1f3b 0%, #050818 50%, #020312 100%);
+      color: var(--text-light);
+      min-height: 100vh;
+    }
+
+    .navbar {
+      background: rgba(17, 22, 43, 0.85);
+      border-bottom: 1px solid rgba(184, 50, 255, 0.4);
+      padding: 18px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      backdrop-filter: blur(6px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      font-family: Orbitron, sans-serif;
+      font-size: 2em;
+      font-weight: 700;
+      background: linear-gradient(45deg, var(--primary-blue), var(--accent-violet));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .navbar-buttons {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+
+    .btn {
+      background: linear-gradient(90deg, var(--primary-blue), var(--accent-violet));
+      color: #fff;
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 18px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: transform 0.3s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+      background: rgba(0, 180, 255, 0.2);
+      border: 1px solid rgba(0, 180, 255, 0.5);
+      color: var(--primary-blue);
+    }
+
+    .btn-back {
+      background: rgba(184, 50, 255, 0.2);
+      border: 1px solid rgba(184, 50, 255, 0.5);
+      color: var(--accent-violet);
+    }
+
+    .btn-danger {
+      background: rgba(255, 71, 87, 0.2);
+      border: 1px solid rgba(255, 71, 87, 0.5);
+      color: var(--danger);
+      padding: 8px 15px;
+      font-size: 0.9em;
+    }
+
+    .btn-danger:hover {
+      background: rgba(255, 71, 87, 0.4);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 0 25px;
+    }
+
+    h1 {
+      font-family: Orbitron, sans-serif;
+      text-shadow: 0 0 12px rgba(0, 180, 255, 0.6);
+      margin-bottom: 30px;
+    }
+
+    .search-section {
+      background: rgba(17, 22, 43, 0.65);
+      border: 1px solid rgba(0, 180, 255, 0.35);
+      border-radius: 14px;
+      padding: 25px;
+      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(5px);
+      margin-bottom: 30px;
+    }
+
+    .search-group {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .search-input {
+      flex: 1;
+      min-width: 250px;
+      padding: 12px 18px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(0, 180, 255, 0.3);
+      border-radius: 8px;
+      color: var(--text-light);
+      font-family: Montserrat, sans-serif;
+      font-size: 1em;
+    }
+
+    .search-input::placeholder {
+      color: var(--subtle);
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--primary-blue);
+      box-shadow: 0 0 10px rgba(0, 180, 255, 0.3);
+    }
+
+    .filter-select {
+      padding: 12px 18px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(0, 180, 255, 0.3);
+      border-radius: 8px;
+      color: var(--text-light);
+      font-family: Montserrat, sans-serif;
+      font-size: 1em;
+    }
+
+    .filter-select:focus {
+      outline: none;
+      border-color: var(--primary-blue);
+    }
+
+    .channels-grid {
+      display: grid;
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .channel-card {
+      background: rgba(17, 22, 43, 0.65);
+      border: 1px solid rgba(184, 50, 255, 0.35);
+      border-radius: 14px;
+      padding: 25px;
+      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(5px);
+      transition: transform 0.3s ease, border-color 0.3s ease;
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      gap: 20px;
+    }
+
+    .channel-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(255, 71, 87, 0.6);
+    }
+
+    .channel-info {
+      flex: 1;
+    }
+
+    .channel-name {
+      font-family: Orbitron, sans-serif;
+      font-size: 1.4em;
+      font-weight: 700;
+      color: var(--primary-blue);
+      margin: 0 0 10px 0;
+    }
+
+    .channel-owner {
+      color: var(--subtle);
+      font-size: 0.95em;
+      margin-bottom: 8px;
+    }
+
+    .channel-description {
+      color: var(--text-light);
+      font-size: 0.95em;
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+
+    .channel-stats {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .stat {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9em;
+    }
+
+    .stat-value {
+      color: var(--primary-blue);
+      font-weight: 700;
+    }
+
+    .channel-tags {
+      margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag {
+      background: rgba(0, 180, 255, 0.2);
+      border: 1px solid rgba(0, 180, 255, 0.4);
+      color: var(--primary-blue);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.85em;
+    }
+
+    .channel-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--subtle);
+    }
+
+    .empty-state-icon {
+      font-size: 4em;
+      margin-bottom: 20px;
+    }
+
+    .empty-state h2 {
+      font-family: Orbitron, sans-serif;
+      color: var(--text-light);
+      margin-bottom: 10px;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: var(--subtle);
+    }
+
+    .error-message {
+      background: rgba(255, 71, 87, 0.1);
+      border: 1px solid rgba(255, 71, 87, 0.5);
+      color: var(--danger);
+      padding: 15px 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+    .success-message {
+      background: rgba(46, 213, 115, 0.1);
+      border: 1px solid rgba(46, 213, 115, 0.5);
+      color: var(--success);
+      padding: 15px 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.show {
+      display: flex;
+    }
+
+    .modal-content {
+      background: var(--dark-card);
+      border: 1px solid rgba(184, 50, 255, 0.5);
+      border-radius: 14px;
+      padding: 30px;
+      max-width: 500px;
+      width: 90%;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+    }
+
+    .modal-header {
+      font-family: Orbitron, sans-serif;
+      font-size: 1.5em;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: var(--danger);
+    }
+
+    .modal-body {
+      color: var(--text-light);
+      margin-bottom: 25px;
+      line-height: 1.6;
+    }
+
+    .modal-footer {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+    }
+
+    .btn-cancel {
+      background: rgba(0, 180, 255, 0.2);
+      border: 1px solid rgba(0, 180, 255, 0.5);
+      color: var(--primary-blue);
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .btn-confirm {
+      background: linear-gradient(90deg, #ff6b6b, #ff4757);
+      border: 0;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    @media (max-width: 768px) {
+      .search-group {
+        flex-direction: column;
+      }
+
+      .search-input,
+      .filter-select {
+        width: 100%;
+      }
+
+      .channel-card {
+        flex-direction: column;
+      }
+
+      .channel-actions {
+        justify-content: center;
+      }
+
+      h1 {
+        font-size: 1.8em;
+      }
+
+      .navbar {
+        padding: 15px 20px;
+      }
+
+      .logo {
+        font-size: 1.5em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="logo">UniVerse Admin</div>
+    <div class="navbar-buttons">
+      <button class="btn btn-back" onclick="window.location.href='/api/admin/landing'">
+        ← Back to Dashboard
+      </button>
+      <form action="/api/logout" method="get" style="margin: 0">
+        <button class="btn" type="submit">Logout</button>
+      </form>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h1>🛑 Manage Forum Channels</h1>
+
+    <% if (typeof message !== 'undefined' && message) { %>
+      <div class="<%= messageType === 'success' ? 'success-message' : 'error-message' %>">
+        <%= message %>
+      </div>
+    <% } %>
+
+    <div class="search-section">
+      <div class="search-group">
+        <input
+          type="text"
+          id="searchInput"
+          class="search-input"
+          placeholder="Search channels by name or owner..."
+          onkeyup="searchChannels()"
+        />
+        <select id="sortFilter" class="filter-select" onchange="sortChannels()">
+          <option value="newest">Newest First</option>
+          <option value="oldest">Oldest First</option>
+          <option value="popular">Most Active</option>
+          <option value="alphabetical">Alphabetical</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="channelsContainer" class="channels-grid">
+      <div class="loading">Loading channels...</div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div id="deleteModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">⚠️ Delete Channel</div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete the channel "<span id="channelNameConfirm"></span>"?</p>
+        <p><strong style="color: var(--danger)">This action cannot be undone.</strong> All messages and discussions in this channel will be permanently removed.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" onclick="closeDeleteModal()">Cancel</button>
+        <button class="btn-confirm" onclick="confirmDelete()">Delete Channel</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let allChannels = [];
+    let channelToDelete = null;
+
+    async function loadChannels() {
+      try {
+        const response = await fetch('/api/admin/channels/search?query=');
+        const data = await response.json();
+
+        if (data.success) {
+          allChannels = data.channels;
+          displayChannels(allChannels);
+        } else {
+          showError(data.message || 'Failed to load channels');
+        }
+      } catch (error) {
+        console.error('Error loading channels:', error);
+        showError('An error occurred while loading channels');
+      }
+    }
+
+    function displayChannels(channels) {
+      const container = document.getElementById('channelsContainer');
+
+      if (channels.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">📭</div>
+            <h2>No Channels Found</h2>
+            <p>There are no forum channels matching your search criteria.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = channels
+        .map(
+          (channel) => `
+        <div class="channel-card">
+          <div class="channel-info">
+            <h3 class="channel-name">${escapeHtml(channel.channelName)}</h3>
+            <div class="channel-owner">Owner: <strong>${escapeHtml(channel.ChannelOwner)}</strong></div>
+            ${
+              channel.channelDescription
+                ? `<p class="channel-description">${escapeHtml(channel.channelDescription)}</p>`
+                : ''
+            }
+            <div class="channel-stats">
+              <div class="stat">
+                <span>👥 Active:</span>
+                <span class="stat-value">${channel.ChannelActiveCount || 0}</span>
+              </div>
+              <div class="stat">
+                <span>👍 Upvotes:</span>
+                <span class="stat-value">${channel.ChannelUpvote || 0}</span>
+              </div>
+              <div class="stat">
+                <span>👎 Downvotes:</span>
+                <span class="stat-value">${channel.ChannelDownvote || 0}</span>
+              </div>
+            </div>
+            ${
+              channel.ChannelTags && channel.ChannelTags.length > 0
+                ? `
+              <div class="channel-tags">
+                ${channel.ChannelTags.map((tag) => `<span class="tag">${escapeHtml(tag)}</span>`).join('')}
+              </div>
+            `
+                : ''
+            }
+          </div>
+          <div class="channel-actions">
+            <button class="btn btn-danger" onclick="openDeleteModal('${channel._id}', '${escapeHtml(channel.channelName).replace(/'/g, "\\'")}')">
+              Delete Channel
+            </button>
+          </div>
+        </div>
+      `
+        )
+        .join('');
+    }
+
+    function searchChannels() {
+      const query = document.getElementById('searchInput').value.toLowerCase();
+      const filtered = allChannels.filter(
+        (channel) =>
+          channel.channelName.toLowerCase().includes(query) ||
+          channel.ChannelOwner.toLowerCase().includes(query) ||
+          (channel.channelDescription && channel.channelDescription.toLowerCase().includes(query))
+      );
+      displayChannels(filtered);
+    }
+
+    function sortChannels() {
+      const sortValue = document.getElementById('sortFilter').value;
+      let sorted = [...allChannels];
+
+      switch (sortValue) {
+        case 'newest':
+          sorted.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+          break;
+        case 'oldest':
+          sorted.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+          break;
+        case 'popular':
+          sorted.sort((a, b) => b.ChannelActiveCount - a.ChannelActiveCount);
+          break;
+        case 'alphabetical':
+          sorted.sort((a, b) => a.channelName.localeCompare(b.channelName));
+          break;
+      }
+
+      displayChannels(sorted);
+    }
+
+    function openDeleteModal(channelId, channelName) {
+      channelToDelete = channelId;
+      document.getElementById('channelNameConfirm').textContent = channelName;
+      document.getElementById('deleteModal').classList.add('show');
+    }
+
+    function closeDeleteModal() {
+      document.getElementById('deleteModal').classList.remove('show');
+      channelToDelete = null;
+    }
+
+    async function confirmDelete() {
+      if (!channelToDelete) return;
+
+      try {
+        const response = await fetch(`/api/admin/channels/delete/${channelToDelete}`, {
+          method: 'POST',
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          closeDeleteModal();
+          allChannels = allChannels.filter((ch) => ch._id !== channelToDelete);
+          displayChannels(allChannels);
+          showSuccess('Channel deleted successfully');
+        } else {
+          showError(data.message || 'Failed to delete channel');
+        }
+      } catch (error) {
+        console.error('Error deleting channel:', error);
+        showError('An error occurred while deleting the channel');
+      }
+    }
+
+    function showError(message) {
+      const container = document.getElementById('channelsContainer');
+      const errorDiv = document.createElement('div');
+      errorDiv.className = 'error-message';
+      errorDiv.textContent = message;
+      container.insertAdjacentElement('beforebegin', errorDiv);
+      setTimeout(() => errorDiv.remove(), 5000);
+    }
+
+    function showSuccess(message) {
+      const container = document.getElementById('channelsContainer');
+      const successDiv = document.createElement('div');
+      successDiv.className = 'success-message';
+      successDiv.textContent = message;
+      container.insertAdjacentElement('beforebegin', successDiv);
+      setTimeout(() => successDiv.remove(), 5000);
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function (event) {
+      const modal = document.getElementById('deleteModal');
+      if (event.target === modal) {
+        closeDeleteModal();
+      }
+    };
+
+    // Load channels on page load
+    document.addEventListener('DOMContentLoaded', loadChannels);
+  </script>
+</body>
+</html>
