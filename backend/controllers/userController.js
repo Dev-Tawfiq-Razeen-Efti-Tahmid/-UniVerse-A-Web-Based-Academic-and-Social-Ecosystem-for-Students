@@ -1,5 +1,5 @@
 import User from "../models/UserModel.js";
-
+import bcrypt from "bcrypt";
 export const getUsers = async (req, res) => {
   try {
     const users = await User.find().lean();
@@ -92,7 +92,6 @@ export const updateProfile = async (req, res) => {
 
     // If changing password
     if (newPassword || currentPassword) {
-      // Validate all password fields are provided
       if (!currentPassword || !newPassword || !confirmPassword) {
         return res.render("profileUpdate", {
           user: req.session.userData,
@@ -101,8 +100,13 @@ export const updateProfile = async (req, res) => {
         });
       }
 
-      // Check if current password matches
-      if (user.password !== currentPassword) {
+      // Verify current password using bcrypt
+      const isCurrentPasswordValid = await bcrypt.compare(
+        currentPassword,
+        user.password
+      );
+
+      if (!isCurrentPasswordValid) {
         return res.render("profileUpdate", {
           user: req.session.userData,
           error: "Current password is incorrect",
@@ -119,16 +123,6 @@ export const updateProfile = async (req, res) => {
         });
       }
 
-      // Check password length
-      // if (newPassword.length < 6) {
-      //   return res.render("profileUpdate", {
-      //     user: req.session.userData,
-      //     error: "Password must be at least 6 characters",
-      //     success: null,
-      //   });
-      // }
-
-      // Update password
       user.password = newPassword;
     }
 

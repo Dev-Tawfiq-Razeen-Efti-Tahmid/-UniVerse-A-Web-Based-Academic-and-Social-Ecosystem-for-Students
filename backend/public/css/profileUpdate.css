@@ -1,0 +1,188 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Orbitron:wght@400;700&display=swap");
+:root {
+  --dark-bg: #1a1a2e;
+  --dark-card: #272c4a;
+  --primary-blue: #007bff;
+  --accent-violet: #8a2be2;
+  --text-light: #e0e0e0;
+  --input-bg: #3e4a6e;
+  --subtle-text: #a0a0a0;
+  --success-green: #00c878;
+  --danger-red: #ff4757;
+}
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+body {
+  font-family: "Montserrat", sans-serif;
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--dark-bg) 0%, #160e2c 100%);
+  color: var(--text-light);
+  display: flex;
+  flex-direction: column;
+}
+.top-bar {
+  background-color: var(--dark-card);
+  padding: 15px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+  border-bottom: 1px solid var(--accent-violet);
+}
+.logo {
+  font-family: "Orbitron", sans-serif;
+  font-size: 2em;
+  font-weight: 700;
+  background: linear-gradient(45deg, var(--primary-blue), var(--accent-violet));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.back-btn {
+  background: transparent;
+  border: 1px solid rgba(0, 123, 255, 0.6);
+  color: var(--text-light);
+  border-radius: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.back-btn:hover {
+  background: rgba(0, 123, 255, 0.15);
+}
+.main-content {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 0 20px;
+  width: 100%;
+}
+.profile-card {
+  background: rgba(23, 27, 54, 0.9);
+  border-radius: 16px;
+  padding: 40px;
+  border: 1px solid rgba(0, 123, 255, 0.25);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+.profile-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+.profile-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: linear-gradient(
+    135deg,
+    var(--primary-blue),
+    var(--accent-violet)
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 48px;
+  font-weight: bold;
+  margin: 0 auto 15px;
+}
+.profile-header h2 {
+  font-family: "Orbitron", sans-serif;
+  font-size: 1.8em;
+  margin-bottom: 5px;
+}
+.profile-header p {
+  color: var(--subtle-text);
+  font-size: 0.95em;
+}
+.form-section {
+  margin-bottom: 30px;
+}
+.section-title {
+  font-size: 1.2em;
+  font-weight: 600;
+  margin-bottom: 15px;
+  color: var(--text-light);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.form-group {
+  margin-bottom: 20px;
+}
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: var(--text-light);
+}
+.form-group input {
+  width: 100%;
+  padding: 12px 15px;
+  border: 2px solid rgba(0, 123, 255, 0.4);
+  border-radius: 8px;
+  background-color: var(--input-bg);
+  color: var(--text-light);
+  font-size: 1em;
+  transition: all 0.3s;
+}
+.form-group input:focus {
+  outline: none;
+  border-color: var(--accent-violet);
+}
+.form-group input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.alert {
+  padding: 12px 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.alert-success {
+  background: rgba(0, 200, 120, 0.2);
+  border: 1px solid var(--success-green);
+  color: var(--success-green);
+}
+.alert-error {
+  background: rgba(255, 71, 87, 0.2);
+  border: 1px solid var(--danger-red);
+  color: var(--danger-red);
+}
+.btn-submit {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(90deg, var(--primary-blue), var(--accent-violet));
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.btn-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+@media (max-width: 768px) {
+  .top-bar {
+    padding: 12px 18px;
+  }
+  .logo {
+    font-size: 1.6em;
+  }
+  .profile-card {
+    padding: 30px 20px;
+  }
+}
