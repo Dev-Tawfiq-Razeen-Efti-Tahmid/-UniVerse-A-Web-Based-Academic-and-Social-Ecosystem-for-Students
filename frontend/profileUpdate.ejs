@@ -23,12 +23,9 @@
     <div class="main-content">
       <div class="profile-card">
         <div class="profile-header">
-          <!-- <div class="profile-avatar">
-            //<%= user.profilePic ? `<img
-              //src="${user.profilePic}"
-              //alt="${user.name}"
-            //>` : user.name.charAt(0).toUpperCase() %>
-          </div> -->
+          <div class="profile-avatar">
+            <%= user.name.charAt(0).toUpperCase() %>
+          </div>
           <h2><%= user.name %></h2>
           <p><%= user.email %> • <%= user.student_id %></p>
         </div>
@@ -84,7 +81,28 @@
                 required
               />
             </div>
-          </div>
+            <div class="form-group">
+  <label for="department">Department</label>
+  <select id="department" name="department" required>
+
+    <option value="Computer Science" <%= user.department === 'Computer Science' ? 'selected' : '' %>>Computer Science</option>
+
+    <option value="Electrical Engineering" <%= user.department === 'Electrical Engineering' ? 'selected' : '' %>>Electrical Engineering</option>
+    <option value="Physics" <%= user.department === 'Physics' ? 'selected' : '' %>>Physics</option>
+    <option value="Mathematics" <%= user.department === 'Mathematics' ? 'selected' : '' %>>Mathematics</option>
+    <option value="Biology" <%= user.department === 'Biology' ? 'selected' : '' %>>Biology</option>
+    <option value="Chemistry" <%= user.department === 'Chemistry' ? 'selected' : '' %>>Chemistry</option>
+    <option value="Management" <%= user.department === 'Management' ? 'selected' : '' %>>Management</option>
+    <option value="Mechanical Engineering" <%= user.department === 'Mechanical Engineering' ? 'selected' : '' %>>Mechanical Engineering</option>
+    <option value="Literature" <%= user.department === 'Literature' ? 'selected' : '' %>>Literature</option>
+    <option value="History" <%= user.department === 'History' ? 'selected' : '' %>>History</option>
+    <option value="Arts" <%= user.department === 'Arts' ? 'selected' : '' %>>Arts</option>
+
+    
+   
+
+  </select>
+</div>
 
           <div class="form-section">
             <div class="section-title">

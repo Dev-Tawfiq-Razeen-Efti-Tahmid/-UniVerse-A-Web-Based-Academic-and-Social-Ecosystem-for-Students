@@ -83,6 +83,66 @@ export const searchUsers = async (req, res) => {
   }
 };
 
+export const filterSearch = async (req, res) => {
+  try {
+    const { department } = req.query;
+    const currentUserId = req.session.userData._id;
+
+    if (!department || department.trim().length === 0) {
+      return res.json({ success: false, error: "Department is required" });
+    }
+
+    // Search users by department, exclude current user
+    const users = await User.find({
+      _id: { $ne: currentUserId },
+      department: department,
+    })
+      .select("name UserName student_id department profilePic")
+      .limit(20); // Limit results
+
+    // Get friendship status for each user
+    const usersWithStatus = await Promise.all(
+      users.map(async (user) => {
+        const friendship = await Friend.findOne({
+          $or: [
+            { requester: currentUserId, recipient: user._id },
+            { requester: user._id, recipient: currentUserId },
+          ],
+        });
+
+        let friendStatus = "none";
+        let requestId = null;
+
+        if (friendship) {
+          requestId = friendship._id;
+          if (friendship.status === "accepted") {
+            friendStatus = "friends";
+          } else if (friendship.requester.toString() === currentUserId) {
+            friendStatus = "requested";
+          } else {
+            friendStatus = "pending";
+          }
+        }
+
+        return {
+          _id: user._id,
+          name: user.name,
+          username: user.UserName,
+          student_id: user.student_id,
+          department: user.department,
+          friendStatus: friendStatus,
+          requestId: requestId,
+        };
+      })
+    );
+
+    res.json({ success: true, users: usersWithStatus });
+  } catch (err) {
+    console.error("Error filtering users:", err);
+    res.status(500).json({ success: false, error: "Failed to filter users" });
+  }
+};
+
 // Get friend list (only accepted friends)
 export const getFriendList = async (req, res) => {
   try {

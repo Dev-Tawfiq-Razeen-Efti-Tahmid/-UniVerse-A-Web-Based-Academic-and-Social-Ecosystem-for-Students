@@ -301,6 +301,7 @@ body {
   padding: 40px 20px;
   color: var(--subtle-text);
 }
+
 .confirm-dialog {
   position: fixed;
   inset: 0;

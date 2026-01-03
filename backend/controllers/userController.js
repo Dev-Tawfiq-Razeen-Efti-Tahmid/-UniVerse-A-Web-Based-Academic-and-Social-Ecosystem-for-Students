@@ -42,7 +42,6 @@ export const showProfilePage = async (req, res) => {
         email: user.email,
         student_id: user.student_id,
         department: user.department,
-        // profilePic: user.profilePic,
       },
       error: null,
       success: null,
@@ -56,8 +55,13 @@ export const showProfilePage = async (req, res) => {
 export const updateProfile = async (req, res) => {
   try {
     const userId = req.session.userData._id;
-    const { username, currentPassword, newPassword, confirmPassword } =
-      req.body;
+    const {
+      username,
+      currentPassword,
+      newPassword,
+      confirmPassword,
+      department,
+    } = req.body;
 
     // Find user
     const user = await User.findById(userId);
@@ -88,6 +92,14 @@ export const updateProfile = async (req, res) => {
           success: null,
         });
       }
+    }
+    //department
+    if (!department || department.trim().length === 0) {
+      return res.render("profileUpdate", {
+        user: req.session.userData,
+        error: "Department cannot be empty",
+        success: null,
+      });
     }
 
     // If changing password
@@ -125,13 +137,14 @@ export const updateProfile = async (req, res) => {
 
       user.password = newPassword;
     }
-
+    user.department = department;
     user.UserName = username;
 
     await user.save();
 
     // Update session data
     req.session.userData.username = username;
+    req.session.userData.department = department;
 
     res.render("profileUpdate", {
       user: {
@@ -141,7 +154,6 @@ export const updateProfile = async (req, res) => {
         email: user.email,
         student_id: user.student_id,
         department: user.department,
-        // profilePic: user.profilePic,
       },
       error: null,
       success: "Profile updated successfully!",
