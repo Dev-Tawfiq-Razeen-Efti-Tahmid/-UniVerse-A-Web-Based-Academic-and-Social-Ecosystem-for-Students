@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Routine Maker - UniVerse</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Orbitron:wght@400;700&display=swap");
+
+        :root {
+            --dark-bg: #1a1a2e;
+            --dark-card: #272c4a;
+            --primary-blue: #007bff;
+            --accent-violet: #8a2be2;
+            --text-light: #e0e0e0;
+            --subtle-text: #a0a0a0;
+            --border-glow: rgba(138, 43, 226, 0.4);
+            --success: #10b981;
+            --danger: #ef4444;
+        }
+
+        body {
+            font-family: "Montserrat", sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #160e2c 100%);
+            color: var(--text-light);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-family: "Orbitron", sans-serif;
+            font-size: 2.5em;
+            color: var(--primary-blue);
+            text-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+            margin: 0;
+        }
+
+        .back-btn {
+            background: var(--dark-card);
+            color: var(--text-light);
+            border: 1px solid var(--primary-blue);
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: var(--primary-blue);
+            box-shadow: 0 0 15px var(--primary-blue);
+        }
+
+        .routine-card {
+            background: var(--dark-card);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(138, 43, 226, 0.3);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 10px;
+            min-width: 800px;
+        }
+
+        th {
+            font-family: "Orbitron", sans-serif;
+            color: var(--accent-violet);
+            padding: 15px;
+            text-align: center;
+            font-size: 0.9em;
+        }
+
+        td {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 15px;
+            min-height: 100px;
+            vertical-align: top;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid transparent;
+            width: 14%;
+        }
+
+        td:hover {
+            background: rgba(138, 43, 226, 0.1);
+            border-color: var(--accent-violet);
+            transform: scale(1.02);
+        }
+
+        .slot-day {
+            font-weight: 700;
+            color: var(--primary-blue);
+            background: none !important;
+            cursor: default;
+            width: 100px;
+        }
+
+        .slot-content {
+            font-size: 0.85em;
+        }
+
+        .course-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .room-no {
+            font-size: 0.8em;
+            color: var(--subtle-text);
+            display: block;
+        }
+
+        .empty-slot {
+            color: rgba(255, 255, 255, 0.2);
+            font-style: italic;
+            font-size: 0.8em;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1001;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: var(--dark-card);
+            padding: 30px;
+            border-radius: 12px;
+            width: 400px;
+            border: 1px solid var(--accent-violet);
+            box-shadow: 0 0 30px var(--accent-violet);
+        }
+
+        .modal-header {
+            font-family: "Orbitron", sans-serif;
+            color: var(--primary-blue);
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+            color: var(--subtle-text);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            background: #1e2235;
+            border: 1px solid #3e4a6e;
+            border-radius: 5px;
+            color: white;
+            outline: none;
+        }
+
+        .form-group input:focus {
+            border-color: var(--primary-blue);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            border: none;
+            transition: all 0.3s;
+        }
+
+        .btn-save {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        .btn-save:hover {
+            background: #0056b3;
+        }
+
+        .btn-cancel {
+            background: #444;
+            color: white;
+        }
+
+        .btn-clear {
+            background: var(--danger);
+            color: white;
+        }
+
+        /* Notifications */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            z-index: 2000;
+            transform: translateY(100px);
+            transition: transform 0.3s ease;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+        }
+
+        .toast-success {
+            background: var(--success);
+        }
+
+        .toast-error {
+            background: var(--danger);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Routine <span>Maker</span></h1>
+            <a href="/api/dashboard" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+        </div>
+
+        <div class="routine-card">
+            <table id="routineTable">
+                <thead>
+                    <tr>
+                        <th>Day</th>
+                        <th>8:00 - 9:20</th>
+                        <th>9:30 - 10:50</th>
+                        <th>11:00 - 12:20</th>
+                        <th>12:30 - 1:50</th>
+                        <th>2:00 - 3:20</th>
+                        <th>3:30 - 4:50</th>
+                    </tr>
+                </thead>
+                <tbody id="routineBody">
+                    <!-- Rows will be injected by JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header" id="modalTitle">Edit Slot</div>
+            <form id="routineForm">
+                <input type="hidden" id="modalDay" />
+                <input type="hidden" id="modalTime" />
+                <div class="form-group">
+                    <label for="courseName">Course Name</label>
+                    <input type="text" id="courseName" placeholder="e.g. CSE101" />
+                </div>
+                <div class="form-group">
+                    <label for="roomNo">Room No</label>
+                    <input type="text" id="roomNo" placeholder="e.g. 402, UB" />
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="btn btn-clear" onclick="clearSlot()">Clear</button>
+                    <button type="button" class="btn btn-cancel" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn btn-save">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        const userId = "<%= userId %>";
+        const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+        const timeSlots = ["8:00 - 9:20", "9:30 - 10:50", "11:00 - 12:20", "12:30 - 1:50", "2:00 - 3:20", "3:30 - 4:50"];
+
+        let routineData = [];
+
+        async function fetchRoutine() {
+            try {
+                const response = await fetch(`/api/routine/${userId}`);
+                routineData = await response.json();
+                renderTable();
+            } catch (error) {
+                showToast("Error loading routine", "error");
+            }
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById("routineBody");
+            tbody.innerHTML = "";
+
+            days.forEach(day => {
+                const row = document.createElement("tr");
+
+                // Day Cell
+                const dayCell = document.createElement("td");
+                dayCell.className = "slot-day";
+                dayCell.innerText = day;
+                row.appendChild(dayCell);
+
+                timeSlots.forEach(slot => {
+                    const cell = document.createElement("td");
+                    cell.onclick = () => openModal(day, slot);
+
+                    const entry = routineData.find(r => r.day === day && r.timeSlot === slot);
+
+                    if (entry && entry.courseName) {
+                        cell.innerHTML = `
+              <div class="slot-content">
+                <span class="course-name">${entry.courseName}</span>
+                <span class="room-no">${entry.roomNo || ''}</span>
+              </div>
+            `;
+                    } else {
+                        cell.innerHTML = `<div class="empty-slot">+</div>`;
+                    }
+                    row.appendChild(cell);
+                });
+
+                tbody.appendChild(row);
+            });
+        }
+
+        function openModal(day, slot) {
+            document.getElementById("modalDay").value = day;
+            document.getElementById("modalTime").value = slot;
+            document.getElementById("modalTitle").innerText = `${day} (${slot})`;
+
+            const entry = routineData.find(r => r.day === day && r.timeSlot === slot);
+            document.getElementById("courseName").value = entry ? entry.courseName : "";
+            document.getElementById("roomNo").value = entry ? entry.roomNo : "";
+
+            document.getElementById("editModal").style.display = "flex";
+        }
+
+        function closeModal() {
+            document.getElementById("editModal").style.display = "none";
+        }
+
+        document.getElementById("routineForm").onsubmit = async (e) => {
+            e.preventDefault();
+            const day = document.getElementById("modalDay").value;
+            const timeSlot = document.getElementById("modalTime").value;
+            const courseName = document.getElementById("courseName").value;
+            const roomNo = document.getElementById("roomNo").value;
+
+            try {
+                const response = await fetch("/api/routine/update", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ userId, day, timeSlot, courseName, roomNo })
+                });
+
+                if (response.ok) {
+                    showToast("Saved successfully!");
+                    closeModal();
+                    fetchRoutine();
+                } else {
+                    showToast("Error saving", "error");
+                }
+            } catch (error) {
+                showToast("Network error", "error");
+            }
+        };
+
+        async function clearSlot() {
+            const day = document.getElementById("modalDay").value;
+            const timeSlot = document.getElementById("modalTime").value;
+
+            try {
+                const response = await fetch("/api/routine/delete", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ userId, day, timeSlot })
+                });
+
+                if (response.ok) {
+                    showToast("Slot cleared!");
+                    closeModal();
+                    fetchRoutine();
+                } else {
+                    showToast("Error clearing", "error");
+                }
+            } catch (error) {
+                showToast("Network error", "error");
+            }
+        }
+
+        function showToast(msg, type = "success") {
+            const toast = document.getElementById("toast");
+            toast.innerText = msg;
+            toast.className = `toast toast-${type} show`;
+            setTimeout(() => toast.classList.remove("show"), 3000);
+        }
+
+        // Initial fetch
+        fetchRoutine();
+
+        // Close modal if clicked outside
+        window.onclick = function (event) {
+            const modal = document.getElementById("editModal");
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+
+</html>
