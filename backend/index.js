@@ -34,6 +34,8 @@ import socialRoutes from "./routes/socialRoutes.js";
 import chatRoutes from "./routes/chatRoutes.js";
 import repositoryRoutes from "./routes/repositoryRoutes.js";
 import ticketRoutes from "./routes/ticketRoutes.js";
+import routineRouter from "./routes/routineRoutes.js";
+
 
 // Load env
 dotenv.config();
@@ -327,6 +329,8 @@ app.use("/api/chat", chatRoutes);
 app.use("/api/repository", repositoryRoutes);
 
 app.use("/api/tickets", ticketRoutes);
+app.use("/api/routine", routineRouter);
+
 
 // ---------- DB + SERVER ----------
 const PORT = process.env.PORT || 5000;
