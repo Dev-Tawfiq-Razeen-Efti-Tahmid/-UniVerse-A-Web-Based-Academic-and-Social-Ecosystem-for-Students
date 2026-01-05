@@ -258,6 +258,7 @@ export const updateTicketStatus = async (req, res) => {
   try {
     const { ticketId } = req.params;
     const { status, resolution, adminResponse } = req.body;
+    const adminId = req.session.userData._id;
     const adminUsername = req.session.userData.username;
 
     if (!["unchosen", "processing", "completed"].includes(status)) {
@@ -268,6 +269,12 @@ export const updateTicketStatus = async (req, res) => {
     }
 
     const updateData = { status };
+
+    // Assign ticket to admin when status changes to processing or completed
+    if (status === "processing" || status === "completed") {
+      updateData.assignedTo = adminId;
+      updateData.assignedAdmin = adminUsername;
+    }
 
     if (status === "completed" && resolution) {
       updateData.resolution = resolution;

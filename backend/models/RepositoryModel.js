@@ -43,7 +43,6 @@ const repositorySchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Optional: Index for faster searching
 repositorySchema.index({ courseCode: 1, semester: 1, voteScore: -1 });
 
 export default mongoose.model("Repository", repositorySchema);

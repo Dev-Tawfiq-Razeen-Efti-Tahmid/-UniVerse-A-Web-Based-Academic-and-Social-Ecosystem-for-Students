@@ -697,6 +697,7 @@
                             const data = await res.json();
                             if (res.ok) {
                                 document.getElementById('up-' + id).innerText = data.upvotes;
+                                document.getElementById('down-' + id).innerText = data.downvotes;
                             } else {
                                 alert(data.error || 'Upvote failed');
                             }
@@ -711,6 +712,7 @@
                             const res = await fetch(`/dashboard/forumDash/api/${id}/downvote`, { method: 'POST' });
                             const data = await res.json();
                             if (res.ok) {
+                                document.getElementById('up-' + id).innerText = data.upvotes;
                                 document.getElementById('down-' + id).innerText = data.downvotes;
                             } else {
                                 alert(data.error || 'Downvote failed');
