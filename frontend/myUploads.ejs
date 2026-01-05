@@ -127,8 +127,65 @@
       }
       .muted { color: var(--subtle-text); margin-top: 12px; }
       .error { color: var(--danger-red); margin-top: 12px; }
+
+      /* ✅ Modal styles */
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.65);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+      }
+      .modal-overlay.hidden { display: none; }
+
+      .modal {
+        width: min(520px, 92vw);
+        background: rgba(20, 24, 48, 0.96);
+        border: 1px solid rgba(138, 43, 226, 0.45);
+        border-radius: 14px;
+        padding: 18px 18px 16px;
+        box-shadow: 0 18px 40px rgba(0,0,0,0.65);
+        color: var(--text-light);
+      }
+      .modal-title {
+        margin: 0 0 8px;
+        font-size: 1.2rem;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .modal-text {
+        margin: 0 0 16px;
+        color: rgba(224,224,224,0.85);
+        line-height: 1.45;
+      }
+      .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+      }
+      .modal-btn {
+        border: 0;
+        border-radius: 10px;
+        padding: 10px 14px;
+        cursor: pointer;
+        font-weight: 800;
+      }
+      .modal-btn.secondary {
+        background: transparent;
+        border: 1px solid rgba(0, 123, 255, 0.5);
+        color: var(--text-light);
+      }
+      .modal-btn.danger {
+        background: linear-gradient(90deg, #ff4757, #ff6b81);
+        color: white;
+      }
     </style>
   </head>
+
   <body>
     <div class="top-bar">
       <div class="logo"><i class="fa-solid fa-folder-open"></i> My Uploads</div>
@@ -169,17 +226,86 @@
                   <i class="fa-solid fa-download"></i> Download
                 </a>
 
-                <form method="POST" action="/api/repository/<%= r._id %>/delete"
-                      onsubmit="return confirm('Delete this resource? This cannot be undone.');">
-                  <button type="submit" class="action-btn danger">
-                    <i class="fa-solid fa-trash"></i> Delete
-                  </button>
-                </form>
+                <!-- ✅ Delete button now opens modal (no browser confirm) -->
+                <button
+                  type="button"
+                  class="action-btn danger js-open-delete"
+                  data-action="/api/repository/<%= r._id %>/delete"
+                  data-title="<%= r.title %>"
+                >
+                  <i class="fa-solid fa-trash"></i> Delete
+                </button>
               </div>
             </div>
           </div>
         <% }) %>
       <% } %>
     </div>
+
+    <!-- ✅ Delete Confirm Modal -->
+    <div id="deleteModal" class="modal-overlay hidden" aria-hidden="true">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="deleteTitle">
+        <div class="modal-title" id="deleteTitle">
+          <i class="fa-solid fa-triangle-exclamation" style="color:#ff4757;"></i>
+          Delete Resource?
+        </div>
+        <p class="modal-text" id="deleteModalText">
+          This action cannot be undone.
+        </p>
+
+        <div class="modal-actions">
+          <button id="cancelDelete" class="modal-btn secondary" type="button">Cancel</button>
+
+          <!-- This form gets its action set dynamically -->
+          <form id="confirmDeleteForm" method="POST">
+            <button class="modal-btn danger" type="submit">Delete</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const modal = document.getElementById("deleteModal");
+      const cancelBtn = document.getElementById("cancelDelete");
+      const confirmForm = document.getElementById("confirmDeleteForm");
+      const modalText = document.getElementById("deleteModalText");
+
+      function openModal(actionUrl, title) {
+        confirmForm.action = actionUrl;
+        modalText.textContent = title
+          ? `Delete "${title}"? This action cannot be undone.`
+          : "This action cannot be undone.";
+        modal.classList.remove("hidden");
+        modal.setAttribute("aria-hidden", "false");
+      }
+
+      function closeModal() {
+        modal.classList.add("hidden");
+        modal.setAttribute("aria-hidden", "true");
+        confirmForm.action = "";
+      }
+
+      // Open modal from buttons
+      document.querySelectorAll(".js-open-delete").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const actionUrl = btn.getAttribute("data-action");
+          const title = btn.getAttribute("data-title") || "";
+          openModal(actionUrl, title);
+        });
+      });
+
+      // Cancel closes modal
+      cancelBtn.addEventListener("click", closeModal);
+
+      // Clicking outside modal closes it
+      modal.addEventListener("click", (e) => {
+        if (e.target === modal) closeModal();
+      });
+
+      // ESC closes modal
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeModal();
+      });
+    </script>
   </body>
 </html>
