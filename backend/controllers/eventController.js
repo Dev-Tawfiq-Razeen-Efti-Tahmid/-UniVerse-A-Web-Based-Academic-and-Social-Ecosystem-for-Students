@@ -6,22 +6,33 @@ export const listUpcomingEvents = async (req, res) => {
   try {
     const now = new Date();
 
-    const events = await Event.find({
+    // read category from query
+    const category = (req.query.category || "all").toLowerCase();
+
+    // base filter: upcoming + approved
+    const filter = {
       startTime: { $gte: now },
       isApproved: true,
-    })
-      .sort({ startTime: 1 })
-      .lean();
+    };
 
-    // 👇 read ?reminder=1 from the URL
+    // add category filter if not "all"
+    const allowed = ["workshop", "club fest", "seminar", "other"];
+    if (category !== "all" && allowed.includes(category)) {
+      filter.category = category;
+    }
+
+    const events = await Event.find(filter).sort({ startTime: 1 }).lean();
+
     const reminderAdded = req.query.reminder === "1";
 
-    res.render("events", { events, reminderAdded });
+    // pass selected category to EJS
+    res.render("events", { events, reminderAdded, category });
   } catch (err) {
     console.error("Error loading events:", err);
     res.status(500).send("Failed to load events");
   }
 };
+
 
 
 export const listUpcomingEventsJson = async (req, res) => {
@@ -47,27 +58,17 @@ export const addEventReminder = async (req, res) => {
 
     const eventId = req.params.id;
 
-    console.log("Adding reminder for user:", user.userId, "event:", eventId);
+    const existing = await Reminder.findOne({ user: user.userId, event: eventId });
+    if (!existing) await Reminder.create({ user: user.userId, event: eventId });
 
-    // avoid duplicates
-    const existing = await Reminder.findOne({
-      user: user.userId,
-      event: eventId,
-    });
-
-    if (!existing) {
-      await Reminder.create({
-        user: user.userId,
-        event: eventId,
-      });
-    }
-
-    return res.redirect("/dashboard/events?reminder=1");
+    const category = req.query.category ? `&category=${encodeURIComponent(req.query.category)}` : "";
+    return res.redirect(`/dashboard/events?reminder=1${category}`);
   } catch (err) {
     console.error("Error adding reminder:", err);
     return res.status(500).send("Failed to add reminder");
   }
 };
+
 
 // GET /dashboard/events/reminders
 export const listEventReminders = async (req, res) => {
