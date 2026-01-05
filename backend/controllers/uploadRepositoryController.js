@@ -7,10 +7,10 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// ✅ Always upload to backend/public/uploads/repository
+//  Always upload to backend/public/uploads/repository
 const UPLOAD_DIR = path.join(__dirname, "..", "public", "uploads", "repository");
 
-// ✅ Ensure folder exists
+//  Ensure folder exists
 if (!fs.existsSync(UPLOAD_DIR)) {
   fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 }
