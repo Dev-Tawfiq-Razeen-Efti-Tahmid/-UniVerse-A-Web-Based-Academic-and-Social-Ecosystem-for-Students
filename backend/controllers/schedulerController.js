@@ -11,6 +11,9 @@ export const autoCreateNotifications = async (taskId, deadline, userId) => {
       { type: "1hour", minutesBefore: 60 },
     ];
 
+    const task = await SchedulerModel.findById(taskId);
+    if (!task) return;
+
     for (const reminder of reminders) {
       const scheduledFor = new Date(
         deadline.getTime() - reminder.minutesBefore * 60000
@@ -29,7 +32,7 @@ export const autoCreateNotifications = async (taskId, deadline, userId) => {
         await NotificationModel.create({
           userId,
           taskId,
-          taskTitle: "Task",
+          taskTitle: task.title,
           taskDeadline: deadline,
           reminderType: reminder.type,
           scheduledFor,
@@ -111,6 +114,12 @@ export const updateTask = async (req, res) => {
       updateData,
       { new: true }
     );
+
+    if (updatedTask) {
+      // Refresh notifications
+      await NotificationModel.deleteMany({ taskId });
+      await autoCreateNotifications(updatedTask._id, updatedTask.deadline, updatedTask.userId);
+    }
 
     if (!updatedTask) {
       return res.status(404).json({ error: "Task not found" });

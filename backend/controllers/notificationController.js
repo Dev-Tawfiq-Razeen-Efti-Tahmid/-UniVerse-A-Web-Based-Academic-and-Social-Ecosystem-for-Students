@@ -75,6 +75,7 @@ export const getNotifications = async (req, res) => {
 
     const notifications = await NotificationModel.find({
       userId,
+      notificationSent: true,
       dismissed: false,
     })
       .sort({ scheduledFor: -1 })
