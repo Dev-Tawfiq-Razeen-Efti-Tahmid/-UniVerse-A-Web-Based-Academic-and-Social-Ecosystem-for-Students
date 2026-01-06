@@ -9,6 +9,7 @@ import {
   getPendingRequests,
   getSentRequests,
   cancelFriendRequest,
+  filterSearch,
 } from "../controllers/socialController.js";
 
 import { isAuthenticated } from "../middlewares/auth.js";
@@ -18,6 +19,7 @@ router.get("/social", isAuthenticated, showSocialHub);
 
 // API routes
 router.get("/social/search", isAuthenticated, searchUsers);
+router.get("/social/filter", isAuthenticated, filterSearch);
 router.get("/social/friends", isAuthenticated, getFriendList);
 router.get("/social/requests/pending", isAuthenticated, getPendingRequests);
 router.get("/social/requests/sent", isAuthenticated, getSentRequests);

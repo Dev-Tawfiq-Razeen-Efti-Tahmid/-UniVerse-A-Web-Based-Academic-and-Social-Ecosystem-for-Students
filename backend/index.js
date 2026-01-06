@@ -27,8 +27,7 @@ import forumApiRouter from "./routes/forumApi.js";
 import forumCreateRouter from "./routes/forumCreate.js";
 import ForumMessagingRouter from "./routes/ForumMessaging.js";
 import Message from "./models/forumMessage.js";
-// import socialHubRouter from "./routes/socialHubRouter.js";
-// import socialApiRouter from "./routes/socialApiRouter.js";
+
 
 import socialRoutes from "./routes/socialRoutes.js";
 import chatRoutes from "./routes/chatRoutes.js";
@@ -320,13 +319,13 @@ app.use("/dashboard/forumDash", forumRouter);
 app.use("/dashboard/forumDash/api", forumApiRouter);
 app.use("/dashboard/forumDash/ForumCreate", forumCreateRouter);
 app.use("/dashboard/forumDash/ForumMessaging/:channelId", ForumMessagingRouter);
+
+//!------Tawfiq's routes
 app.use("/api/dashboard", socialRoutes);
-
 app.use("/api/users", usersRouter);
-
 app.use("/api/chat", chatRoutes);
-
 app.use("/api/repository", repositoryRoutes);
+
 
 app.use("/api/tickets", ticketRoutes);
 app.use("/api/routine", routineRouter);

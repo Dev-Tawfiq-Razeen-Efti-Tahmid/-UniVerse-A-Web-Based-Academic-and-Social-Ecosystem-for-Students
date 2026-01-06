@@ -1,8 +1,6 @@
 import channelObj from "../models/channel.js";
 
-/**
- * Show channel management page
- */
+
 export const showChannelManagement = async (req, res) => {
   try {
     res.render("adminChannelManagement", {
@@ -14,10 +12,7 @@ export const showChannelManagement = async (req, res) => {
   }
 };
 
-/**
- * Search for channels
- * Query parameters: query (search string)
- */
+
 export const searchChannels = async (req, res) => {
   try {
     const { query } = req.query;
@@ -54,9 +49,7 @@ export const searchChannels = async (req, res) => {
   }
 };
 
-/**
- * Delete a channel by ID
- */
+
 export const deleteChannel = async (req, res) => {
   try {
     const { channelId } = req.params;
@@ -93,9 +86,7 @@ export const deleteChannel = async (req, res) => {
   }
 };
 
-/**
- * Get statistics about channels
- */
+
 export const getChannelStats = async (req, res) => {
   try {
     const totalChannels = await channelObj.countDocuments();

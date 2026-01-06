@@ -26,11 +26,7 @@
       --subtle-text: #a0a0a0;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       font-family: "Montserrat", sans-serif;
@@ -45,7 +41,6 @@
       flex-direction: column;
     }
 
-    /* Background dots */
     .background-dots {
       position: absolute;
       inset: 0;
@@ -69,20 +64,11 @@
     }
 
     @keyframes moveDots {
-      0% {
-        transform: translate(var(--x-start), var(--y-start)) scale(0);
-        opacity: 0;
-      }
-      50% {
-        opacity: 1;
-      }
-      100% {
-        transform: translate(var(--x-end), var(--y-end)) scale(1.5);
-        opacity: 0;
-      }
+      0% { transform: translate(var(--x-start), var(--y-start)) scale(0); opacity: 0; }
+      50% { opacity: 1; }
+      100% { transform: translate(var(--x-end), var(--y-end)) scale(1.5); opacity: 0; }
     }
 
-    /* Top bar */
     .top-bar {
       background-color: var(--dark-card);
       padding: 15px 40px;
@@ -161,7 +147,6 @@
       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     }
 
-    /* Main content */
     .main-content {
       max-width: 1200px;
       width: 100%;
@@ -199,7 +184,6 @@
       color: var(--subtle-text);
     }
 
-    /* ✅ RIGHT SIDE: only My Reminders button now */
     .header-actions {
       display: flex;
       align-items: center;
@@ -208,13 +192,12 @@
       flex-wrap: wrap;
     }
 
-    /* ✅ Moderate sized button + hover glow */
     .reminders-btn {
       background: linear-gradient(90deg, var(--primary-blue), var(--accent-violet));
       border: none;
       border-radius: 12px;
-      padding: 10px 18px;      /* moderate */
-      font-size: 0.95em;       /* moderate */
+      padding: 10px 18px;
+      font-size: 0.95em;
       font-weight: 700;
       color: white;
       display: inline-flex;
@@ -226,9 +209,7 @@
       user-select: none;
     }
 
-    .reminders-btn i {
-      font-size: 1.05em;
-    }
+    .reminders-btn i { font-size: 1.05em; }
 
     .reminders-btn:hover {
       transform: translateY(-2px);
@@ -238,13 +219,6 @@
         0 0 24px rgba(138, 43, 226, 0.45);
     }
 
-    .reminders-btn:active {
-      transform: translateY(0);
-      box-shadow:
-        0 0 8px rgba(0, 123, 255, 0.45),
-        0 0 16px rgba(138, 43, 226, 0.35);
-    }
-
     .events-wrapper {
       background-color: rgba(23, 27, 54, 0.9);
       border-radius: 16px;
@@ -252,6 +226,45 @@
       border: 1px solid rgba(0, 123, 255, 0.25);
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
       backdrop-filter: blur(6px);
+    }
+
+    /* ✅ Filter row */
+    .filter-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .filter-form {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .filter-label {
+      font-size: 0.9em;
+      color: var(--subtle-text);
+      font-weight: 600;
+    }
+
+    .filter-select {
+      background: var(--input-bg);
+      color: var(--text-light);
+      border: 1px solid rgba(0, 123, 255, 0.45);
+      padding: 9px 12px;
+      border-radius: 10px;
+      outline: none;
+      cursor: pointer;
+      min-width: 190px;
+    }
+
+    .filter-select:focus {
+      border-color: var(--accent-violet);
+      box-shadow: 0 0 10px rgba(138, 43, 226, 0.35);
     }
 
     .events-grid {
@@ -291,9 +304,7 @@
       border-color: var(--accent-violet);
     }
 
-    .event-card:hover::before {
-      opacity: 1;
-    }
+    .event-card:hover::before { opacity: 1; }
 
     .event-header-row {
       display: flex;
@@ -363,9 +374,7 @@
       gap: 5px;
     }
 
-    .badge-approved i {
-      font-size: 0.8em;
-    }
+    .badge-approved i { font-size: 0.8em; }
 
     .remind-btn {
       background: transparent;
@@ -406,7 +415,6 @@
       margin-bottom: 10px;
     }
 
-    /* Toast */
     .remind-toast {
       position: fixed;
       top: 80px;
@@ -423,9 +431,7 @@
       z-index: 1500;
     }
 
-    .remind-toast i {
-      color: #7fffd4;
-    }
+    .remind-toast i { color: #7fffd4; }
 
     .remind-toast.hide {
       opacity: 0;
@@ -434,30 +440,13 @@
     }
 
     @media (max-width: 768px) {
-      .top-bar {
-        padding: 12px 18px;
-      }
-
-      .top-bar .logo {
-        font-size: 1.8em;
-      }
-
-      .main-content {
-        padding: 28px 16px 40px;
-      }
-
-      .page-title {
-        font-size: 1.8em;
-      }
-
-      .events-wrapper {
-        padding: 18px 16px 24px;
-      }
-
-      .header-actions {
-        width: 100%;
-        justify-content: flex-start;
-      }
+      .top-bar { padding: 12px 18px; }
+      .top-bar .logo { font-size: 1.8em; }
+      .main-content { padding: 28px 16px 40px; }
+      .page-title { font-size: 1.8em; }
+      .events-wrapper { padding: 18px 16px 24px; }
+      .header-actions { width: 100%; justify-content: flex-start; }
+      .filter-row { justify-content: flex-start; }
     }
   </style>
 </head>
@@ -516,7 +505,6 @@
         </p>
       </div>
 
-      <!-- ✅ ONLY My Reminders on the right -->
       <div class="header-actions">
         <button
           type="button"
@@ -530,6 +518,21 @@
     </div>
 
     <section class="events-wrapper">
+
+      <!-- ✅ Category Filter -->
+      <div class="filter-row">
+        <form class="filter-form" method="GET" action="/dashboard/events">
+          <span class="filter-label">Filter by category:</span>
+          <select class="filter-select" name="category" onchange="this.form.submit()">
+            <option value="all" <%= (category || "all") === "all" ? "selected" : "" %>>All</option>
+            <option value="other" <%= (category || "all") === "other" ? "selected" : "" %>>Other</option>
+            <option value="workshop" <%= (category || "all") === "workshop" ? "selected" : "" %>>Workshop</option>
+            <option value="seminar" <%= (category || "all") === "seminar" ? "selected" : "" %>>Seminar</option>
+            <option value="club fest" <%= (category || "all") === "club fest" ? "selected" : "" %>>Club Fest</option>
+          </select>
+        </form>
+      </div>
+
       <% if (!events || events.length === 0) { %>
       <div class="no-events">
         <span>🎉</span>
@@ -577,15 +580,12 @@
           </p>
           <% } %>
 
-          <div class="event-footer">
-            <div class="badge-approved">
-              <i class="fas fa-check-circle"></i>
-              Approved Event
-            </div>
+
 
             <div>
+              <!-- ✅ Preserve category in the POST URL -->
               <form
-                action="/dashboard/events/<%= event._id %>/remind"
+                action="/dashboard/events/<%= event._id %>/remind?<%= (category && category !== 'all') ? 'category=' + encodeURIComponent(category) : '' %>"
                 method="POST"
                 style="display: inline;"
               >
