@@ -28,13 +28,11 @@ import forumCreateRouter from "./routes/forumCreate.js";
 import ForumMessagingRouter from "./routes/ForumMessaging.js";
 import Message from "./models/forumMessage.js";
 
-
 import socialRoutes from "./routes/socialRoutes.js";
 import chatRoutes from "./routes/chatRoutes.js";
 import repositoryRoutes from "./routes/repositoryRoutes.js";
 import ticketRoutes from "./routes/ticketRoutes.js";
 import routineRouter from "./routes/routineRoutes.js";
-
 
 // Load env
 dotenv.config();
@@ -326,36 +324,40 @@ app.use("/api/users", usersRouter);
 app.use("/api/chat", chatRoutes);
 app.use("/api/repository", repositoryRoutes);
 
-
 app.use("/api/tickets", ticketRoutes);
 app.use("/api/routine", routineRouter);
 
-
 // ---------- DB + SERVER ----------
-const PORT = process.env.PORT || 5000;
-const MONGO_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/universe";
+if (process.env.NODE_ENV !== "test") {
+  const PORT = process.env.PORT || 5000;
+  const MONGO_URI =
+    process.env.MONGO_URI || "mongodb://127.0.0.1:27017/universe";
 
-mongoose
-  .connect(MONGO_URI)
-  .then(() => {
-    console.log("✅ MongoDB Atlas connected");
+  mongoose
+    .connect(MONGO_URI)
+    .then(() => {
+      console.log("✅ MongoDB Atlas connected");
 
-    // Start background job to process notifications every minute
-    setInterval(async () => {
-      await processDueNotifications();
-    }, 60000); // Run every 60 seconds
+      // Start background job to process notifications every minute
+      setInterval(async () => {
+        await processDueNotifications();
+      }, 60000); // Run every 60 seconds
 
-    console.log("📬 Notification processor started (runs every 60 seconds)");
+      console.log("📬 Notification processor started (runs every 60 seconds)");
 
-    // Start background job to auto-reactivate expired suspensions every 30 minutes
-    setInterval(async () => {
-      await autoReactivateExpiredSuspensions();
-    }, 1800000); // Run every 30 minutes (1800000 ms)
+      // Start background job to auto-reactivate expired suspensions every 30 minutes
+      setInterval(async () => {
+        await autoReactivateExpiredSuspensions();
+      }, 1800000); // Run every 30 minutes (1800000 ms)
 
-    console.log("⏰ Suspension auto-reactivation started (runs every 30 minutes)");
-  })
-  .catch((err) => console.error("❌ Mongo error:", err));
+      console.log(
+        "⏰ Suspension auto-reactivation started (runs every 30 minutes)"
+      );
+    })
+    .catch((err) => console.error("❌ Mongo error:", err));
 
-httpServer.listen(PORT, () => {
-  console.log(`✅ API running on http://localhost:${PORT}`);
-});
+  httpServer.listen(PORT, () => {
+    console.log(`✅ API running on http://localhost:${PORT}`);
+  });
+}
+export { app, httpServer };
