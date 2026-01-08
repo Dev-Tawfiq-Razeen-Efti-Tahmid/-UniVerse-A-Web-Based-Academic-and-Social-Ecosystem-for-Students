@@ -8,7 +8,8 @@
     "start": "node index.js",
     "test": "cross-env NODE_ENV=test node --experimental-vm-modules ./node_modules/jest/bin/jest.js",
     "test-watch": "cross-env NODE_ENV=test node --experimental-vm-modules ./node_modules/jest/bin/jest.js --watchAll",
-    "test:social": "cross-env NODE_ENV=test node --experimental-vm-modules ./node_modules/jest/bin/jest.js tests/23101125_socialHub.test.js"
+    "test:social": "cross-env NODE_ENV=test node --experimental-vm-modules ./node_modules/jest/bin/jest.js tests/23101125_socialHub.test.js",
+    "test:forum": "cross-env NODE_ENV=test node --experimental-vm-modules ./node_modules/jest/bin/jest.js tests/23101133_Forum.test.js"
   },
   "keywords": [],
   "author": "",
