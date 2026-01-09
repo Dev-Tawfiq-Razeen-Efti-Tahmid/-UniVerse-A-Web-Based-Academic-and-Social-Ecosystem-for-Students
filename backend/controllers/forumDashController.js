@@ -1,5 +1,6 @@
 
 import channelObj from "../models/channel.js";
+import Message from "../models/forumMessage.js";
 
 // const channels = [
 //     {
@@ -66,7 +67,6 @@ export const showForumDashboard = async (req, res) => {
     };
     channels.push(temp);
   }
-  // userData exists, so we can safely use username
   res.render("forumDash", { channels, user: userData });
 };
 
@@ -85,7 +85,7 @@ export const upvoteChannel = async (req, res) => {
       return res.status(400).json({ error: "You already upvoted this channel" });
     }
 
-    // Remove from downvoters if present
+    // Remove from downvoters
     const wasDownvoter = channel.downvoters && channel.downvoters.includes(userData.username);
     if (wasDownvoter) {
       channel.downvoters = channel.downvoters.filter(u => u !== userData.username);
@@ -154,6 +154,10 @@ export const deleteChannel = async (req, res) => {
       return res.status(403).json({ error: "Forbidden: not the owner" });
     }
 
+    // Delete all messages associated with this channel
+    await Message.deleteMany({ channel: channelId });
+    
+    // Delete the channel itself
     await channelObj.findByIdAndDelete(channelId);
     return res.json({ ok: true });
   } catch (err) {

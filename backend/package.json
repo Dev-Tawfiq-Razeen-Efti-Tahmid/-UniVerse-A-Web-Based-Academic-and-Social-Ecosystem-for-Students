@@ -5,7 +5,11 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon index.js",
-    "start": "node index.js"
+    "start": "node index.js",
+    "test": "cross-env NODE_ENV=test node --experimental-vm-modules ./node_modules/jest/bin/jest.js",
+    "test-watch": "cross-env NODE_ENV=test node --experimental-vm-modules ./node_modules/jest/bin/jest.js --watchAll",
+    "test:social": "cross-env NODE_ENV=test node --experimental-vm-modules ./node_modules/jest/bin/jest.js tests/23101125_socialHub.test.js",
+    "test:forum": "cross-env NODE_ENV=test node --experimental-vm-modules ./node_modules/jest/bin/jest.js tests/23101133_Forum.test.js"
   },
   "keywords": [],
   "author": "",
@@ -23,6 +27,10 @@
     "socket.io": "^4.8.1"
   },
   "devDependencies": {
-    "nodemon": "^3.1.10"
+    "@types/jest": "^30.0.0",
+    "cross-env": "^10.1.0",
+    "jest": "^30.2.0",
+    "nodemon": "^3.1.10",
+    "supertest": "^7.2.2"
   }
 }
