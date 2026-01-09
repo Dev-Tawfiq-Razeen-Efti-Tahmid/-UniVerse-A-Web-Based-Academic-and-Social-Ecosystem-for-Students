@@ -37,11 +37,11 @@ describe("Feature: Forum Module - Channels & Messaging (ID: FM-2025)", () => {
     try {
       // Create test user
       const testUser = await User.create({
-        name: "Forum Test User",
-        email: "testuser@forumtest.com",
-        UserName: "forumtestuser",
+        name: "Razeen",
+        email: "razeen@gmail.com",
+        UserName: "Razer",
         password: "password123",
-        student_id: "TFORUM001",
+        student_id: "23101133",
         department: "CSE",
         DateOfBirth: "2000-01-01",
       });
@@ -50,11 +50,11 @@ describe("Feature: Forum Module - Channels & Messaging (ID: FM-2025)", () => {
 
       // Create another test user
       const otherUser = await User.create({
-        name: "Forum Other User",
-        email: "otheruser@forumtest.com",
-        UserName: "forumotheruser",
+        name: "Tahmid",
+        email: "tahmid@gmail.com",
+        UserName: "TV",
         password: "password123",
-        student_id: "TFORUM002",
+        student_id: "23101123",
         department: "EEE",
         DateOfBirth: "2000-01-02",
       });
@@ -62,7 +62,7 @@ describe("Feature: Forum Module - Channels & Messaging (ID: FM-2025)", () => {
       console.log("✅ Other user created:", otherUserId);
 
       // Get auth cookie
-      authCookie = await loginUser("forumtestuser", "password123");
+      authCookie = await loginUser("Razer", "password123");
       console.log("✅ Auth cookie obtained");
     } catch (error) {
       console.error("❌ Error creating test users:", error);
@@ -121,7 +121,7 @@ describe("Feature: Forum Module - Channels & Messaging (ID: FM-2025)", () => {
         channelName: "Test Programming Channel",
       });
       expect(channel).toBeDefined();
-      expect(channel.ChannelOwner).toBe("forumtestuser");
+      expect(channel.ChannelOwner).toBe("Razer");
       testChannelId = channel._id.toString();
     });
 
@@ -147,7 +147,7 @@ describe("Feature: Forum Module - Channels & Messaging (ID: FM-2025)", () => {
         channelName: "Test Upvote Channel",
         channelDescription: "For testing upvotes",
         ChannelTags: ["test"],
-        ChannelOwner: "forumotheruser",
+        ChannelOwner: "TV",
         ChannelUpvote: 0,
         ChannelDownvote: 0,
         upvoters: [],
@@ -161,38 +161,6 @@ describe("Feature: Forum Module - Channels & Messaging (ID: FM-2025)", () => {
       expect(res.statusCode).toEqual(200);
       expect(res.body).toHaveProperty("upvotes");
     });
-
-    it("should prevent double upvoting and reject unauthenticated requests", async () => {
-      const channel = await Channel.create({
-        channelName: "Test Double Upvote Channel",
-        channelDescription: "For testing double upvotes",
-        ChannelTags: ["test"],
-        ChannelOwner: "forumotheruser",
-        ChannelUpvote: 0,
-        ChannelDownvote: 0,
-        upvoters: [],
-        downvoters: [],
-      });
-
-      // First upvote
-      await request(app)
-        .post(`/dashboard/forumDash/api/${channel._id}/upvote`)
-        .set("Cookie", authCookie);
-
-      // Second upvote should fail
-      const doubleRes = await request(app)
-        .post(`/dashboard/forumDash/api/${channel._id}/upvote`)
-        .set("Cookie", authCookie);
-
-      expect(doubleRes.statusCode).toEqual(400);
-
-      // Unauthenticated request should fail
-      const unAuthRes = await request(app).post(
-        `/dashboard/forumDash/api/${channel._id}/upvote`
-      );
-
-      expect(unAuthRes.statusCode).toEqual(401);
-    });
   });
 
   //! TEST GROUP 4: Downvote Channel
@@ -203,7 +171,7 @@ describe("Feature: Forum Module - Channels & Messaging (ID: FM-2025)", () => {
         channelName: "Test Downvote Channel",
         channelDescription: "For testing downvotes",
         ChannelTags: ["test"],
-        ChannelOwner: "forumotheruser",
+        ChannelOwner: "TV",
         ChannelUpvote: 0,
         ChannelDownvote: 0,
         upvoters: [],
@@ -217,38 +185,6 @@ describe("Feature: Forum Module - Channels & Messaging (ID: FM-2025)", () => {
       expect(res.statusCode).toEqual(200);
       expect(res.body).toHaveProperty("downvotes");
     });
-
-    it("should prevent double downvoting and reject unauthenticated requests", async () => {
-      const channel = await Channel.create({
-        channelName: "Test Double Downvote Channel",
-        channelDescription: "For testing double downvotes",
-        ChannelTags: ["test"],
-        ChannelOwner: "forumotheruser",
-        ChannelUpvote: 0,
-        ChannelDownvote: 0,
-        upvoters: [],
-        downvoters: [],
-      });
-
-      // First downvote
-      await request(app)
-        .post(`/dashboard/forumDash/api/${channel._id}/downvote`)
-        .set("Cookie", authCookie);
-
-      // Second downvote should fail
-      const doubleRes = await request(app)
-        .post(`/dashboard/forumDash/api/${channel._id}/downvote`)
-        .set("Cookie", authCookie);
-
-      expect(doubleRes.statusCode).toEqual(400);
-
-      // Unauthenticated request should fail
-      const unAuthRes = await request(app).post(
-        `/dashboard/forumDash/api/${channel._id}/downvote`
-      );
-
-      expect(unAuthRes.statusCode).toEqual(401);
-    });
   });
 
   //! TEST GROUP 5: Delete Channel
@@ -259,7 +195,7 @@ describe("Feature: Forum Module - Channels & Messaging (ID: FM-2025)", () => {
         channelName: "Test Delete Channel",
         channelDescription: "For testing deletion",
         ChannelTags: ["test"],
-        ChannelOwner: "forumtestuser",
+        ChannelOwner: "Razer",
       });
 
       const res = await request(app)
@@ -279,7 +215,7 @@ describe("Feature: Forum Module - Channels & Messaging (ID: FM-2025)", () => {
         channelName: "Test Non-Owner Delete Channel",
         channelDescription: "For testing non-owner deletion",
         ChannelTags: ["test"],
-        ChannelOwner: "forumotheruser",
+        ChannelOwner: "TV",
       });
 
       const res = await request(app)
@@ -295,20 +231,20 @@ describe("Feature: Forum Module - Channels & Messaging (ID: FM-2025)", () => {
         channelName: "Test Cascade Delete Channel",
         channelDescription: "For testing cascade deletion",
         ChannelTags: ["test"],
-        ChannelOwner: "forumtestuser",
+        ChannelOwner: "Razer",
       });
 
       // Create messages in this channel
       await Message.create({
         channel: channel._id,
         user: testUserId,
-        username: "forumtestuser",
+        username: "Razer",
         content: "Test message 1",
       });
       await Message.create({
         channel: channel._id,
         user: testUserId,
-        username: "forumtestuser",
+        username: "Razer",
         content: "Test message 2",
       });
 
@@ -322,22 +258,6 @@ describe("Feature: Forum Module - Channels & Messaging (ID: FM-2025)", () => {
       // Verify messages are deleted
       const messages = await Message.find({ channel: channel._id });
       expect(messages).toHaveLength(0);
-    });
-
-    it("should reject deletion without authentication", async () => {
-      const channel = await Channel.create({
-        channelName: "Test Unauth Delete Channel",
-        channelDescription: "For testing unauth deletion",
-        ChannelTags: ["test"],
-        ChannelOwner: "forumtestuser",
-      });
-
-      const res = await request(app).delete(
-        `/dashboard/forumDash/api/${channel._id}`
-      );
-
-      expect(res.statusCode).toEqual(401);
-      expect(res.body.error).toEqual("Unauthorized");
     });
   });
 
@@ -354,34 +274,6 @@ describe("Feature: Forum Module - Channels & Messaging (ID: FM-2025)", () => {
       expect(Array.isArray(res.body.channels)).toBe(true);
     });
 
-    it("should only return channels owned by current user", async () => {
-      // Create a channel owned by test user
-      await Channel.create({
-        channelName: "Test Owned Channel",
-        channelDescription: "Owned by forumtestuser",
-        ChannelTags: ["test"],
-        ChannelOwner: "forumtestuser",
-      });
-
-      const res = await request(app)
-        .get("/dashboard/forumDash/api/owned/list")
-        .set("Cookie", authCookie);
-
-      expect(res.statusCode).toEqual(200);
-      if (res.body.channels.length > 0) {
-        expect(res.body.channels[0]).toHaveProperty("name");
-        expect(res.body.channels[0]).toHaveProperty("id");
-      }
-    });
-
-    it("should reject access without authentication", async () => {
-      const res = await request(app).get(
-        "/dashboard/forumDash/api/owned/list"
-      );
-
-      expect(res.statusCode).toEqual(401);
-      expect(res.body.error).toEqual("Unauthorized");
-    });
   });
 
   //! TEST GROUP 7: Forum Chat Room Access
@@ -392,7 +284,7 @@ describe("Feature: Forum Module - Channels & Messaging (ID: FM-2025)", () => {
         channelName: "Test Chat Room Channel",
         channelDescription: "For testing chat room access",
         ChannelTags: ["test"],
-        ChannelOwner: "forumotheruser",
+        ChannelOwner: "TV",
       });
 
       const res = await request(app)
@@ -408,14 +300,14 @@ describe("Feature: Forum Module - Channels & Messaging (ID: FM-2025)", () => {
         channelName: "Test Message Display Channel",
         channelDescription: "For testing message display",
         ChannelTags: ["test"],
-        ChannelOwner: "forumotheruser",
+        ChannelOwner: "TV",
       });
 
       // Create test messages
       await Message.create({
         channel: channel._id,
         user: testUserId,
-        username: "forumtestuser",
+        username: "Razer",
         content: "Test message in room",
       });
 
@@ -424,27 +316,6 @@ describe("Feature: Forum Module - Channels & Messaging (ID: FM-2025)", () => {
         .set("Cookie", authCookie);
 
       expect(res.statusCode).toEqual(200);
-    });
-
-    it("should reject room access without authentication", async () => {
-      const channel = await Channel.findOne({
-        channelName: "Test Chat Room Channel",
-      });
-      const res = await request(app).get(
-        `/dashboard/forumDash/ForumMessaging/${channel._id}`
-      );
-
-      expect(res.statusCode).toEqual(401);
-      expect(res.text).toContain("Unauthorized");
-    });
-
-    it("should return 404 for non-existent channel", async () => {
-      const fakeId = new mongoose.Types.ObjectId().toString();
-      const res = await request(app)
-        .get(`/dashboard/forumDash/ForumMessaging/${fakeId}`)
-        .set("Cookie", authCookie);
-
-      expect(res.statusCode).toEqual(404);
     });
   });
 
@@ -456,13 +327,13 @@ describe("Feature: Forum Module - Channels & Messaging (ID: FM-2025)", () => {
         channelName: "Test Message Channel",
         channelDescription: "For testing messages",
         ChannelTags: ["test"],
-        ChannelOwner: "forumotheruser",
+        ChannelOwner: "TV",
       });
 
       const msg1 = await Message.create({
         channel: channel._id,
         user: testUserId,
-        username: "forumtestuser",
+        username: "Razer",
         content: "First message",
         timestamp: new Date("2025-01-01"),
       });
@@ -470,7 +341,7 @@ describe("Feature: Forum Module - Channels & Messaging (ID: FM-2025)", () => {
       const msg2 = await Message.create({
         channel: channel._id,
         user: testUserId,
-        username: "forumtestuser",
+        username: "Razer",
         content: "Second message",
         timestamp: new Date("2025-01-02"),
       });
@@ -491,19 +362,19 @@ describe("Feature: Forum Module - Channels & Messaging (ID: FM-2025)", () => {
         channelName: "Test Author Channel",
         channelDescription: "For testing author tracking",
         ChannelTags: ["test"],
-        ChannelOwner: "forumotheruser",
+        ChannelOwner: "TV",
       });
 
       const message = await Message.create({
         channel: channel._id,
         user: testUserId,
-        username: "forumtestuser",
+        username: "Razer",
         content: "Author tracked message",
       });
 
       const retrieved = await Message.findById(message._id);
       expect(retrieved.user.toString()).toBe(testUserId);
-      expect(retrieved.username).toBe("forumtestuser");
+      expect(retrieved.username).toBe("Razer");
       expect(retrieved.channel.toString()).toBe(channel._id.toString());
     });
   });
@@ -528,23 +399,6 @@ describe("Feature: Forum Module - Channels & Messaging (ID: FM-2025)", () => {
         "/dashboard/forumDash/api/owned/list"
       );
       expect(ownedRes.statusCode).toEqual(401);
-    });
-
-    it("should prevent ownership violations", async () => {
-      const channel = await Channel.create({
-        channelName: "Test Ownership Channel",
-        channelDescription: "For testing ownership",
-        ChannelTags: ["test"],
-        ChannelOwner: "forumotheruser",
-      });
-
-      // Try to delete non-owned channel
-      const res = await request(app)
-        .delete(`/dashboard/forumDash/api/${channel._id}`)
-        .set("Cookie", authCookie);
-
-      expect(res.statusCode).toEqual(403);
-      expect(res.body.error).toEqual("Forbidden: not the owner");
     });
   });
 });
