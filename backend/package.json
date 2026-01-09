@@ -9,7 +9,9 @@
     "test": "cross-env NODE_ENV=test node --experimental-vm-modules ./node_modules/jest/bin/jest.js",
     "test-watch": "cross-env NODE_ENV=test node --experimental-vm-modules ./node_modules/jest/bin/jest.js --watchAll",
     "test:social": "cross-env NODE_ENV=test node --experimental-vm-modules ./node_modules/jest/bin/jest.js tests/23101125_socialHub.test.js",
-    "test:forum": "cross-env NODE_ENV=test node --experimental-vm-modules ./node_modules/jest/bin/jest.js tests/23101133_Forum.test.js"
+    "test:forum": "cross-env NODE_ENV=test node --experimental-vm-modules ./node_modules/jest/bin/jest.js tests/23101133_Forum.test.js",
+    "test:event": "cross-env NODE_ENV=test node --experimental-vm-modules ./node_modules/jest/bin/jest.js tests/23301687_event.test.js"
+
   },
   "keywords": [],
   "author": "",
